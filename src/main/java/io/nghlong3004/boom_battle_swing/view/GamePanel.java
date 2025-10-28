@@ -8,6 +8,9 @@ import lombok.Getter;
 import javax.swing.*;
 import java.awt.*;
 
+import static io.nghlong3004.boom_battle_swing.constant.GameConstant.GAME_HEIGHT;
+import static io.nghlong3004.boom_battle_swing.constant.GameConstant.GAME_WIDTH;
+
 public class GamePanel extends JPanel {
     @Getter
     private final Game game;
@@ -31,7 +34,7 @@ public class GamePanel extends JPanel {
     }
 
     private void setSize() {
-        Dimension size = new Dimension(1280, 800);
+        Dimension size = new Dimension(GAME_WIDTH, GAME_HEIGHT);
         setMinimumSize(size);
         setPreferredSize(size);
         setMaximumSize(size);

@@ -11,6 +11,8 @@ public class GameWindow {
         jFrame.setSize(400, 400);
         jFrame.setVisible(true);
         jFrame.add(panel);
+        jFrame.setResizable(false);
+        jFrame.pack();
         jFrame.setLocationRelativeTo(null);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }

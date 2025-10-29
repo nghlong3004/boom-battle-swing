@@ -1,7 +1,9 @@
-package io.nghlong3004.boom_battle_swing.view.scene;
+package io.nghlong3004.boom_battle_swing.view.scene.component;
 
 import io.nghlong3004.boom_battle_swing.model.Bomber;
 import io.nghlong3004.boom_battle_swing.view.GameApplication;
+import io.nghlong3004.boom_battle_swing.view.scene.AbstractScene;
+import io.nghlong3004.boom_battle_swing.view.scene.GameScene;
 import lombok.Getter;
 
 import java.awt.*;
@@ -12,17 +14,17 @@ import static io.nghlong3004.boom_battle_swing.constant.GameConstant.SCALE;
 import static io.nghlong3004.boom_battle_swing.constant.ImageConstant.IMAGE_BOMBER_HEIGHT;
 import static io.nghlong3004.boom_battle_swing.constant.ImageConstant.IMAGE_BOMBER_WIDTH;
 
-public class PlayingScene extends AbstractScene implements GameScene {
+public class PlayingComponent extends AbstractScene implements GameScene {
 
     @Getter
     private Bomber bomber;
-    private final PauseScene pauseScene;
+    private final PauseComponent pauseScene;
     private boolean paused = true;
 
-    public PlayingScene(GameApplication game) {
+    public PlayingComponent(GameApplication game) {
         super(game);
         initClasses();
-        pauseScene = new PauseScene();
+        pauseScene = new PauseComponent();
     }
 
     private void initClasses() {

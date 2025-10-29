@@ -1,8 +1,11 @@
-package io.nghlong3004.boom_battle_swing.view.scene;
+package io.nghlong3004.boom_battle_swing.view.scene.component;
 
 import io.nghlong3004.boom_battle_swing.util.ImageUtil;
 import io.nghlong3004.boom_battle_swing.view.GameApplication;
-import io.nghlong3004.boom_battle_swing.view.scene.component.MenuButton;
+import io.nghlong3004.boom_battle_swing.view.scene.AbstractScene;
+import io.nghlong3004.boom_battle_swing.view.scene.GameScene;
+import io.nghlong3004.boom_battle_swing.view.scene.GameState;
+import io.nghlong3004.boom_battle_swing.view.scene.button.MenuButton;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -14,7 +17,7 @@ import static io.nghlong3004.boom_battle_swing.constant.GameConstant.*;
 import static io.nghlong3004.boom_battle_swing.constant.ImageConstant.BACKGROUND;
 import static io.nghlong3004.boom_battle_swing.constant.ImageConstant.MENU_BACKGROUND;
 
-public class MenuScene extends AbstractScene implements GameScene {
+public class MenuComponent extends AbstractScene implements GameScene {
 
     private MenuButton[] menuButtons;
     private BufferedImage menuBackground;
@@ -22,7 +25,7 @@ public class MenuScene extends AbstractScene implements GameScene {
     private int witdhBackground, heightBackground;
     private int xBackground, yBackground;
 
-    public MenuScene(GameApplication game) {
+    public MenuComponent(GameApplication game) {
         super(game);
         loadMenuBackground();
         loadMenuButtons();

@@ -1,9 +1,11 @@
-package io.nghlong3004.boom_battle_swing.view.scene;
+package io.nghlong3004.boom_battle_swing.view.scene.component;
 
 import io.nghlong3004.boom_battle_swing.constant.ButtonConstant;
 import io.nghlong3004.boom_battle_swing.constant.GameConstant;
 import io.nghlong3004.boom_battle_swing.constant.ImageConstant;
 import io.nghlong3004.boom_battle_swing.util.ImageUtil;
+import io.nghlong3004.boom_battle_swing.view.scene.MouseScene;
+import io.nghlong3004.boom_battle_swing.view.scene.Scene;
 import io.nghlong3004.boom_battle_swing.view.scene.button.PauseButton;
 import io.nghlong3004.boom_battle_swing.view.scene.button.SoundButton;
 
@@ -11,13 +13,13 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
-public class PauseScene implements Scene, MouseScene {
+public class PauseComponent implements Scene, MouseScene {
 
     private BufferedImage background;
     private int xBackground, yBackground, widthBackground, heightBackground;
     private SoundButton musicButton, sfxButton;
 
-    public PauseScene() {
+    public PauseComponent() {
         loadBackground();
         createSoundButton();
     }

@@ -2,8 +2,8 @@ package io.nghlong3004.boom_battle_swing.view;
 
 import io.nghlong3004.boom_battle_swing.view.scene.GameScene;
 import io.nghlong3004.boom_battle_swing.view.scene.GameState;
-import io.nghlong3004.boom_battle_swing.view.scene.MenuScene;
-import io.nghlong3004.boom_battle_swing.view.scene.PlayingScene;
+import io.nghlong3004.boom_battle_swing.view.scene.component.MenuComponent;
+import io.nghlong3004.boom_battle_swing.view.scene.component.PlayingComponent;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,14 +16,14 @@ import static io.nghlong3004.boom_battle_swing.constant.FrameRateConstant.UPS_SE
 @Getter
 public class GameApplication implements Runnable {
     private final GameScene menu;
-    private final PlayingScene playing;
+    private final PlayingComponent playing;
     private final GameWindow gameWindow;
     private final GamePanel gamePanel;
     private Thread gameThread;
 
     public GameApplication() {
-        menu = new MenuScene(this);
-        playing = new PlayingScene(this);
+        menu = new MenuComponent(this);
+        playing = new PlayingComponent(this);
         gamePanel = new GamePanel(this);
         gameWindow = new GameWindow(gamePanel);
         gamePanel.requestFocus();

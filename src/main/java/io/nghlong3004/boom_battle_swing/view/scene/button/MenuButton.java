@@ -1,4 +1,4 @@
-package io.nghlong3004.boom_battle_swing.view.scene.component;
+package io.nghlong3004.boom_battle_swing.view.scene.button;
 
 import io.nghlong3004.boom_battle_swing.util.ImageUtil;
 import io.nghlong3004.boom_battle_swing.view.scene.GameState;

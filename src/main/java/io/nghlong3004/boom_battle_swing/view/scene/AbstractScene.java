@@ -1,7 +1,7 @@
 package io.nghlong3004.boom_battle_swing.view.scene;
 
 import io.nghlong3004.boom_battle_swing.view.GameApplication;
-import io.nghlong3004.boom_battle_swing.view.scene.component.MenuButton;
+import io.nghlong3004.boom_battle_swing.view.scene.button.MenuButton;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

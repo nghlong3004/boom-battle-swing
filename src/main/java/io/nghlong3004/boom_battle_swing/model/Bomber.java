@@ -1,45 +1,55 @@
 package io.nghlong3004.boom_battle_swing.model;
 
 import io.nghlong3004.boom_battle_swing.util.ImageUtil;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
 
-import static io.nghlong3004.boom_battle_swing.model.Action.IDLE;
-import static io.nghlong3004.boom_battle_swing.model.Action.RUNNING;
-import static io.nghlong3004.boom_battle_swing.model.Direction.DOWN;
+import static io.nghlong3004.boom_battle_swing.constant.BomberConstant.*;
+import static io.nghlong3004.boom_battle_swing.constant.GameConstant.SCALE;
+import static io.nghlong3004.boom_battle_swing.constant.ImageConstant.IMAGE_BOMBER_HEIGHT;
+import static io.nghlong3004.boom_battle_swing.constant.ImageConstant.IMAGE_BOMBER_WIDTH;
 
+@Slf4j
 public class Bomber extends Entity {
 
-    private List<List<BufferedImage>> images;
+    private BufferedImage[][] animations;
+
+    private float xDrawOffset = 10 * SCALE;
+    private float yDrawOffset = 2 * SCALE;
 
     private int aniTick, aniIndex, aniSpeed = 15;
     private boolean moving = false;
+    @Setter
+    private boolean up, down, right, left;
+    private float playerSpeed = 1.0f * SCALE;
 
-    private Action action = IDLE;
+    private int direction = DOWN;
 
-    private Direction direction = DOWN;
-
-    public Bomber(float x, float y) {
-        super(x, y);
+    public Bomber(float x, float y, int width, int height) {
+        super(x, y, width, height);
         importImage();
+        setHitbox(x, y, (int) (IMAGE_BOMBER_WIDTH * SCALE - xDrawOffset),
+                  (int) (IMAGE_BOMBER_HEIGHT * SCALE - yDrawOffset));
     }
 
     @Override
     public void update() {
+        updatePos();
         updateAnimationTick();
         setAnimation();
-        updatePos();
     }
 
     @Override
-    public void render(Graphics graphics) {
-        graphics.drawImage(images.get(1).get(0), (int) x, (int) y, null);
+    public void render(Graphics g) {
+        g.drawImage(animations[direction][aniIndex], (int) (hitbox.x - xDrawOffset), (int) (hitbox.y - yDrawOffset),
+                    width, height, null);
+        drawHitbox(g);
     }
 
-    public void setDirection(Direction direction) {
+    public void setDirection(int direction) {
         this.direction = direction;
         moving = true;
     }
@@ -56,36 +66,74 @@ public class Bomber extends Entity {
 
     }
 
+
     private void setAnimation() {
+        int currentDirection = direction;
         if (moving) {
-            action = RUNNING;
+            if (left) {
+                direction = LEFT;
+            }
+            if (right) {
+                direction = RIGHT;
+            }
+            if (up) {
+                direction = UP;
+            }
+            if (down) {
+                direction = DOWN;
+            }
         }
         else {
-            action = IDLE;
+            aniIndex = 2;
+        }
+        if (currentDirection != direction) {
+            aniIndex = 0;
+            aniTick = 0;
         }
     }
 
     private void updatePos() {
-        if (moving) {
-            switch (direction) {
-                case LEFT -> x -= 5;
-                case UP -> y -= 5;
-                case RIGHT -> x += 5;
-                case DOWN -> y += 5;
-            }
+        moving = false;
+        if ((!left && !right && !up && !down) || ((left && right && up && down))) {
+            return;
         }
+        float xSpeed = 0;
+        float ySpeed = 0;
+        if (left) {
+            xSpeed -= playerSpeed;
+        }
+        if (right) {
+            xSpeed += playerSpeed;
+        }
+        if (up) {
+            ySpeed -= playerSpeed;
+        }
+        if (down) {
+            ySpeed += playerSpeed;
+        }
+        hitbox.x += xSpeed;
+        hitbox.y += ySpeed;
+        moving = true;
+    }
+
+    public void resetDirection() {
+        left = false;
+        right = false;
+        up = false;
+        down = false;
     }
 
     private void importImage() {
-        images = new ArrayList<>();
-        for (var direction : Direction.values()) {
-            var playerImage = new ArrayList<BufferedImage>();
-            for (int i = 1; i <= 5; ++i) {
-                String name = "/images/player/player_%s_%d.png".formatted(direction.getMean(), i);
-                playerImage.add(ImageUtil.loadImage(name));
+        animations = new BufferedImage[4][5];
+        BufferedImage image = ImageUtil.loadImage("/images/player/boz.png");
+        for (int i = 0; i < 4; ++i) {
+            for (int j = 0; j < 5; ++j) {
+                animations[i][j] = image.getSubimage(j * IMAGE_BOMBER_WIDTH, i * IMAGE_BOMBER_HEIGHT,
+                                                     IMAGE_BOMBER_WIDTH, IMAGE_BOMBER_HEIGHT);
             }
-            images.add(playerImage);
         }
+
+
     }
 
 }

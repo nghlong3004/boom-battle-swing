@@ -1,7 +1,7 @@
 package io.nghlong3004.boom_battle_swing.view.scene;
 
 import io.nghlong3004.boom_battle_swing.util.ImageUtil;
-import io.nghlong3004.boom_battle_swing.view.Game;
+import io.nghlong3004.boom_battle_swing.view.GameApplication;
 import io.nghlong3004.boom_battle_swing.view.scene.component.MenuButton;
 
 import java.awt.*;
@@ -22,7 +22,7 @@ public class MenuScene extends AbstractScene implements GameScene {
     private int witdhBackground, heightBackground;
     private int xBackground, yBackground;
 
-    public MenuScene(Game game) {
+    public MenuScene(GameApplication game) {
         super(game);
         loadMenuBackground();
         loadMenuButtons();
@@ -57,7 +57,6 @@ public class MenuScene extends AbstractScene implements GameScene {
     @Override
     public void render(Graphics g) {
         g.drawImage(background, 0, 0, GAME_WIDTH, GAME_HEIGHT, null);
-        g.drawImage(menuBackground, xBackground, yBackground, witdhBackground, heightBackground, null);
         for (MenuButton button : menuButtons) {
             button.draw(g);
         }

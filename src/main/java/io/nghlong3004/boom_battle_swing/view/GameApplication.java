@@ -5,22 +5,23 @@ import io.nghlong3004.boom_battle_swing.view.scene.GameState;
 import io.nghlong3004.boom_battle_swing.view.scene.MenuScene;
 import io.nghlong3004.boom_battle_swing.view.scene.PlayingScene;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
 
-@Getter
-public class Game implements Runnable {
-    @Getter
-    private final GameScene menu;
-    @Getter
-    private final GameScene playing;
-    private GameWindow gameWindow;
-    private GamePanel gamePanel;
-    private Thread gameThread;
-    private final int FPS_SET = 60;
-    private final int UPS_SET = 200;
+import static io.nghlong3004.boom_battle_swing.constant.FrameRateConstant.FPS_SET;
+import static io.nghlong3004.boom_battle_swing.constant.FrameRateConstant.UPS_SET;
 
-    public Game() {
+@Slf4j
+@Getter
+public class GameApplication implements Runnable {
+    private final GameScene menu;
+    private final PlayingScene playing;
+    private final GameWindow gameWindow;
+    private final GamePanel gamePanel;
+    private Thread gameThread;
+
+    public GameApplication() {
         menu = new MenuScene(this);
         playing = new PlayingScene(this);
         gamePanel = new GamePanel(this);
@@ -31,6 +32,7 @@ public class Game implements Runnable {
 
     private void startGameLoop() {
         gameThread = new Thread(this);
+        log.debug("starting game..");
         gameThread.start();
     }
 
@@ -53,6 +55,7 @@ public class Game implements Runnable {
 
     @Override
     public void run() {
+        log.debug("Running game...");
         double timePerFrame = 1000000000.0 / FPS_SET;
         double timePerUpdate = 1000000000.0 / UPS_SET;
         long lastCheck = System.currentTimeMillis();
@@ -81,11 +84,23 @@ public class Game implements Runnable {
 
             if (System.currentTimeMillis() - lastCheck >= 1000) {
                 lastCheck = System.currentTimeMillis();
-                System.out.println("FPS: " + frames + " | UPS: " + updates);
+                log.debug("FPS: {} | UPS: {}", frames, updates);
                 frames = 0;
                 updates = 0;
             }
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
         }
 
+    }
+
+    public void windowFocusLost() {
+        if (GameState.state == GameState.PLAYING) {
+            playing.getBomber().resetDirection();
+        }
     }
 }

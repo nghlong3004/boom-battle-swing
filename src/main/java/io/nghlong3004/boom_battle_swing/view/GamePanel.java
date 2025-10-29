@@ -13,9 +13,9 @@ import static io.nghlong3004.boom_battle_swing.constant.GameConstant.GAME_WIDTH;
 
 public class GamePanel extends JPanel {
     @Getter
-    private final Game game;
+    private final GameApplication game;
 
-    public GamePanel(Game game) {
+    public GamePanel(GameApplication game) {
         this.game = game;
         setInput();
         setSize();

@@ -1,20 +1,40 @@
 package io.nghlong3004.boom_battle_swing.view;
 
 import javax.swing.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 
-public class GameWindow {
+public class GameWindow extends JFrame {
 
-    private JFrame jFrame;
 
-    public GameWindow(JPanel panel) {
-        jFrame = new JFrame();
-        jFrame.setSize(400, 400);
-        jFrame.setVisible(true);
-        jFrame.add(panel);
-        jFrame.setResizable(false);
-        jFrame.pack();
-        jFrame.setLocationRelativeTo(null);
-        jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    public GameWindow(GamePanel panel) {
+        super("Boom Battle");
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        setting(panel);
+    }
+
+    private void setting(GamePanel panel) {
+        setVisible(true);
+        add(panel);
+        setResizable(false);
+        pack();
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        addWindowFocusListener(new WindowFocusListener() {
+
+            @Override
+            public void windowLostFocus(WindowEvent e) {
+                panel.getGame().windowFocusLost();
+            }
+
+            @Override
+            public void windowGainedFocus(WindowEvent e) {
+            }
+        });
     }
 
 }

@@ -16,10 +16,13 @@ public class PlayingScene extends AbstractScene implements GameScene {
 
     @Getter
     private Bomber bomber;
+    private final PauseScene pauseScene;
+    private boolean paused = true;
 
     public PlayingScene(GameApplication game) {
         super(game);
         initClasses();
+        pauseScene = new PauseScene();
     }
 
     private void initClasses() {
@@ -29,11 +32,13 @@ public class PlayingScene extends AbstractScene implements GameScene {
     @Override
     public void update() {
         bomber.update();
+        pauseScene.update();
     }
 
     @Override
-    public void render(Graphics g) {
+    public void draw(Graphics g) {
         bomber.render(g);
+        pauseScene.draw(g);
     }
 
     @Override
@@ -43,12 +48,16 @@ public class PlayingScene extends AbstractScene implements GameScene {
 
     @Override
     public void mousePressed(MouseEvent e) {
-
+        if (paused) {
+            pauseScene.mousePressed(e);
+        }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-
+        if (paused) {
+            pauseScene.mouseReleased(e);
+        }
     }
 
     @Override
@@ -58,7 +67,9 @@ public class PlayingScene extends AbstractScene implements GameScene {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-
+        if (paused) {
+            pauseScene.mouseMoved(e);
+        }
     }
 
     @Override

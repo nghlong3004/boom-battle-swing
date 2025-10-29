@@ -48,8 +48,8 @@ public class GameApplication implements Runnable {
 
     public void render(Graphics graphics) {
         switch (GameState.state) {
-            case MENU -> menu.render(graphics);
-            case PLAYING -> playing.render(graphics);
+            case MENU -> menu.draw(graphics);
+            case PLAYING -> playing.draw(graphics);
         }
     }
 

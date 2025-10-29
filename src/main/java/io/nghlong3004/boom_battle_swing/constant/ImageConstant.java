@@ -8,6 +8,10 @@ public class ImageConstant {
 
     public static final String BACKGROUND = "/images/home/boom-online-3.jpg";
 
+    public static final String PAUSE_BACKGROUND = "/images/buttons/pause_menu.png";
+
+    public static final String SOUND_BUTTON = "/images/buttons/sound_button.png";
+
     public static final int IMAGE_BOMBER_WIDTH = 58;
     public static final int IMAGE_BOMBER_HEIGHT = 71;
 }

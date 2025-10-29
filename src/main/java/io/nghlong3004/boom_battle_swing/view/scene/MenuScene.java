@@ -55,7 +55,7 @@ public class MenuScene extends AbstractScene implements GameScene {
     }
 
     @Override
-    public void render(Graphics g) {
+    public void draw(Graphics g) {
         g.drawImage(background, 0, 0, GAME_WIDTH, GAME_HEIGHT, null);
         for (MenuButton button : menuButtons) {
             button.draw(g);

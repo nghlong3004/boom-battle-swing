@@ -5,6 +5,7 @@ import io.nghlong3004.boom_battle_swing.view.GameApplication;
 import io.nghlong3004.boom_battle_swing.view.scene.AbstractScene;
 import io.nghlong3004.boom_battle_swing.view.scene.GameScene;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -19,12 +20,13 @@ public class PlayingComponent extends AbstractScene implements GameScene {
     @Getter
     private Bomber bomber;
     private final PauseComponent pauseScene;
+    @Setter
     private boolean paused = true;
 
     public PlayingComponent(GameApplication game) {
         super(game);
         initClasses();
-        pauseScene = new PauseComponent();
+        pauseScene = new PauseComponent(this);
     }
 
     private void initClasses() {
@@ -33,14 +35,20 @@ public class PlayingComponent extends AbstractScene implements GameScene {
 
     @Override
     public void update() {
-        bomber.update();
-        pauseScene.update();
+        if (paused) {
+            pauseScene.update();
+        }
+        else {
+            bomber.update();
+        }
     }
 
     @Override
     public void draw(Graphics g) {
         bomber.render(g);
-        pauseScene.draw(g);
+        if (paused) {
+            pauseScene.draw(g);
+        }
     }
 
     @Override
@@ -64,7 +72,9 @@ public class PlayingComponent extends AbstractScene implements GameScene {
 
     @Override
     public void mouseDragged(MouseEvent e) {
-
+        if (paused) {
+            pauseScene.mouseDragged(e);
+        }
     }
 
     @Override
@@ -77,36 +87,21 @@ public class PlayingComponent extends AbstractScene implements GameScene {
     @Override
     public void keyPressed(KeyEvent e) {
         switch (e.getKeyCode()) {
-            case KeyEvent.VK_A:
-                bomber.setLeft(true);
-                break;
-            case KeyEvent.VK_D:
-                bomber.setRight(true);
-                break;
-            case KeyEvent.VK_W:
-                bomber.setUp(true);
-                break;
-            case KeyEvent.VK_S:
-                bomber.setDown(true);
-                break;
+            case KeyEvent.VK_A -> bomber.setLeft(true);
+            case KeyEvent.VK_D -> bomber.setRight(true);
+            case KeyEvent.VK_W -> bomber.setUp(true);
+            case KeyEvent.VK_S -> bomber.setDown(true);
+            case KeyEvent.VK_ENTER -> paused = !paused;
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
         switch (e.getKeyCode()) {
-            case KeyEvent.VK_A:
-                bomber.setLeft(false);
-                break;
-            case KeyEvent.VK_D:
-                bomber.setRight(false);
-                break;
-            case KeyEvent.VK_W:
-                bomber.setUp(false);
-                break;
-            case KeyEvent.VK_S:
-                bomber.setDown(false);
-                break;
+            case KeyEvent.VK_A -> bomber.setLeft(false);
+            case KeyEvent.VK_D -> bomber.setRight(false);
+            case KeyEvent.VK_W -> bomber.setUp(false);
+            case KeyEvent.VK_S -> bomber.setDown(false);
         }
     }
 }

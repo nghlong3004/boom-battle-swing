@@ -73,7 +73,7 @@ public class MenuComponent extends AbstractScene implements GameScene {
     @Override
     public void mousePressed(MouseEvent e) {
         for (var menuButton : menuButtons) {
-            if (isInMenuButton(e, menuButton)) {
+            if (isInButton(e, menuButton)) {
                 menuButton.setMousePressed(true);
             }
         }
@@ -82,7 +82,7 @@ public class MenuComponent extends AbstractScene implements GameScene {
     @Override
     public void mouseReleased(MouseEvent e) {
         for (var menuButton : menuButtons) {
-            if (isInMenuButton(e, menuButton)) {
+            if (isInButton(e, menuButton)) {
                 menuButton.applyGameState();
                 break;
             }
@@ -107,7 +107,7 @@ public class MenuComponent extends AbstractScene implements GameScene {
             menuButton.setMouseOver(false);
         }
         for (var menuButton : menuButtons) {
-            if (isInMenuButton(e, menuButton)) {
+            if (isInButton(e, menuButton)) {
                 menuButton.setMouseOver(true);
                 break;
             }

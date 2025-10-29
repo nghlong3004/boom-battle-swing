@@ -10,31 +10,15 @@ import lombok.Setter;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public class SoundButton extends PauseButton implements Scene {
-
-    private BufferedImage[][] soundImages;
+public class SoundButton extends AbstractButton implements Scene {
 
     @Getter
     @Setter
-    private boolean mouseOver, mousePressed, muted;
-    private int rowIndex, columnIndex;
+    private boolean muted;
+    private BufferedImage[][] images;
 
     public SoundButton(int x, int y, int height, int width) {
-        super(x, y, height, width);
-        loadSoundImages();
-    }
-
-    private void loadSoundImages() {
-        BufferedImage image = ImageUtil.loadImage(ImageConstant.SOUND_BUTTON);
-        soundImages = new BufferedImage[2][3];
-        for (int j = 0; j < soundImages.length; ++j) {
-            for (int i = 0; i < soundImages[j].length; ++i) {
-                soundImages[j][i] = image.getSubimage(i * ButtonConstant.SOUND_BUTTON_SIZE_DEFAULT,
-                                                      j * ButtonConstant.SOUND_BUTTON_SIZE_DEFAULT,
-                                                      ButtonConstant.SOUND_BUTTON_SIZE_DEFAULT,
-                                                      ButtonConstant.SOUND_BUTTON_SIZE_DEFAULT);
-            }
-        }
+        super(x, y, width, height, 0);
     }
 
     @Override
@@ -56,11 +40,20 @@ public class SoundButton extends PauseButton implements Scene {
 
     @Override
     public void draw(Graphics g) {
-        g.drawImage(soundImages[rowIndex][columnIndex], x, y, width, height, null);
+        g.drawImage(images[rowIndex][columnIndex], x, y, width, height, null);
     }
 
-    public void reset() {
-        mouseOver = false;
-        mousePressed = false;
+    @Override
+    protected void loadImage() {
+        BufferedImage image = ImageUtil.loadImage(ImageConstant.SOUND_BUTTON);
+        images = new BufferedImage[2][3];
+        for (int i = 0; i < images.length; ++i) {
+            for (int j = 0; j < images[i].length; ++j) {
+                images[i][j] = image.getSubimage(j * ButtonConstant.SOUND_BUTTON_SIZE_DEFAULT,
+                                                 i * ButtonConstant.SOUND_BUTTON_SIZE_DEFAULT,
+                                                 ButtonConstant.SOUND_BUTTON_SIZE_DEFAULT,
+                                                 ButtonConstant.SOUND_BUTTON_SIZE_DEFAULT);
+            }
+        }
     }
 }

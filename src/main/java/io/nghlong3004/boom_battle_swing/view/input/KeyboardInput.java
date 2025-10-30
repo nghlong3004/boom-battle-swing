@@ -14,6 +14,12 @@ public class KeyboardInput implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+            if (GameState.state == GameState.PLAYING) {
+                GameState.state = GameState.OPTION;
+                return;
+            }
+        }
         switch (GameState.state) {
             case MENU -> gamePanel.getGame().getMenu().keyPressed(e);
             case PLAYING -> gamePanel.getGame().getPlaying().keyPressed(e);

@@ -1,6 +1,7 @@
 package io.nghlong3004.boom_battle_swing.model;
 
 import io.nghlong3004.boom_battle_swing.util.ImageUtil;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,6 +22,7 @@ public class Bomber extends Entity {
     private float yDrawOffset = 2 * SCALE;
 
     private int aniTick, aniIndex, aniSpeed = 15;
+    @Getter
     private boolean moving = false;
     @Setter
     private boolean up, down, right, left;
@@ -136,4 +138,13 @@ public class Bomber extends Entity {
 
     }
 
+    public void resetAll() {
+        hitbox.x = x;
+        hitbox.y = y;
+        resetDirection();
+        aniTick = 0;
+        aniIndex = 0;
+        moving = false;
+        direction = DOWN;
+    }
 }

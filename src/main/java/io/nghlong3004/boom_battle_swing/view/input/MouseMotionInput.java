@@ -14,8 +14,9 @@ public class MouseMotionInput implements MouseMotionListener {
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        if (GameState.state == GameState.PLAYING) {
-            gamePanel.getGame().getPlaying().mouseDragged(e);
+        switch (GameState.state) {
+            case MENU -> gamePanel.getGame().getMenu().mouseDragged(e);
+            case OPTION -> gamePanel.getGame().getOption().mouseDragged(e);
         }
     }
 
@@ -23,7 +24,7 @@ public class MouseMotionInput implements MouseMotionListener {
     public void mouseMoved(MouseEvent e) {
         switch (GameState.state) {
             case MENU -> gamePanel.getGame().getMenu().mouseMoved(e);
-            case PLAYING -> gamePanel.getGame().getPlaying().mouseMoved(e);
+            case OPTION -> gamePanel.getGame().getOption().mouseMoved(e);
         }
     }
 }

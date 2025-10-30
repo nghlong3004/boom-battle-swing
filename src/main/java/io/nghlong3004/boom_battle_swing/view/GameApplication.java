@@ -1,14 +1,18 @@
 package io.nghlong3004.boom_battle_swing.view;
 
+import io.nghlong3004.boom_battle_swing.util.ObjectContainer;
 import io.nghlong3004.boom_battle_swing.view.scene.GameScene;
 import io.nghlong3004.boom_battle_swing.view.scene.GameState;
 import io.nghlong3004.boom_battle_swing.view.scene.component.MenuComponent;
+import io.nghlong3004.boom_battle_swing.view.scene.component.OptionComponent;
 import io.nghlong3004.boom_battle_swing.view.scene.component.PlayingComponent;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
 
+import static io.nghlong3004.boom_battle_swing.constant.AudioConstant.BYE_BYE;
+import static io.nghlong3004.boom_battle_swing.constant.AudioConstant.MENU;
 import static io.nghlong3004.boom_battle_swing.constant.FrameRateConstant.FPS_SET;
 import static io.nghlong3004.boom_battle_swing.constant.FrameRateConstant.UPS_SET;
 
@@ -17,6 +21,7 @@ import static io.nghlong3004.boom_battle_swing.constant.FrameRateConstant.UPS_SE
 public class GameApplication implements Runnable {
     private final GameScene menu;
     private final PlayingComponent playing;
+    private final OptionComponent option;
     private final GameWindow gameWindow;
     private final GamePanel gamePanel;
     private Thread gameThread;
@@ -24,6 +29,7 @@ public class GameApplication implements Runnable {
     public GameApplication() {
         menu = new MenuComponent(this);
         playing = new PlayingComponent(this);
+        option = new OptionComponent(this);
         gamePanel = new GamePanel(this);
         gameWindow = new GameWindow(gamePanel);
         gamePanel.requestFocus();
@@ -34,15 +40,18 @@ public class GameApplication implements Runnable {
         gameThread = new Thread(this);
         log.debug("starting game..");
         gameThread.start();
+        ObjectContainer.getAudioPlayer().playSong(MENU);
     }
 
     public void update() {
         switch (GameState.state) {
             case MENU -> menu.update();
             case PLAYING -> playing.update();
-            case OPTION -> {
+            case OPTION -> option.update();
+            case QUIT -> {
+                ObjectContainer.getAudioPlayer().playSong(BYE_BYE);
+                System.exit(0);
             }
-            case QUIT -> System.exit(0);
         }
     }
 
@@ -50,6 +59,7 @@ public class GameApplication implements Runnable {
         switch (GameState.state) {
             case MENU -> menu.draw(graphics);
             case PLAYING -> playing.draw(graphics);
+            case OPTION -> option.draw(graphics);
         }
     }
 

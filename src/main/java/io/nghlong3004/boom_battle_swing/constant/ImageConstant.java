@@ -14,7 +14,14 @@ public final class ImageConstant {
 
     public static final String URM_BUTTON = "/images/buttons/urm_buttons.png";
 
-    public static final String VOLUM_BUTTON = "/images/buttons/volume_buttons.png";
+    public static final String VOLUME_BUTTON = "/images/buttons/volume_buttons.png";
+
+    public static final String CRABBY = "/images/player/crabby_sprite.png";
+
+    public static final String LEVEL_ONE_DATA = "/images/player/level_one_data.png";
+
+    public static final String TITLE = "/images/icon_titlebar.png";
+
 
     public static final int IMAGE_BOMBER_WIDTH = 58;
     public static final int IMAGE_BOMBER_HEIGHT = 71;

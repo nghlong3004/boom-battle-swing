@@ -1,11 +1,14 @@
 package io.nghlong3004.boom_battle_swing.view.input;
 
+import io.nghlong3004.boom_battle_swing.util.ObjectContainer;
 import io.nghlong3004.boom_battle_swing.view.GamePanel;
 import io.nghlong3004.boom_battle_swing.view.scene.GameState;
 import lombok.AllArgsConstructor;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+
+import static io.nghlong3004.boom_battle_swing.constant.AudioConstant.CLICK;
 
 @AllArgsConstructor
 public class MouseInput implements MouseListener {
@@ -14,9 +17,10 @@ public class MouseInput implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        ObjectContainer.getAudioPlayer().playEffect(CLICK);
         switch (GameState.state) {
             case MENU -> gamePanel.getGame().getMenu().mouseClicked(e);
-            case PLAYING -> gamePanel.getGame().getPlaying().mouseClicked(e);
+            case OPTION -> gamePanel.getGame().getOption().mouseClicked(e);
         }
     }
 
@@ -24,7 +28,7 @@ public class MouseInput implements MouseListener {
     public void mousePressed(MouseEvent e) {
         switch (GameState.state) {
             case MENU -> gamePanel.getGame().getMenu().mousePressed(e);
-            case PLAYING -> gamePanel.getGame().getPlaying().mousePressed(e);
+            case OPTION -> gamePanel.getGame().getOption().mousePressed(e);
         }
     }
 
@@ -32,7 +36,7 @@ public class MouseInput implements MouseListener {
     public void mouseReleased(MouseEvent e) {
         switch (GameState.state) {
             case MENU -> gamePanel.getGame().getMenu().mouseReleased(e);
-            case PLAYING -> gamePanel.getGame().getPlaying().mouseReleased(e);
+            case OPTION -> gamePanel.getGame().getOption().mouseReleased(e);
         }
     }
 

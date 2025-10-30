@@ -84,7 +84,6 @@ public class AudioOptionComponent extends AbstractScene implements Scene, MouseS
             volumeButton.changeButtonX(e.getX());
             float valueAfter = volumeButton.getFloatValue();
             if (valueBefore != valueAfter) {
-                log.debug("Value after set volume: {}", valueAfter);
                 ObjectContainer.getAudioPlayer().setVolume(valueAfter);
             }
         }

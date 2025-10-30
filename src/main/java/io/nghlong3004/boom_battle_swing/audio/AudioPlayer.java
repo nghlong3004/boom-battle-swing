@@ -6,16 +6,18 @@ import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static io.nghlong3004.boom_battle_swing.constant.AudioConstant.CLICK;
 import static io.nghlong3004.boom_battle_swing.constant.AudioConstant.VOLUME_START;
 
 public class AudioPlayer {
 
-    private Clip[] songs, effects;
+    private volatile Clip[] songs, effects;
     private volatile int currentSongId = 0;
     private volatile float volume = VOLUME_START;
-    private volatile boolean songMute, effectMute;
+    private final AtomicBoolean songMute;
+    private final AtomicBoolean effectMute;
     private volatile boolean wasPlayingBeforeMute;
 
     private final ExecutorService audioExec = Executors.newSingleThreadExecutor(new ThreadFactory() {
@@ -36,6 +38,8 @@ public class AudioPlayer {
     }
 
     private AudioPlayer() {
+        songMute = new AtomicBoolean(false);
+        effectMute = new AtomicBoolean(false);
         loadSongs();
         loadEffects();
         audioExec.execute(() -> {
@@ -83,8 +87,7 @@ public class AudioPlayer {
         if (volume > 1f) {
             volume = 1f;
         }
-        final float newVol = volume;
-        this.volume = newVol;
+        this.volume = volume;
         audioExec.execute(() -> {
             safeUpdateSongVolume();
             safeUpdateEffectsVolume();
@@ -114,7 +117,7 @@ public class AudioPlayer {
                 c.stop();
             }
             c.setMicrosecondPosition(0);
-            setClipMuteIfSupported(c, effectMute);
+            setClipMuteIfSupported(c, effectMute.get());
             c.start();
         });
     }
@@ -136,23 +139,23 @@ public class AudioPlayer {
             }
 
             safeUpdateSongVolume();
-            setClipMuteIfSupported(next, songMute);
+            setClipMuteIfSupported(next, songMute.get());
 
             next.setMicrosecondPosition(0);
             next.loop(Clip.LOOP_CONTINUOUSLY);
-            wasPlayingBeforeMute = !songMute;
+            wasPlayingBeforeMute = !songMute.get();
         });
     }
 
     public void toggleSongMute() {
         audioExec.execute(() -> {
-            songMute = !songMute;
+            songMute.set(!songMute.get());
             Clip cur = songs[currentSongId];
             if (cur == null) {
                 return;
             }
 
-            if (songMute) {
+            if (songMute.get()) {
                 wasPlayingBeforeMute = cur.isActive();
                 setClipMuteIfSupported(cur, true);
                 if (cur.isActive()) {
@@ -171,11 +174,11 @@ public class AudioPlayer {
 
     public void toggleEffectMute() {
         audioExec.execute(() -> {
-            effectMute = !effectMute;
+            effectMute.set(!effectMute.get());
             for (Clip c : effects) {
-                setClipMuteIfSupported(c, effectMute);
+                setClipMuteIfSupported(c, effectMute.get());
             }
-            if (!effectMute) {
+            if (!effectMute.get()) {
                 playEffect(CLICK);
             }
         });

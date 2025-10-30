@@ -1,4 +1,4 @@
-package io.nghlong3004.boom_battle_swing.view;
+package io.nghlong3004.boom_battle_swing.view.game;
 
 import io.nghlong3004.boom_battle_swing.constant.ImageConstant;
 import io.nghlong3004.boom_battle_swing.util.ImageUtil;

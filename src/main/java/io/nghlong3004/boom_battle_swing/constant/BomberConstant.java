@@ -21,26 +21,22 @@ public final class BomberConstant extends GameConstant {
     public static final int CRABBY_WIDTH = (int) (CRABBY_WIDTH_DEFAULT * SCALE);
     public static final int CRABBY_HEIGHT = (int) (CRABBY_HEIGHT_DEFAULT * SCALE);
 
-    public static int GetSpriteAmount(int enemy_type, int enemy_state) {
+    public static final int BOMBER_WIDTH_DEFAULT = 50;
+    public static final int BOMBER_HEIGHT_DEFAULT = 30;
 
-        switch (enemy_type) {
-            case CRABBY:
-                switch (enemy_state) {
-                    case IDLE:
-                        return 9;
-                    case RUNNING:
-                        return 6;
-                    case ATTACK:
-                        return 7;
-                    case HIT:
-                        return 4;
-                    case DEAD:
-                        return 5;
-                }
-        }
+    public static final int BOMBER_WIDTH = (int) (BOMBER_WIDTH_DEFAULT * SCALE);
+    public static final int BOMBER_HEIGHT = (int) (BOMBER_HEIGHT_DEFAULT * SCALE);
 
-        return 0;
+    public static final int ANIMATION_SPEED = 15;
 
-    }
+    public static final float BOMBER_SPEED = 1f * SCALE;
+
+    public static final float X_DRAW_OFF_SET = 5f * SCALE;
+    public static final float Y_DRAW_OFF_SET = 1f * SCALE;
+
+    public static final int BOMBER_LENGTH_WIDTH = 4;
+    public static final int BOMBER_LENGTH_HEIGHT = 5;
+
+    public static final float DIAGONAL_SPEED_MODIFIER = 0.70710678f;
 
 }

@@ -1,6 +1,6 @@
 package io.nghlong3004.boom_battle_swing.view.input;
 
-import io.nghlong3004.boom_battle_swing.view.GamePanel;
+import io.nghlong3004.boom_battle_swing.view.game.GamePanel;
 import io.nghlong3004.boom_battle_swing.view.scene.GameState;
 import lombok.AllArgsConstructor;
 

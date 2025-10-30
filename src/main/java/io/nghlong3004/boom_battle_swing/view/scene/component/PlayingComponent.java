@@ -1,11 +1,16 @@
 package io.nghlong3004.boom_battle_swing.view.scene.component;
 
+import io.nghlong3004.boom_battle_swing.constant.ImageConstant;
 import io.nghlong3004.boom_battle_swing.model.Bomber;
-import io.nghlong3004.boom_battle_swing.model.EnemyManager;
 import io.nghlong3004.boom_battle_swing.view.GameApplication;
+import io.nghlong3004.boom_battle_swing.view.map.LevelManager;
+import io.nghlong3004.boom_battle_swing.view.render.BomberRenderer;
+import io.nghlong3004.boom_battle_swing.view.render.Renderer;
 import io.nghlong3004.boom_battle_swing.view.scene.AbstractScene;
 import io.nghlong3004.boom_battle_swing.view.scene.KeyboardScene;
 import io.nghlong3004.boom_battle_swing.view.scene.Scene;
+import io.nghlong3004.boom_battle_swing.view.update.BomberUpdater;
+import io.nghlong3004.boom_battle_swing.view.update.Updater;
 import lombok.Getter;
 
 import java.awt.*;
@@ -13,15 +18,15 @@ import java.awt.event.KeyEvent;
 
 import static io.nghlong3004.boom_battle_swing.constant.AudioConstant.MOVE;
 import static io.nghlong3004.boom_battle_swing.constant.GameConstant.SCALE;
-import static io.nghlong3004.boom_battle_swing.constant.ImageConstant.IMAGE_BOMBER_HEIGHT;
-import static io.nghlong3004.boom_battle_swing.constant.ImageConstant.IMAGE_BOMBER_WIDTH;
 import static io.nghlong3004.boom_battle_swing.util.ObjectContainer.getAudioPlayer;
 
 public class PlayingComponent extends AbstractScene implements Scene, KeyboardScene {
 
     @Getter
     private Bomber bomber;
-    private EnemyManager enemyManager;
+    private Updater updater;
+    private Renderer renderer;
+    private LevelManager levelManager;
     private static final long MOVE_SFX_COOLDOWN_MS = 120;
     private long lastMoveSfxAtMs = 0L;
 
@@ -31,8 +36,11 @@ public class PlayingComponent extends AbstractScene implements Scene, KeyboardSc
     }
 
     private void initClasses() {
-        bomber = new Bomber(0f, 0f, (int) (IMAGE_BOMBER_WIDTH * SCALE), (int) (IMAGE_BOMBER_HEIGHT * SCALE));
-        enemyManager = new EnemyManager(this);
+        levelManager = new LevelManager(game);
+        bomber = new Bomber(200f, 200f, (int) (50 * SCALE), (int) (30 * SCALE), ImageConstant.IKE);
+        bomber.setLevelData(levelManager.getLevelData());
+        updater = new BomberUpdater();
+        renderer = new BomberRenderer();
     }
 
     public void reset() {
@@ -41,14 +49,13 @@ public class PlayingComponent extends AbstractScene implements Scene, KeyboardSc
 
     @Override
     public void update() {
-        enemyManager.update();
-        bomber.update();
+        updater.update(bomber);
     }
 
     @Override
     public void draw(Graphics g) {
-        bomber.render(g);
-        enemyManager.draw(g, 0);
+        levelManager.draw(g);
+        renderer.render(g, bomber);
         if (bomber.isMoving()) {
             long now = System.currentTimeMillis();
             if (now - lastMoveSfxAtMs >= MOVE_SFX_COOLDOWN_MS) {

@@ -1,8 +1,13 @@
 package io.nghlong3004.boom_battle_swing.view;
 
+import io.nghlong3004.boom_battle_swing.constant.AudioConstant;
 import io.nghlong3004.boom_battle_swing.util.ObjectContainer;
-import io.nghlong3004.boom_battle_swing.view.scene.GameScene;
+import io.nghlong3004.boom_battle_swing.view.game.GameAudioStateObserver;
+import io.nghlong3004.boom_battle_swing.view.game.GameLoop;
+import io.nghlong3004.boom_battle_swing.view.game.GamePanel;
+import io.nghlong3004.boom_battle_swing.view.game.GameWindow;
 import io.nghlong3004.boom_battle_swing.view.scene.GameState;
+import io.nghlong3004.boom_battle_swing.view.scene.SceneRouter;
 import io.nghlong3004.boom_battle_swing.view.scene.component.MenuComponent;
 import io.nghlong3004.boom_battle_swing.view.scene.component.OptionComponent;
 import io.nghlong3004.boom_battle_swing.view.scene.component.PlayingComponent;
@@ -11,106 +16,65 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
 
-import static io.nghlong3004.boom_battle_swing.constant.AudioConstant.BYE_BYE;
-import static io.nghlong3004.boom_battle_swing.constant.AudioConstant.MENU;
-import static io.nghlong3004.boom_battle_swing.constant.FrameRateConstant.FPS_SET;
-import static io.nghlong3004.boom_battle_swing.constant.FrameRateConstant.UPS_SET;
-
 @Slf4j
 @Getter
-public class GameApplication implements Runnable {
-    private final GameScene menu;
-    private final PlayingComponent playing;
-    private final OptionComponent option;
+public class GameApplication {
     private final GameWindow gameWindow;
     private final GamePanel gamePanel;
-    private Thread gameThread;
+    private final SceneRouter router;
+    private final MenuComponent menu;
+    private final PlayingComponent playing;
+    private final OptionComponent option;
+    private Thread loopThread;
+    private GameLoop loop;
 
     public GameApplication() {
-        menu = new MenuComponent(this);
-        playing = new PlayingComponent(this);
-        option = new OptionComponent(this);
-        gamePanel = new GamePanel(this);
-        gameWindow = new GameWindow(gamePanel);
-        gamePanel.requestFocus();
-        startGameLoop();
+        this.menu = new MenuComponent(this);
+        this.playing = new PlayingComponent(this);
+        this.option = new OptionComponent(this);
+
+        this.router = new SceneRouter(menu, playing, option);
+        this.router.setOnStateChanged(new GameAudioStateObserver());
+
+        this.gamePanel = new GamePanel(this);
+        this.gameWindow = new GameWindow(gamePanel);
+        this.gamePanel.requestFocus();
+
+        ObjectContainer.getAudioPlayer().playSong(AudioConstant.MENU);
+
+        startLoop();
     }
 
-    private void startGameLoop() {
-        gameThread = new Thread(this);
-        log.debug("starting game..");
-        gameThread.start();
-        ObjectContainer.getAudioPlayer().playSong(MENU);
-    }
-
-    public void update() {
-        switch (GameState.state) {
-            case MENU -> menu.update();
-            case PLAYING -> playing.update();
-            case OPTION -> option.update();
-            case QUIT -> {
-                ObjectContainer.getAudioPlayer().playSong(BYE_BYE);
-                System.exit(0);
+    private void startLoop() {
+        loop = new GameLoop(() -> {
+            router.update();
+            if (GameState.state == GameState.QUIT) {
+                shutdown();
             }
+        }, gamePanel::repaint);
+        loopThread = new Thread(loop, "game-loop");
+        loopThread.start();
+    }
+
+    public void shutdown() {
+        try {
+            if (loop != null) {
+                loop.stop();
+            }
+            ObjectContainer.getAudioPlayer().playSong(AudioConstant.BYE_BYE);
+            System.exit(0);
+        } catch (Exception e) {
+            log.error(e.getLocalizedMessage());
         }
     }
 
-    public void render(Graphics graphics) {
-        switch (GameState.state) {
-            case MENU -> menu.draw(graphics);
-            case PLAYING -> playing.draw(graphics);
-            case OPTION -> option.draw(graphics);
-        }
-    }
-
-    @Override
-    public void run() {
-        log.debug("Running game...");
-        double timePerFrame = 1000000000.0 / FPS_SET;
-        double timePerUpdate = 1000000000.0 / UPS_SET;
-        long lastCheck = System.currentTimeMillis();
-        long previousTime = System.nanoTime();
-        int frames = 0;
-        int updates = 0;
-        double deltaU = 0;
-        double deltaF = 0;
-        while (true) {
-            long currentTime = System.nanoTime();
-            deltaU += (currentTime - previousTime) / timePerUpdate;
-            deltaF += (currentTime - previousTime) / timePerFrame;
-            previousTime = currentTime;
-
-            if (deltaU >= 1) {
-                update();
-                ++updates;
-                --deltaU;
-            }
-
-            if (deltaF >= 1) {
-                gamePanel.repaint();
-                ++frames;
-                --deltaF;
-            }
-
-            if (System.currentTimeMillis() - lastCheck >= 1000) {
-                lastCheck = System.currentTimeMillis();
-                log.debug("FPS: {} | UPS: {}", frames, updates);
-                frames = 0;
-                updates = 0;
-            }
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
-            }
-        }
-
+    public void render(Graphics g) {
+        router.render(g);
     }
 
     public void windowFocusLost() {
         if (GameState.state == GameState.PLAYING) {
-            playing.getBomber().resetDirection();
+            router.getPlaying().getBomber().resetDirection();
         }
     }
 }

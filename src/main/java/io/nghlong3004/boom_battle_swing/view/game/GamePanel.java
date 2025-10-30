@@ -1,5 +1,6 @@
-package io.nghlong3004.boom_battle_swing.view;
+package io.nghlong3004.boom_battle_swing.view.game;
 
+import io.nghlong3004.boom_battle_swing.view.GameApplication;
 import io.nghlong3004.boom_battle_swing.view.input.KeyboardInput;
 import io.nghlong3004.boom_battle_swing.view.input.MouseInput;
 import io.nghlong3004.boom_battle_swing.view.input.MouseMotionInput;

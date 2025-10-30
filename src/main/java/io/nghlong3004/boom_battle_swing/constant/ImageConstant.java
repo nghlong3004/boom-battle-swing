@@ -20,7 +20,17 @@ public final class ImageConstant {
 
     public static final String LEVEL_ONE_DATA = "/images/player/level_one_data.png";
 
+    public static final String LEVEL_ONE_DATA_LONG = "/images/map/level_one_data_long.png";
+
+    public static final String LEVEL_ATLAS = "/images/map/outside_sprites.png";
+
     public static final String TITLE = "/images/icon_titlebar.png";
+
+    public static final String BOZ = "/images/player/boz.png";
+    public static final String EVIE = "/images/player/evie.png";
+    public static final String IKE = "/images/player/ike.png";
+    public static final String LODUMANI = "/images/player/lodumani.png";
+    public static final String PLUNK = "/images/player/plunk.png";
 
 
     public static final int IMAGE_BOMBER_WIDTH = 58;

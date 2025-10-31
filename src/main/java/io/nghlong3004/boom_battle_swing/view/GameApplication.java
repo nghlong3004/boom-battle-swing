@@ -1,12 +1,12 @@
 package io.nghlong3004.boom_battle_swing.view;
 
 import io.nghlong3004.boom_battle_swing.constant.AudioConstant;
+import io.nghlong3004.boom_battle_swing.model.GameState;
 import io.nghlong3004.boom_battle_swing.util.ObjectContainer;
 import io.nghlong3004.boom_battle_swing.view.game.GameAudioStateObserver;
 import io.nghlong3004.boom_battle_swing.view.game.GameLoop;
 import io.nghlong3004.boom_battle_swing.view.game.GamePanel;
 import io.nghlong3004.boom_battle_swing.view.game.GameWindow;
-import io.nghlong3004.boom_battle_swing.view.scene.GameState;
 import io.nghlong3004.boom_battle_swing.view.scene.SceneRouter;
 import io.nghlong3004.boom_battle_swing.view.scene.component.MenuComponent;
 import io.nghlong3004.boom_battle_swing.view.scene.component.OptionComponent;

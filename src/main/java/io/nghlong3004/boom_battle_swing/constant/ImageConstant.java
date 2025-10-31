@@ -32,6 +32,8 @@ public final class ImageConstant {
     public static final String LODUMANI = "/images/player/lodumani.png";
     public static final String PLUNK = "/images/player/plunk.png";
 
+    public static final String BOMBER_SKIN_TEMPLATE = "/images/player/%s.png";
+
 
     public static final int IMAGE_BOMBER_WIDTH = 58;
     public static final int IMAGE_BOMBER_HEIGHT = 71;

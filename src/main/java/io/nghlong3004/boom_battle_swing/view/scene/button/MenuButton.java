@@ -1,7 +1,7 @@
 package io.nghlong3004.boom_battle_swing.view.scene.button;
 
-import io.nghlong3004.boom_battle_swing.util.ImageUtil;
-import io.nghlong3004.boom_battle_swing.view.scene.GameState;
+import io.nghlong3004.boom_battle_swing.model.GameState;
+import io.nghlong3004.boom_battle_swing.util.ImageLoaderUtil;
 import io.nghlong3004.boom_battle_swing.view.scene.Scene;
 
 import java.awt.*;
@@ -44,7 +44,7 @@ public class MenuButton extends AbstractButton implements Scene {
     @Override
     protected void loadImage() {
         images = new BufferedImage[3];
-        BufferedImage image = ImageUtil.loadImage(MENU_BUTTON);
+        BufferedImage image = ImageLoaderUtil.loadImage(MENU_BUTTON);
         for (int i = 0; i < images.length; ++i) {
             images[i] = image.getSubimage(i * MENU_BUTTON_WIDTH_DEFAULT, rowIndex * MENU_BUTTON_HEIGHT_DEFAULT,
                                           MENU_BUTTON_WIDTH_DEFAULT, MENU_BUTTON_HEIGHT_DEFAULT);

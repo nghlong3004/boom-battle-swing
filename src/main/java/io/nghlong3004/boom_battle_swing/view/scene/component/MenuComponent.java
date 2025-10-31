@@ -1,10 +1,10 @@
 package io.nghlong3004.boom_battle_swing.view.scene.component;
 
-import io.nghlong3004.boom_battle_swing.util.ImageUtil;
+import io.nghlong3004.boom_battle_swing.model.GameState;
+import io.nghlong3004.boom_battle_swing.util.ImageLoaderUtil;
 import io.nghlong3004.boom_battle_swing.view.GameApplication;
 import io.nghlong3004.boom_battle_swing.view.scene.AbstractScene;
 import io.nghlong3004.boom_battle_swing.view.scene.GameScene;
-import io.nghlong3004.boom_battle_swing.view.scene.GameState;
 import io.nghlong3004.boom_battle_swing.view.scene.button.MenuButton;
 
 import java.awt.*;
@@ -32,8 +32,8 @@ public class MenuComponent extends AbstractScene implements GameScene {
     }
 
     private void loadMenuBackground() {
-        menuBackground = ImageUtil.loadImage(MENU_BACKGROUND);
-        background = ImageUtil.loadImage(BACKGROUND);
+        menuBackground = ImageLoaderUtil.loadImage(MENU_BACKGROUND);
+        background = ImageLoaderUtil.loadImage(BACKGROUND);
         witdhBackground = (int) (menuBackground.getWidth() * SCALE);
         heightBackground = (int) (menuBackground.getHeight() * SCALE);
         xBackground = (GAME_WIDTH - witdhBackground) / 2;

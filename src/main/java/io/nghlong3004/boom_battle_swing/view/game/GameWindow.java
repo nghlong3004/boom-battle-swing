@@ -1,7 +1,7 @@
 package io.nghlong3004.boom_battle_swing.view.game;
 
 import io.nghlong3004.boom_battle_swing.constant.ImageConstant;
-import io.nghlong3004.boom_battle_swing.util.ImageUtil;
+import io.nghlong3004.boom_battle_swing.util.ImageLoaderUtil;
 
 import javax.swing.*;
 import java.awt.event.WindowEvent;
@@ -27,7 +27,7 @@ public class GameWindow extends JFrame {
         pack();
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setIconImage(ImageUtil.loadImage(ImageConstant.TITLE));
+        setIconImage(ImageLoaderUtil.loadImage(ImageConstant.TITLE));
         addWindowFocusListener(new WindowFocusListener() {
 
             @Override

@@ -1,7 +1,7 @@
 package io.nghlong3004.boom_battle_swing.view.scene.button;
 
 import io.nghlong3004.boom_battle_swing.constant.ImageConstant;
-import io.nghlong3004.boom_battle_swing.util.ImageUtil;
+import io.nghlong3004.boom_battle_swing.util.ImageLoaderUtil;
 import io.nghlong3004.boom_battle_swing.view.scene.Scene;
 import lombok.Getter;
 
@@ -35,7 +35,7 @@ public class VolumeButton extends AbstractButton implements Scene {
     @Override
     protected void loadImage() {
         images = new BufferedImage[3];
-        BufferedImage image = ImageUtil.loadImage(ImageConstant.VOLUME_BUTTON);
+        BufferedImage image = ImageLoaderUtil.loadImage(ImageConstant.VOLUME_BUTTON);
         for (int i = 0; i < images.length; ++i) {
             images[i] = image.getSubimage(i * VOLUME_BUTTON_WIDTH_DEFAULT, 0, VOLUME_BUTTON_WIDTH_DEFAULT,
                                           VOLUME_BUTTON_HEIGHT_DEFAULT);

@@ -1,8 +1,8 @@
 package io.nghlong3004.boom_battle_swing.view.game;
 
 import io.nghlong3004.boom_battle_swing.constant.AudioConstant;
+import io.nghlong3004.boom_battle_swing.model.GameState;
 import io.nghlong3004.boom_battle_swing.util.ObjectContainer;
-import io.nghlong3004.boom_battle_swing.view.scene.GameState;
 
 import java.util.function.Consumer;
 

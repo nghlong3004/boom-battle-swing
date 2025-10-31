@@ -1,8 +1,8 @@
 package io.nghlong3004.boom_battle_swing.view.scene.component;
 
+import io.nghlong3004.boom_battle_swing.model.GameState;
 import io.nghlong3004.boom_battle_swing.view.GameApplication;
 import io.nghlong3004.boom_battle_swing.view.scene.AbstractScene;
-import io.nghlong3004.boom_battle_swing.view.scene.GameState;
 import io.nghlong3004.boom_battle_swing.view.scene.MouseScene;
 import io.nghlong3004.boom_battle_swing.view.scene.Scene;
 import io.nghlong3004.boom_battle_swing.view.scene.button.URMButton;
@@ -15,11 +15,11 @@ import static io.nghlong3004.boom_battle_swing.constant.ButtonConstant.URM_BUTTO
 import static io.nghlong3004.boom_battle_swing.constant.GameConstant.SCALE;
 
 @Slf4j
-public class URMOptionalComponent extends AbstractScene implements Scene, MouseScene {
+public class URMOptionComponent extends AbstractScene implements Scene, MouseScene {
 
     private URMButton homeButton, replayButton, unpauseButton;
 
-    public URMOptionalComponent(GameApplication game) {
+    public URMOptionComponent(GameApplication game) {
         super(game);
         createURMButton();
     }

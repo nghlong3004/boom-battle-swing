@@ -2,7 +2,7 @@ package io.nghlong3004.boom_battle_swing.view.scene.button;
 
 import io.nghlong3004.boom_battle_swing.constant.ButtonConstant;
 import io.nghlong3004.boom_battle_swing.constant.ImageConstant;
-import io.nghlong3004.boom_battle_swing.util.ImageUtil;
+import io.nghlong3004.boom_battle_swing.util.ImageLoaderUtil;
 import io.nghlong3004.boom_battle_swing.view.scene.Scene;
 import lombok.Getter;
 import lombok.Setter;
@@ -45,7 +45,7 @@ public class SoundButton extends AbstractButton implements Scene {
 
     @Override
     protected void loadImage() {
-        BufferedImage image = ImageUtil.loadImage(ImageConstant.SOUND_BUTTON);
+        BufferedImage image = ImageLoaderUtil.loadImage(ImageConstant.SOUND_BUTTON);
         images = new BufferedImage[2][3];
         for (int i = 0; i < images.length; ++i) {
             for (int j = 0; j < images[i].length; ++j) {

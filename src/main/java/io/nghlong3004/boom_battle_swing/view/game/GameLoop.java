@@ -11,9 +11,9 @@ import static io.nghlong3004.boom_battle_swing.constant.FrameRateConstant.UPS_SE
 public final class GameLoop implements Runnable {
 
     private final GameUpdater updater;
-    private final GameDrawer renderer;
+    private final GameRenderer renderer;
 
-    public GameLoop(GameUpdater updater, GameDrawer renderer) {
+    public GameLoop(GameUpdater updater, GameRenderer renderer) {
         this.updater = updater;
         this.renderer = renderer;
     }
@@ -56,7 +56,7 @@ public final class GameLoop implements Runnable {
             }
 
             if (accF >= nsPerFrame) {
-                renderer.draw();
+                renderer.render();
                 frames++;
                 accF -= nsPerFrame;
                 if (accF >= nsPerFrame) {

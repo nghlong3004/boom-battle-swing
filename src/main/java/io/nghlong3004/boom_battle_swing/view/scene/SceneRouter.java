@@ -1,5 +1,6 @@
 package io.nghlong3004.boom_battle_swing.view.scene;
 
+import io.nghlong3004.boom_battle_swing.model.GameState;
 import io.nghlong3004.boom_battle_swing.view.scene.component.OptionComponent;
 import io.nghlong3004.boom_battle_swing.view.scene.component.PlayingComponent;
 import lombok.Getter;

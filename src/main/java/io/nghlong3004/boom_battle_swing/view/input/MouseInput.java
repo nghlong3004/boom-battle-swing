@@ -1,8 +1,8 @@
 package io.nghlong3004.boom_battle_swing.view.input;
 
+import io.nghlong3004.boom_battle_swing.model.GameState;
 import io.nghlong3004.boom_battle_swing.util.ObjectContainer;
 import io.nghlong3004.boom_battle_swing.view.game.GamePanel;
-import io.nghlong3004.boom_battle_swing.view.scene.GameState;
 import lombok.AllArgsConstructor;
 
 import java.awt.event.MouseEvent;

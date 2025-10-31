@@ -1,5 +1,5 @@
 package io.nghlong3004.boom_battle_swing.view.game;
 
-public interface GameDrawer {
-    void draw();
+public interface GameRenderer {
+    void render();
 }

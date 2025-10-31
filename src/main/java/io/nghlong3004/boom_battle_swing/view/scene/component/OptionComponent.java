@@ -2,7 +2,7 @@ package io.nghlong3004.boom_battle_swing.view.scene.component;
 
 import io.nghlong3004.boom_battle_swing.constant.GameConstant;
 import io.nghlong3004.boom_battle_swing.constant.ImageConstant;
-import io.nghlong3004.boom_battle_swing.util.ImageUtil;
+import io.nghlong3004.boom_battle_swing.util.ImageLoaderUtil;
 import io.nghlong3004.boom_battle_swing.view.GameApplication;
 import io.nghlong3004.boom_battle_swing.view.scene.AbstractScene;
 import io.nghlong3004.boom_battle_swing.view.scene.MouseScene;
@@ -20,18 +20,18 @@ public class OptionComponent extends AbstractScene implements Scene, MouseScene 
 
     private BufferedImage background;
     private int xBackground, yBackground, widthBackground, heightBackground;
-    private final URMOptionalComponent urmOptionalComponent;
+    private final URMOptionComponent urmOptionalComponent;
     private final AudioOptionComponent audioOptionComponent;
 
     public OptionComponent(GameApplication game) {
         super(game);
         loadBackground();
         this.audioOptionComponent = new AudioOptionComponent(game);
-        this.urmOptionalComponent = new URMOptionalComponent(game);
+        this.urmOptionalComponent = new URMOptionComponent(game);
     }
 
     private void loadBackground() {
-        background = ImageUtil.loadImage(ImageConstant.PAUSE_BACKGROUND);
+        background = ImageLoaderUtil.loadImage(ImageConstant.PAUSE_BACKGROUND);
         widthBackground = (int) (background.getWidth() * SCALE);
         heightBackground = (int) (background.getHeight() * SCALE);
         xBackground = GameConstant.GAME_WIDTH - widthBackground >>> 1;

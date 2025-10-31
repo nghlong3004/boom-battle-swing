@@ -5,7 +5,6 @@ import io.nghlong3004.boom_battle_swing.model.Bomber;
 import java.awt.geom.Rectangle2D;
 
 import static io.nghlong3004.boom_battle_swing.constant.BomberConstant.*;
-import static io.nghlong3004.boom_battle_swing.util.HelpMethod.CanMoveHere;
 
 public class BomberUpdater implements Updater {
     @Override
@@ -85,10 +84,8 @@ public class BomberUpdater implements Updater {
         }
 
         Rectangle2D.Float hitbox = bomber.getHitbox();
-        if (CanMoveHere(hitbox.x + xSpeed, hitbox.y + ySpeed, hitbox.width, hitbox.height, bomber.getLevelData())) {
-            hitbox.x += xSpeed;
-            hitbox.y += ySpeed;
-        }
+        hitbox.x += xSpeed;
+        hitbox.y += ySpeed;
         bomber.setMoving(true);
     }
 }

@@ -1,68 +1,44 @@
 package io.nghlong3004.boom_battle_swing.view.scene.component;
 
-import io.nghlong3004.boom_battle_swing.constant.ImageConstant;
 import io.nghlong3004.boom_battle_swing.model.Bomber;
 import io.nghlong3004.boom_battle_swing.view.GameApplication;
-import io.nghlong3004.boom_battle_swing.view.map.LevelManager;
-import io.nghlong3004.boom_battle_swing.view.render.BomberRenderer;
-import io.nghlong3004.boom_battle_swing.view.render.Renderer;
+import io.nghlong3004.boom_battle_swing.view.game.GameWorld;
 import io.nghlong3004.boom_battle_swing.view.scene.AbstractScene;
 import io.nghlong3004.boom_battle_swing.view.scene.KeyboardScene;
 import io.nghlong3004.boom_battle_swing.view.scene.Scene;
-import io.nghlong3004.boom_battle_swing.view.update.BomberUpdater;
-import io.nghlong3004.boom_battle_swing.view.update.Updater;
 import lombok.Getter;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
-import static io.nghlong3004.boom_battle_swing.constant.AudioConstant.MOVE;
-import static io.nghlong3004.boom_battle_swing.constant.GameConstant.SCALE;
-import static io.nghlong3004.boom_battle_swing.util.ObjectContainer.getAudioPlayer;
+import static io.nghlong3004.boom_battle_swing.constant.BomberConstant.BOMBER_HEIGHT;
+import static io.nghlong3004.boom_battle_swing.constant.BomberConstant.BOMBER_WIDTH;
 
 public class PlayingComponent extends AbstractScene implements Scene, KeyboardScene {
 
     @Getter
-    private Bomber bomber;
-    private Updater updater;
-    private Renderer renderer;
-    private LevelManager levelManager;
-    private static final long MOVE_SFX_COOLDOWN_MS = 120;
-    private long lastMoveSfxAtMs = 0L;
+    private final Bomber bomber;
+    private final GameWorld gameWorld;
 
     public PlayingComponent(GameApplication game) {
         super(game);
-        initClasses();
-    }
-
-    private void initClasses() {
-        levelManager = new LevelManager(game);
-        bomber = new Bomber(200f, 200f, (int) (50 * SCALE), (int) (30 * SCALE), ImageConstant.IKE);
-        bomber.setLevelData(levelManager.getLevelData());
-        updater = new BomberUpdater();
-        renderer = new BomberRenderer();
+        this.gameWorld = new GameWorld();
+        this.bomber = new Bomber(200f, 200f, (int) BOMBER_WIDTH, (int) BOMBER_HEIGHT);
+        this.gameWorld.add(bomber);
     }
 
     public void reset() {
-        bomber.resetAll();
+        gameWorld.resetAll();
     }
 
     @Override
     public void update() {
-        updater.update(bomber);
+        gameWorld.update();
     }
 
     @Override
     public void draw(Graphics g) {
-        levelManager.draw(g);
-        renderer.render(g, bomber);
-        if (bomber.isMoving()) {
-            long now = System.currentTimeMillis();
-            if (now - lastMoveSfxAtMs >= MOVE_SFX_COOLDOWN_MS) {
-                getAudioPlayer().playEffect(MOVE);
-                lastMoveSfxAtMs = now;
-            }
-        }
+        gameWorld.render(g);
     }
 
     @Override

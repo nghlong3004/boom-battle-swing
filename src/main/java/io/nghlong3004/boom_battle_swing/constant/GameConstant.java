@@ -15,4 +15,6 @@ public class GameConstant {
 
     public static final float HITBOX_WIDTH_OFF_SET = 40f * SCALE;
     public static final float HITBOX_HEIGHT_OFF_SET = 12f * SCALE;
+
+    public static final long MOVE_SFX_COOLDOWN_MS = 120;
 }

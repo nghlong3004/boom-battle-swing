@@ -1,7 +1,7 @@
 package io.nghlong3004.boom_battle_swing.view.scene.button;
 
 import io.nghlong3004.boom_battle_swing.constant.ImageConstant;
-import io.nghlong3004.boom_battle_swing.util.ImageUtil;
+import io.nghlong3004.boom_battle_swing.util.ImageLoaderUtil;
 import io.nghlong3004.boom_battle_swing.view.scene.Scene;
 
 import java.awt.*;
@@ -38,7 +38,7 @@ public class URMButton extends AbstractButton implements Scene {
     @Override
     protected void loadImage() {
         images = new BufferedImage[3];
-        BufferedImage image = ImageUtil.loadImage(ImageConstant.URM_BUTTON);
+        BufferedImage image = ImageLoaderUtil.loadImage(ImageConstant.URM_BUTTON);
         for (int i = 0; i < images.length; ++i) {
             images[i] = image.getSubimage(i * URM_BUTTON_SIZE_DEFAULT, rowIndex * URM_BUTTON_SIZE_DEFAULT,
                                           URM_BUTTON_SIZE_DEFAULT, URM_BUTTON_SIZE_DEFAULT);

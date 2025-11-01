@@ -50,7 +50,7 @@ public class AudioUtil {
     }
 
     private void loadSongs() {
-        String[] names = {"soundMenu", "soundGame", "bye_bye"};
+        String[] names = {"desert", "land", "town", "underwater", "xmas", "soundMenu", "soundGame"};
         songs = new Clip[names.length];
         for (int i = 0; i < songs.length; i++) {
             songs[i] = getClip(names[i]);

@@ -49,10 +49,13 @@ public class GameSystem {
     public void update() {
         tileMapUpdater.update(tileMap);
 
-        List<Entity> allEntities = new ArrayList<>(bombers);
+
+        List<Bomber> bombersCopy = new ArrayList<>(bombers);
+
+        List<Entity> allEntities = new ArrayList<>(bombersCopy);
         entityUpdater.setAllEntities(allEntities);
 
-        bomberAISystem.setAllBombers(bombers);
+        bomberAISystem.setAllBombers(bombersCopy);
         bomberAISystem.setBombs(bombs);
         bomberAISystem.setExplosions(explosions);
         bomberAISystem.setTileMap(tileMap);
@@ -60,7 +63,7 @@ public class GameSystem {
 
         List<Bomber> deadBombersToRemove = new ArrayList<>();
 
-        for (var bomber : bombers) {
+        for (var bomber : bombersCopy) {
 
             if (bomber.isDead()) {
                 bomber.updateDeathAnimation();
@@ -79,7 +82,7 @@ public class GameSystem {
             entityUpdater.update(bomber);
 
 
-            checkWalkOverDeadBomber(bomber, deadBombersToRemove);
+            checkWalkOverDeadBomber(bomber, bombersCopy, deadBombersToRemove);
         }
 
 
@@ -95,7 +98,9 @@ public class GameSystem {
             if (bomb.isExploded()) {
                 createExplosion(bomb);
 
-                for (var bomber : bombers) {
+
+                List<Bomber> bombersCopyForBomb = new ArrayList<>(bombers);
+                for (var bomber : bombersCopyForBomb) {
                     bomber.decrementBombCount();
                 }
                 bombIterator.remove();
@@ -276,7 +281,9 @@ public class GameSystem {
 
             boolean entityStillOnBomb = false;
 
-            for (Bomber bomber : bombers) {
+
+            List<Bomber> bombersCopyForBombExit = new ArrayList<>(bombers);
+            for (Bomber bomber : bombersCopyForBombExit) {
                 if (bomber.getBox().intersects(bomb.getBox())) {
                     entityStillOnBomb = true;
                     break;
@@ -291,7 +298,9 @@ public class GameSystem {
     }
 
     private void checkExplosionDamage(Explosion explosion) {
-        for (var bomber : bombers) {
+
+        List<Bomber> bombersCopyForExplosion = new ArrayList<>(bombers);
+        for (var bomber : bombersCopyForExplosion) {
             if (!bomber.isAlive()) {
                 continue;
             }
@@ -325,13 +334,14 @@ public class GameSystem {
     }
 
 
-    private void checkWalkOverDeadBomber(Bomber aliveBomber, List<Bomber> deadBombersToRemove) {
+    private void checkWalkOverDeadBomber(Bomber aliveBomber, List<Bomber> bombersList,
+                                         List<Bomber> deadBombersToRemove) {
         if (!aliveBomber.isAlive() || aliveBomber.isDead()) {
             return;
         }
 
 
-        for (Bomber deadBomber : bombers) {
+        for (Bomber deadBomber : bombersList) {
             if (!deadBomber.isDead()) {
                 continue;
             }

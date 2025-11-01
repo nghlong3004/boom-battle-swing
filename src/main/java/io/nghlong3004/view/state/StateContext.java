@@ -2,12 +2,15 @@ package io.nghlong3004.view.state;
 
 import io.nghlong3004.model.State;
 import io.nghlong3004.system.GameStateContextHolder;
+import io.nghlong3004.util.ObjectContainer;
 import io.nghlong3004.view.GameObject;
 import lombok.Getter;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+
+import static io.nghlong3004.constant.AudioConstant.CLICK;
 
 public final class StateContext implements GameObject {
 
@@ -22,6 +25,7 @@ public final class StateContext implements GameObject {
     private final GameState modeSelectionState;
     private final GameState skinSelectionState;
     private final GameState mapSelectionState;
+    private final GameState gameOverState;
 
     public StateContext() {
         menuState = new MenuState(this);
@@ -31,6 +35,7 @@ public final class StateContext implements GameObject {
         modeSelectionState = new ModeSelectionState(this);
         skinSelectionState = new SkinSelectionState(this);
         mapSelectionState = new MapSelectionState(this);
+        gameOverState = new GameOverState(this);
 
         changeState(State.MENU);
     }
@@ -54,6 +59,7 @@ public final class StateContext implements GameObject {
             case PLAYING -> currentState = playingState;
             case PAUSED -> currentState = pausedState;
             case OPTION -> currentState = optionState;
+            case GAME_OVER -> currentState = gameOverState;
             case QUIT -> System.exit(0);
         }
 
@@ -91,6 +97,7 @@ public final class StateContext implements GameObject {
     }
 
     public void mouseClicked(MouseEvent e) {
+        ObjectContainer.getAudioUtil().playEffect(CLICK);
         if (currentState != null) {
             currentState.mouseClicked(e);
         }

@@ -69,21 +69,6 @@ public class MapSelectionState implements GameState {
     public void render(Graphics g) {
         g.drawImage(background, 0, 0, GAME_WIDTH, GAME_HEIGHT, null);
 
-
-        g.setColor(Color.WHITE);
-        g.setFont(new Font("Arial", Font.BOLD, (int) (40 * SCALE)));
-        String title = "SELECT YOUR MAP";
-        FontMetrics fm = g.getFontMetrics();
-        int titleWidth = fm.stringWidth(title);
-        g.drawString(title, (GAME_WIDTH - titleWidth) / 2, (int) (100 * SCALE));
-
-
-        g.setFont(new Font("Arial", Font.PLAIN, (int) (20 * SCALE)));
-        String instruction = "Click to select or press 1-5 or ESC to go back";
-        int instrWidth = g.getFontMetrics().stringWidth(instruction);
-        g.drawString(instruction, (GAME_WIDTH - instrWidth) / 2, (int) (550 * SCALE));
-
-
         for (MapButton button : mapButtons) {
             button.render(g);
         }

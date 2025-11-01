@@ -2,10 +2,7 @@ package io.nghlong3004.view.state;
 
 import io.nghlong3004.constant.AudioConstant;
 import io.nghlong3004.constant.MapConstant;
-import io.nghlong3004.model.Bomber;
-import io.nghlong3004.model.Entity;
-import io.nghlong3004.model.SpawnPoint;
-import io.nghlong3004.model.State;
+import io.nghlong3004.model.*;
 import io.nghlong3004.system.GameStateContextHolder;
 import io.nghlong3004.system.GameSystem;
 import io.nghlong3004.util.ObjectContainer;
@@ -28,6 +25,7 @@ public class PlayingState implements GameState {
     private final GameSystem gameSystem;
     private final StateContext stateContext;
     private final Random random;
+    private int deathCheckDelay = 0;
 
     protected PlayingState(StateContext stateContext) {
         this.stateContext = stateContext;
@@ -77,11 +75,25 @@ public class PlayingState implements GameState {
     public void reset() {
         log.info("Resetting PlayingState - clearing all entities and reloading map");
         gameSystem.resetAll();
+        deathCheckDelay = 0;
     }
 
     @Override
     public void update() {
         gameSystem.update();
+
+
+        if (GameStateContextHolder.GAME_MODE == GameMode.OFFLINE && bomber instanceof Bomber playerBomber) {
+            if (playerBomber.isDead()) {
+                deathCheckDelay++;
+
+                if (deathCheckDelay >= 120) {
+                    log.info("Player died in offline mode, showing Game Over screen");
+                    stateContext.changeState(State.GAME_OVER);
+                    deathCheckDelay = 0;
+                }
+            }
+        }
     }
 
     @Override
@@ -97,7 +109,8 @@ public class PlayingState implements GameState {
     @Override
     public void enter() {
         loadMapAndSpawnEntities();
-        ObjectContainer.getAudioUtil().playSong(AudioConstant.GAME);
+        ObjectContainer.getAudioUtil().playSong(GameStateContextHolder.MODE.index);
+        ObjectContainer.getAudioUtil().playEffect(AudioConstant.START);
     }
 
     @Override

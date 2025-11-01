@@ -8,5 +8,6 @@ public enum State {
     MAP_SELECTION,
     PAUSED,
     OPTION,
+    GAME_OVER,
     QUIT;
 }

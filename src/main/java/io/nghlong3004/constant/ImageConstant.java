@@ -65,6 +65,12 @@ public final class ImageConstant {
     public static final String EXPLOSION_LEFT_2 = "/images/boom/explosion_left_2.png";
     public static final String EXPLOSION_RIGHT_1 = "/images/boom/explosion_right_1.png";
     public static final String EXPLOSION_RIGHT_2 = "/images/boom/explosion_right_2.png";
+    
+    public static final String ITEM_BOMB = "/images/items/item_bomb.png";
+    public static final String ITEM_BOMB_SIZE = "/images/items/item_bombsize.png";
+    public static final String ITEM_SHOE = "/images/items/item_shoe.png";
+    public static final String ITEM_EFFECT_TEMPLATE = "/images/items/effect_%d.png";
+    public static final int ITEM_EFFECT_FRAMES = 8;
 
     public static final int IMAGE_BOMBER_WIDTH = 58;
     public static final int IMAGE_BOMBER_HEIGHT = 71;

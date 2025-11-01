@@ -11,6 +11,8 @@ import static io.nghlong3004.constant.BomberConstant.BOMBER_SPEED;
 public class Bomber extends Entity {
     private int maxBombs = 1;
     private int currentBombs = 0;
+    private int explosionRange = 1;
+    private float speedBoost = 0f;
     private boolean placeBombRequested = false;
     private boolean isPlayer;
     private int skinIndex = 0;
@@ -18,7 +20,6 @@ public class Bomber extends Entity {
     private int aiTick = 0;
     private int directionChangeCooldown = 0;
     private AIPathfindingMode pathfindingMode = AIPathfindingMode.BFS;
-
 
     private int deathAnimationFrame = 0;
     private int deathAnimationTick = 0;
@@ -48,7 +49,7 @@ public class Bomber extends Entity {
 
     @Override
     protected float getDefaultSpeed() {
-        return BOMBER_SPEED;
+        return BOMBER_SPEED + speedBoost;
     }
 
     public boolean canPlaceBomb() {
@@ -83,7 +84,6 @@ public class Bomber extends Entity {
         this.deathAnimationTick = 0;
     }
 
-
     public void die() {
         if (!isDead) {
             this.isDead = true;
@@ -92,7 +92,6 @@ public class Bomber extends Entity {
             this.deathAnimationTick = 0;
         }
     }
-
 
     public void updateDeathAnimation() {
         if (!isDead) {
@@ -105,7 +104,6 @@ public class Bomber extends Entity {
             deathAnimationFrame = (deathAnimationFrame + 1) % 4;
         }
     }
-
 
     public boolean isDeathAnimationComplete() {
         return isDead && deathAnimationFrame >= 15;

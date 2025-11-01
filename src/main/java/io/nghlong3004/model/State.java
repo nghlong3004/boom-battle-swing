@@ -9,5 +9,6 @@ public enum State {
     PAUSED,
     OPTION,
     GAME_OVER,
+    VICTORY,
     QUIT;
 }

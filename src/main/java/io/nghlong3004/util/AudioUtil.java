@@ -58,7 +58,7 @@ public class AudioUtil {
     }
 
     private void loadEffects() {
-        String[] effectNames = {"move", "set_boom", "start", "click", "boom_bang"};
+        String[] effectNames = {"move", "set_boom", "start", "click", "boom_bang", "item", "win"};
         effects = new Clip[effectNames.length];
         for (int i = 0; i < effects.length; i++) {
             effects[i] = getClip(effectNames[i]);
@@ -78,8 +78,7 @@ public class AudioUtil {
             throw new RuntimeException("Cannot load audio: " + name, e);
         }
     }
-
-
+    
     public void setVolume(float volume) {
         if (volume < 0f) {
             volume = 0f;
@@ -88,6 +87,9 @@ public class AudioUtil {
             volume = 1f;
         }
         this.volume = volume;
+        if (audioExec.isShutdown()) {
+            return;
+        }
         audioExec.execute(() -> {
             safeUpdateSongVolume();
             safeUpdateEffectsVolume();
@@ -95,6 +97,9 @@ public class AudioUtil {
     }
 
     public void stopSong() {
+        if (audioExec.isShutdown()) {
+            return;
+        }
         audioExec.execute(() -> {
             Clip c = songs[currentSongId];
             if (c != null && c.isActive()) {
@@ -105,6 +110,10 @@ public class AudioUtil {
     }
 
     public void playEffect(int effect) {
+
+        if (audioExec.isShutdown()) {
+            return;
+        }
         audioExec.execute(() -> {
             if (effect < 0 || effect >= effects.length) {
                 return;
@@ -123,6 +132,9 @@ public class AudioUtil {
     }
 
     public void playSong(int song) {
+        if (audioExec.isShutdown()) {
+            return;
+        }
         audioExec.execute(() -> {
             if (song < 0 || song >= songs.length) {
                 return;
@@ -148,6 +160,9 @@ public class AudioUtil {
     }
 
     public void toggleSongMute() {
+        if (audioExec.isShutdown()) {
+            return;
+        }
         audioExec.execute(() -> {
             songMute.set(!songMute.get());
             Clip cur = songs[currentSongId];
@@ -173,6 +188,9 @@ public class AudioUtil {
     }
 
     public void toggleEffectMute() {
+        if (audioExec.isShutdown()) {
+            return;
+        }
         audioExec.execute(() -> {
             effectMute.set(!effectMute.get());
             for (Clip c : effects) {

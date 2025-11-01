@@ -81,13 +81,13 @@ public class CollisionUtil {
         return tileValue == STONE || tileValue == BRICK || tileValue == GIFT_BOX;
     }
 
-    public static void destroyTile(int gridRow, int gridCol, TileMap tileMap) {
+    public static boolean destroyTile(int gridRow, int gridCol, TileMap tileMap) {
         if (tileMap.getData() == null) {
-            return;
+            return false;
         }
 
         if (isGrid(gridRow, gridCol, tileMap)) {
-            return;
+            return false;
         }
 
         int tileValue = tileMap.getData()[gridRow][gridCol];
@@ -96,7 +96,10 @@ public class CollisionUtil {
             log.debug("Destroying tile at row={}, col={}, type={}", gridRow, gridCol,
                       tileValue == BRICK ? "BRICK" : "GIFT_BOX");
             tileMap.getData()[gridRow][gridCol] = FLOOR;
+            return tileValue == GIFT_BOX;
         }
+
+        return false;
     }
 
     private static boolean isGrid(int gridRow, int gridCol, TileMap tileMap) {
@@ -106,14 +109,13 @@ public class CollisionUtil {
     public static boolean isSpawnTile(int tileValue) {
         return SpawnTile.isSpawnTile(tileValue);
     }
-    
+
     public static boolean isSolid(int gridRow, int gridCol, TileMap tileMap) {
         if (tileMap.getData() == null) {
             return true;
         }
 
-        if (gridRow < 0 || gridRow >= tileMap.getData().length || 
-            gridCol < 0 || gridCol >= tileMap.getData()[0].length) {
+        if (gridRow < 0 || gridRow >= tileMap.getData().length || gridCol < 0 || gridCol >= tileMap.getData()[0].length) {
             return true;
         }
 

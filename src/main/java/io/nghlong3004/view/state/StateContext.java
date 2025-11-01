@@ -26,6 +26,7 @@ public final class StateContext implements GameObject {
     private final GameState skinSelectionState;
     private final GameState mapSelectionState;
     private final GameState gameOverState;
+    private final GameState victoryState;
 
     public StateContext() {
         menuState = new MenuState(this);
@@ -36,6 +37,7 @@ public final class StateContext implements GameObject {
         skinSelectionState = new SkinSelectionState(this);
         mapSelectionState = new MapSelectionState(this);
         gameOverState = new GameOverState(this);
+        victoryState = new VictoryState(this);
 
         changeState(State.MENU);
     }
@@ -60,6 +62,7 @@ public final class StateContext implements GameObject {
             case PAUSED -> currentState = pausedState;
             case OPTION -> currentState = optionState;
             case GAME_OVER -> currentState = gameOverState;
+            case VICTORY -> currentState = victoryState;
             case QUIT -> System.exit(0);
         }
 

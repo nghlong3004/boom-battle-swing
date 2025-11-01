@@ -1,27 +1,30 @@
 package io.nghlong3004.view.state;
 
 import io.nghlong3004.model.State;
-import io.nghlong3004.view.component.GameOverComponent;
+import io.nghlong3004.util.ObjectContainer;
+import io.nghlong3004.view.component.VictoryComponent;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
+import static io.nghlong3004.constant.AudioConstant.WIN;
+
 @Slf4j
-public class GameOverState implements GameState {
+public class VictoryState implements GameState {
 
     private final StateContext stateContext;
-    private final GameOverComponent gameOverComponent;
+    private final VictoryComponent victoryComponent;
 
-    protected GameOverState(StateContext stateContext) {
+    protected VictoryState(StateContext stateContext) {
         this.stateContext = stateContext;
-        this.gameOverComponent = new GameOverComponent(stateContext);
+        this.victoryComponent = new VictoryComponent(stateContext);
     }
 
     @Override
     public void update() {
-        gameOverComponent.update();
+        victoryComponent.update();
     }
 
     @Override
@@ -30,18 +33,20 @@ public class GameOverState implements GameState {
         stateContext.getPlayingState().render(g);
         stateContext.getPlayingState().getGameSystem().setSilentMode(false);
 
-        gameOverComponent.render(g);
+        victoryComponent.render(g);
     }
 
     @Override
     public void exit() {
-        log.info("Exiting GameOverState");
+        log.info("Exiting VictoryState");
     }
 
     @Override
     public void enter() {
-        log.info("Entering GameOverState");
-        gameOverComponent.resetAnimation();
+        log.info("Entering VictoryState");
+        victoryComponent.resetAnimation();
+
+        ObjectContainer.getAudioUtil().playEffect(WIN);
     }
 
     @Override
@@ -61,17 +66,17 @@ public class GameOverState implements GameState {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        gameOverComponent.mousePressed(e);
+        victoryComponent.mousePressed(e);
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        gameOverComponent.mouseReleased(e);
+        victoryComponent.mouseReleased(e);
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        gameOverComponent.mouseMoved(e);
+        victoryComponent.mouseMoved(e);
     }
 
     @Override

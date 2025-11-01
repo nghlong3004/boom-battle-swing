@@ -22,6 +22,7 @@ public class PlayingState implements GameState {
 
     @Getter
     private Entity bomber;
+    @Getter
     private final GameSystem gameSystem;
     private final StateContext stateContext;
     private final Random random;
@@ -82,16 +83,25 @@ public class PlayingState implements GameState {
     public void update() {
         gameSystem.update();
 
-
         if (GameStateContextHolder.GAME_MODE == GameMode.OFFLINE && bomber instanceof Bomber playerBomber) {
             if (playerBomber.isDead()) {
                 deathCheckDelay++;
-
                 if (deathCheckDelay >= 120) {
                     log.info("Player died in offline mode, showing Game Over screen");
                     stateContext.changeState(State.GAME_OVER);
                     deathCheckDelay = 0;
                 }
+            }
+            else if (gameSystem.areAllEnemiesDead()) {
+                deathCheckDelay++;
+                if (deathCheckDelay >= 60) {
+                    log.info("All enemies defeated, showing Victory screen");
+                    stateContext.changeState(State.VICTORY);
+                    deathCheckDelay = 0;
+                }
+            }
+            else {
+                deathCheckDelay = 0;
             }
         }
     }
@@ -121,9 +131,7 @@ public class PlayingState implements GameState {
             case KeyEvent.VK_W -> bomber.setUp(true);
             case KeyEvent.VK_S -> bomber.setDown(true);
             case KeyEvent.VK_SPACE -> {
-                if (bomber instanceof Bomber) {
-                    ((Bomber) bomber).requestPlaceBomb();
-                }
+                ((Bomber) bomber).requestPlaceBomb();
             }
             case KeyEvent.VK_ENTER -> {
                 stateContext.changeState(State.PAUSED);

@@ -4,6 +4,7 @@ import io.nghlong3004.model.*;
 import io.nghlong3004.util.CollisionUtil;
 import io.nghlong3004.util.ObjectContainer;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
@@ -19,13 +20,16 @@ public class GameSystem {
     private final UpdateSystem tileMapUpdater, bombUpdater;
     private final BomberAISystem bomberAISystem;
     private final EntityUpdateSystem entityUpdater;
-    private final RenderSystem tileMapRenderer, entityRenderer, bombRenderer, explosionRenderer;
+    private final RenderSystem tileMapRenderer, entityRenderer, bombRenderer, explosionRenderer, itemRenderer;
     private final List<Bomber> bombers;
     private final List<Bomb> bombs;
     private final List<Explosion> explosions;
+    private final List<Item> items;
     @Getter
     private final TileMap tileMap;
     private long lastMoveSfxAtMs = 0L;
+    @Setter
+    private boolean silentMode = false;
 
     public GameSystem() {
         this.tileMapRenderer = new TileMapRenderSystem();
@@ -35,10 +39,12 @@ public class GameSystem {
         this.bombRenderer = new BombRenderSystem();
         this.bombUpdater = new BombUpdateSystem();
         this.explosionRenderer = new ExplosionRenderSystem();
+        this.itemRenderer = new ItemRenderSystem();
         this.bomberAISystem = new BomberAISystem();
         this.bombers = new ArrayList<>();
         this.bombs = new ArrayList<>();
         this.explosions = new ArrayList<>();
+        this.items = new ArrayList<>();
         this.tileMap = new TileMap();
 
         this.entityUpdater.setTileMap(tileMap);
@@ -49,7 +55,6 @@ public class GameSystem {
     public void update() {
         tileMapUpdater.update(tileMap);
 
-
         List<Bomber> bombersCopy = new ArrayList<>(bombers);
 
         List<Entity> allEntities = new ArrayList<>(bombersCopy);
@@ -59,7 +64,6 @@ public class GameSystem {
         bomberAISystem.setBombs(bombs);
         bomberAISystem.setExplosions(explosions);
         bomberAISystem.setTileMap(tileMap);
-
 
         List<Bomber> deadBombersToRemove = new ArrayList<>();
 
@@ -85,20 +89,14 @@ public class GameSystem {
             checkWalkOverDeadBomber(bomber, bombersCopy, deadBombersToRemove);
         }
 
-
         bombers.removeAll(deadBombersToRemove);
-
         checkBombExitStatus();
-
         Iterator<Bomb> bombIterator = bombs.iterator();
         while (bombIterator.hasNext()) {
             Bomb bomb = bombIterator.next();
             bombUpdater.update(bomb);
-
             if (bomb.isExploded()) {
                 createExplosion(bomb);
-
-
                 List<Bomber> bombersCopyForBomb = new ArrayList<>(bombers);
                 for (var bomber : bombersCopyForBomb) {
                     bomber.decrementBombCount();
@@ -111,32 +109,41 @@ public class GameSystem {
         while (explosionIterator.hasNext()) {
             Explosion explosion = explosionIterator.next();
             explosion.update();
-
             checkExplosionDamage(explosion);
-
             if (explosion.isFinished()) {
                 explosionIterator.remove();
+            }
+        }
+        Iterator<Item> itemIterator = items.iterator();
+        while (itemIterator.hasNext()) {
+            Item item = itemIterator.next();
+            item.update();
+            checkItemCollection(item);
+            if (item.isCollected()) {
+                itemIterator.remove();
             }
         }
     }
 
     public void render(Graphics g) {
         tileMapRenderer.render(g, tileMap);
-
         List<Explosion> explosionsCopy = new ArrayList<>(explosions);
         for (var explosion : explosionsCopy) {
             explosionRenderer.render(g, explosion);
         }
-
         List<Bomb> bombsCopy = new ArrayList<>(bombs);
         for (var bomb : bombsCopy) {
             bombRenderer.render(g, bomb);
         }
-
+        List<Item> itemsCopy = new ArrayList<>(items);
+        for (var item : itemsCopy) {
+            itemRenderer.render(g, item);
+        }
         List<Bomber> bombersCopy = new ArrayList<>(bombers);
         for (var bomber : bombersCopy) {
             entityRenderer.render(g, bomber);
-            if (bomber.isPlayer() && bomber.isMoving()) {
+
+            if (!silentMode && bomber.isPlayer() && bomber.isMoving()) {
                 long now = System.currentTimeMillis();
                 if (now - lastMoveSfxAtMs >= MOVE_SFX_COOLDOWN_MS) {
                     ObjectContainer.getAudioUtil().playEffect(MOVE);
@@ -149,23 +156,20 @@ public class GameSystem {
     private void createExplosion(Bomb bomb) {
         Explosion explosion = new Explosion(bomb.getGridRow(), bomb.getGridCol(), bomb.getX(), bomb.getY(),
                                             bomb.getExplosionRange());
-
         calculateExplosionTiles(explosion);
-
         explosions.add(explosion);
-
-        ObjectContainer.getAudioUtil().playEffect(BOOM_BANG);
+        if (!silentMode) {
+            ObjectContainer.getAudioUtil().playEffect(BOOM_BANG);
+        }
     }
 
     private void calculateExplosionTiles(Explosion explosion) {
         int centerRow = explosion.getGridRow();
         int centerCol = explosion.getGridCol();
         int range = explosion.getRange();
-
         explosion.getExplosionTiles()
                  .add(new Explosion.ExplosionTile(centerRow, centerCol, explosion.getX(), explosion.getY(),
                                                   Explosion.Direction.CENTER, false));
-
         calculateExplosionDirection(explosion, centerRow, centerCol, -1, 0, range, Explosion.Direction.UP);
         calculateExplosionDirection(explosion, centerRow, centerCol, 1, 0, range, Explosion.Direction.DOWN);
         calculateExplosionDirection(explosion, centerRow, centerCol, 0, -1, range, Explosion.Direction.LEFT);
@@ -178,7 +182,6 @@ public class GameSystem {
                                              int colDelta, int range, Explosion.Direction direction) {
         int xOffset = tileMap.getXDrawOffSet();
         int yOffset = tileMap.getYDrawOffSet();
-
         for (int i = 1; i <= range; i++) {
             int currentRow = startRow + (i * rowDelta);
             int currentCol = startCol + (i * colDelta);
@@ -187,7 +190,6 @@ public class GameSystem {
                 log.trace("Explosion {} stopped: out of bounds at [row={}, col={}]", direction, currentRow, currentCol);
                 break;
             }
-
             if (CollisionUtil.blocksExplosion(currentRow, currentCol, tileMap)) {
                 if (CollisionUtil.isDestructible(currentRow, currentCol, tileMap)) {
                     boolean isEnd = true;
@@ -197,7 +199,13 @@ public class GameSystem {
                     explosion.getExplosionTiles()
                              .add(new Explosion.ExplosionTile(currentRow, currentCol, tileX, tileY, direction, isEnd));
 
-                    io.nghlong3004.util.CollisionUtil.destroyTile(currentRow, currentCol, tileMap);
+
+                    boolean wasGiftBox = io.nghlong3004.util.CollisionUtil.destroyTile(currentRow, currentCol, tileMap);
+
+                    if (wasGiftBox) {
+                        trySpawnItem(currentRow, currentCol, tileX, tileY);
+                    }
+
                     log.trace("Explosion {} stopped: destroyed tile at [row={}, col={}]", direction, currentRow,
                               currentCol);
                 }
@@ -238,10 +246,13 @@ public class GameSystem {
         }
 
         Bomb bomb = new Bomb(bomberCenterX, bomberCenterY, xOffset, yOffset);
+        bomb.setExplosionRange(bomber.getExplosionRange());
         bombs.add(bomb);
         bomber.incrementBombCount();
 
-        ObjectContainer.getAudioUtil().playEffect(SET_BOOM);
+        if (!silentMode) {
+            ObjectContainer.getAudioUtil().playEffect(SET_BOOM);
+        }
     }
 
     public void add(Entity bomber) {
@@ -255,14 +266,15 @@ public class GameSystem {
         bombers.clear();
         bombs.clear();
         explosions.clear();
+        items.clear();
     }
 
     public void resetAll() {
         bombs.clear();
         bombers.clear();
         explosions.clear();
+        items.clear();
     }
-
 
     public void cleanup() {
         bomberAISystem.shutdown();
@@ -273,15 +285,22 @@ public class GameSystem {
         return tileMap.getSpawnPoints();
     }
 
+    public boolean areAllEnemiesDead() {
+        List<Bomber> bombersCopy = new ArrayList<>(bombers);
+        for (Bomber bomber : bombersCopy) {
+            if (!bomber.isPlayer() && bomber.isAlive() && !bomber.isDead()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private void checkBombExitStatus() {
         for (Bomb bomb : bombs) {
             if (!bomb.isAllowEntityExit()) {
                 continue;
             }
-
             boolean entityStillOnBomb = false;
-
-
             List<Bomber> bombersCopyForBombExit = new ArrayList<>(bombers);
             for (Bomber bomber : bombersCopyForBombExit) {
                 if (bomber.getBox().intersects(bomb.getBox())) {
@@ -340,15 +359,95 @@ public class GameSystem {
             return;
         }
 
-
         for (Bomber deadBomber : bombersList) {
             if (!deadBomber.isDead()) {
                 continue;
             }
 
-
             if (aliveBomber.getBox().intersects(deadBomber.getBox())) {
                 deadBombersToRemove.add(deadBomber);
+            }
+        }
+    }
+
+    private void trySpawnItem(int gridRow, int gridCol, float tileX, float tileY) {
+
+        if (Math.random() > io.nghlong3004.constant.ItemConstant.ITEM_DROP_CHANCE) {
+            return;
+        }
+
+        ItemType itemType;
+        double random = Math.random();
+
+        if (random < io.nghlong3004.constant.ItemConstant.BOMB_DROP_CHANCE) {
+            itemType = ItemType.BOMB;
+        }
+        else if (random < io.nghlong3004.constant.ItemConstant.BOMB_DROP_CHANCE + io.nghlong3004.constant.ItemConstant.BOMB_SIZE_DROP_CHANCE) {
+            itemType = ItemType.BOMB_SIZE;
+        }
+        else {
+            itemType = ItemType.SHOE;
+        }
+
+        int itemWidth = io.nghlong3004.constant.ItemConstant.ITEM_WIDTH;
+        int itemHeight = io.nghlong3004.constant.ItemConstant.ITEM_HEIGHT;
+        float centerOffsetX = (io.nghlong3004.constant.GameConstant.TILES_SIZE - itemWidth) / 2f;
+        float centerOffsetY = (io.nghlong3004.constant.GameConstant.TILES_SIZE - itemHeight) / 2f;
+
+        float itemX = tileX + centerOffsetX;
+        float itemY = tileY + centerOffsetY;
+
+        Item item = new Item(itemType, itemX, itemY, itemWidth, itemHeight);
+        items.add(item);
+
+        log.info("Spawned {} at grid [row={}, col={}], position [x={}, y={}]", itemType.displayName, gridRow, gridCol,
+                 itemX, itemY);
+    }
+
+    private void checkItemCollection(Item item) {
+        if (item.isCollected()) {
+            return;
+        }
+
+        List<Bomber> bombersCopy = new ArrayList<>(bombers);
+        for (Bomber bomber : bombersCopy) {
+            if (!bomber.isAlive() || bomber.isDead()) {
+                continue;
+            }
+
+
+            if (bomber.getBox().intersects(item.getBox())) {
+                applyItemEffect(bomber, item);
+                item.collect();
+
+
+                if (!silentMode) {
+                    ObjectContainer.getAudioUtil().playEffect(io.nghlong3004.constant.AudioConstant.ITEM);
+                }
+
+                log.info("{} collected {} item", bomber.isPlayer() ? "Player" : "AI", item.getType().displayName);
+                break;
+            }
+        }
+    }
+
+    private void applyItemEffect(Bomber bomber, Item item) {
+        switch (item.getType()) {
+            case BOMB -> {
+                bomber.setMaxBombs(bomber.getMaxBombs() + io.nghlong3004.constant.ItemConstant.BOMB_INCREMENT);
+                log.debug("Bomber max bombs increased to {}", bomber.getMaxBombs());
+            }
+            case BOMB_SIZE -> {
+                bomber.setExplosionRange(
+                        bomber.getExplosionRange() + io.nghlong3004.constant.ItemConstant.BOMB_SIZE_INCREMENT);
+                log.debug("Bomber explosion range increased to {}", bomber.getExplosionRange());
+            }
+            case SHOE -> {
+                float currentBoost = bomber.getSpeedBoost();
+                float newBoost = Math.min(currentBoost + io.nghlong3004.constant.ItemConstant.SPEED_INCREMENT,
+                                          io.nghlong3004.constant.ItemConstant.MAX_SPEED_BOOST);
+                bomber.setSpeedBoost(newBoost);
+                log.debug("Bomber speed boost increased to {}", newBoost);
             }
         }
     }

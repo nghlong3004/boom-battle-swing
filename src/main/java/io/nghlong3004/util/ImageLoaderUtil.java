@@ -150,6 +150,26 @@ public final class ImageLoaderUtil {
         sprites[row.index][column.index] = loadImage(path);
     }
 
+    public static BufferedImage[] loadItemImages() {
+        log.info("Loading item images");
+        BufferedImage[] items = new BufferedImage[3];
+        items[0] = loadImage(ITEM_BOMB);
+        items[1] = loadImage(ITEM_BOMB_SIZE);
+        items[2] = loadImage(ITEM_SHOE);
+        log.info("Loaded {} item images", items.length);
+        return items;
+    }
+
+    public static BufferedImage[] loadItemEffectFrames() {
+        log.info("Loading item effect frames");
+        BufferedImage[] effects = new BufferedImage[ITEM_EFFECT_FRAMES];
+        for (int i = 0; i < ITEM_EFFECT_FRAMES; i++) {
+            effects[i] = loadImage(ITEM_EFFECT_TEMPLATE.formatted(i + 1));
+        }
+        log.info("Loaded {} item effect frames", ITEM_EFFECT_FRAMES);
+        return effects;
+    }
+
     private ImageLoaderUtil() {
     }
 

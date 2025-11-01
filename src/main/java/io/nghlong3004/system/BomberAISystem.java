@@ -10,6 +10,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.concurrent.*;
 
 import static io.nghlong3004.constant.BomberConstant.AI_UPDATE_INTERVAL;
 
@@ -21,6 +22,25 @@ public class BomberAISystem implements UpdateSystem {
     private List<Bomb> bombs;
     private List<Explosion> explosions;
     private TileMap tileMap;
+
+
+    private ExecutorService aiExecutor;
+    private final ConcurrentHashMap<Bomber, Future<AIDecision>> pendingDecisions;
+
+    public BomberAISystem() {
+        this.pendingDecisions = new ConcurrentHashMap<>();
+        initializeExecutor();
+    }
+
+    private void initializeExecutor() {
+
+        this.aiExecutor = Executors.newFixedThreadPool(3, r -> {
+            Thread t = new Thread(r);
+            t.setName("AI-Worker");
+            t.setDaemon(true);
+            return t;
+        });
+    }
 
     @Override
     public void update(Object entity) {
@@ -37,10 +57,8 @@ public class BomberAISystem implements UpdateSystem {
         bomber.setAiTick(bomber.getAiTick() + 1);
 
         if (bomber.getAiTick() % AI_UPDATE_INTERVAL != 0) {
-
             return;
         }
-
 
         if (tileMap == null || allBombers == null || bombs == null || explosions == null) {
             log.error("AI context not set properly!");
@@ -48,16 +66,37 @@ public class BomberAISystem implements UpdateSystem {
         }
 
 
-        AIDecision decision = AIStrategy.makeDecision(bomber, allBombers, bombs, explosions, tileMap);
+        Future<AIDecision> pendingDecision = pendingDecisions.get(bomber);
 
-        log.trace("AI executing decision: {}", decision.getAction());
+        if (pendingDecision != null && pendingDecision.isDone()) {
+            try {
+                AIDecision decision = pendingDecision.get(0, TimeUnit.MILLISECONDS);
+                executeDecision(bomber, decision);
+                pendingDecisions.remove(bomber);
+            } catch (Exception e) {
+                log.warn("Failed to get AI decision: {}", e.getMessage());
+                pendingDecisions.remove(bomber);
+            }
+        }
 
 
-        executeDecision(bomber, decision);
+        if (pendingDecision == null || pendingDecision.isDone()) {
+
+            final List<Bomber> bombersCopy = List.copyOf(allBombers);
+            final List<Bomb> bombsCopy = List.copyOf(bombs);
+            final List<Explosion> explosionsCopy = List.copyOf(explosions);
+            final TileMap tileMapRef = tileMap;
+
+            Future<AIDecision> future = aiExecutor.submit(() -> {
+
+                return AIStrategy.makeDecision(bomber, bombersCopy, bombsCopy, explosionsCopy, tileMapRef);
+            });
+
+            pendingDecisions.put(bomber, future);
+        }
     }
 
     private void executeDecision(Bomber bomber, AIDecision decision) {
-
         bomber.setLeft(false);
         bomber.setRight(false);
         bomber.setUp(false);
@@ -77,10 +116,8 @@ public class BomberAISystem implements UpdateSystem {
             case PLACE_BOMB -> {
                 log.info("AI placing bomb");
                 bomber.requestPlaceBomb();
-
             }
             case PLACE_BOMB_AND_ESCAPE -> {
-
                 log.info("AI placing bomb and escaping");
                 bomber.requestPlaceBomb();
 
@@ -106,5 +143,20 @@ public class BomberAISystem implements UpdateSystem {
             case 2 -> bomber.setRight(true);
             case 3 -> bomber.setUp(true);
         }
+    }
+
+
+    public void shutdown() {
+        if (aiExecutor != null && !aiExecutor.isShutdown()) {
+            aiExecutor.shutdownNow();
+            pendingDecisions.clear();
+        }
+    }
+
+
+    public void restart() {
+        shutdown();
+        initializeExecutor();
+        log.info("AI system restarted");
     }
 }

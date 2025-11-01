@@ -4,6 +4,8 @@ public final class ImageConstant {
 
     public static final String MENU_BUTTON = "/images/buttons/button_atlas.png";
 
+    public static final String BUTTON_EMPTY = "/images/buttons/button_empty.png";
+
     public static final String MENU_BACKGROUND = "/images/home/menu_background.png";
 
     public static final String BACKGROUND = "/images/home/boom-online-3.jpg";
@@ -29,11 +31,17 @@ public final class ImageConstant {
     public static final String BOZ = "/images/player/boz.png";
     public static final String EVIE = "/images/player/evie.png";
     public static final String IKE = "/images/player/ike.png";
-    public static final String LODUMANI = "/images/player/lodumani.png";
     public static final String PLUNK = "/images/player/plunk.png";
 
     public static final String BOMBER_SKIN_TEMPLATE = "/images/player/%s.png";
-    
+    public static final String BOMBER_AVATAR_TEMPLATE = "/images/player/%s_avatar.png";
+
+    public static final String BOMBER_DEAD = "/images/player/bomber_deads.png";
+    public static final int BOMBER_DEAD_SPRITE_SIZE = 100;
+    public static final int BOMBER_DEAD_ROWS = 4;
+    public static final int BOMBER_DEAD_COLS = 4;
+    public static final int BOMBER_DEAD_FRAMES = 4;
+
     public static final String SOLDIER_DOWN = "/images/boss/%d/boss_down.png";
     public static final String SOLDIER_UP = "/images/boss/%d/boss_up.png";
     public static final String SOLDIER_LEFT = "/images/boss/%d/boss_left.png";
@@ -41,13 +49,13 @@ public final class ImageConstant {
     public static final String SOLDIER_DIE_TEMPLATE = "/images/boss/%d/boss_die_%d.png";
     public static final int SOLDIER_TYPES = 3;
     public static final int SOLDIER_DIE_FRAMES = 3;
-    
+
     public static final String BOMB_TEMPLATE = "/images/boom/boom%d.png";
     public static final String EXPLOSION_ANIMATION = "/images/boom/explosion.png";
     public static final int EXPLOSION_FRAME_WIDTH = 102;
     public static final int EXPLOSION_FRAME_HEIGHT = 103;
     public static final int EXPLOSION_FRAME_COUNT = 10;
-    
+
     public static final String EXPLOSION_MID = "/images/boom/explosion_mid_2.png";
     public static final String EXPLOSION_UP_1 = "/images/boom/explosion_up_1.png";
     public static final String EXPLOSION_UP_2 = "/images/boom/explosion_up_2.png";

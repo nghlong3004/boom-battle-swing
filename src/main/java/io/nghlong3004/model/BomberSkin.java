@@ -8,8 +8,7 @@ public enum BomberSkin {
     BOZ(0, "boz"),
     EVIE(1, "evie"),
     IKE(2, "ike"),
-    LODUMANI(3, "lodumani"),
-    PLUNK(4, "plunk");
+    PLUNK(3, "plunk");
 
     public final int index;
     public final String name;

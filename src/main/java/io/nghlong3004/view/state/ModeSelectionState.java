@@ -41,11 +41,11 @@ public class ModeSelectionState implements GameState {
 
 
         int yOffline = factor * 3 >>> 1;
-        modeButtons[0] = new ModeButton(x, yOffline, 0, GameMode.OFFLINE, "OFFLINE");
+        modeButtons[0] = new ModeButton(x, yOffline, GameMode.OFFLINE, "OFFLINE");
 
 
         int yOnline = factor * 4 >>> 1;
-        modeButtons[1] = new ModeButton(x, yOnline, 1, GameMode.ONLINE, "ONLINE");
+        modeButtons[1] = new ModeButton(x, yOnline, GameMode.ONLINE, "ONLINE");
     }
 
     @Override
@@ -59,29 +59,10 @@ public class ModeSelectionState implements GameState {
     public void render(Graphics g) {
         g.drawImage(background, 0, 0, GAME_WIDTH, GAME_HEIGHT, null);
 
-
         g.setColor(Color.WHITE);
-        g.setFont(new Font("Arial", Font.BOLD, 48));
-        String title = "SELECT GAME MODE";
-        FontMetrics fm = g.getFontMetrics();
-        int titleWidth = fm.stringWidth(title);
-        int titleX = (GAME_WIDTH - titleWidth) / 2;
-        int titleY = 100;
-        g.drawString(title, titleX, titleY);
-
-
         for (ModeButton button : modeButtons) {
             button.render(g);
         }
-
-
-        g.setFont(new Font("Arial", Font.ITALIC, 16));
-        g.setColor(new Color(255, 255, 100));
-        String message = "(Online mode coming soon...)";
-        int msgWidth = g.getFontMetrics().stringWidth(message);
-        int msgX = (GAME_WIDTH - msgWidth) / 2;
-        int msgY = GAME_HEIGHT - 150;
-        g.drawString(message, msgX, msgY);
     }
 
     @Override
@@ -100,15 +81,14 @@ public class ModeSelectionState implements GameState {
                 GameMode selectedMode = modeButton.getGameMode();
 
                 if (selectedMode == GameMode.ONLINE) {
-
-                    log.info("Online mode not implemented yet");
-
+                    log.info("Online mode selected, proceeding to skin selection");
+                    GameStateContextHolder.GAME_MODE = selectedMode;
+                    stateContext.changeState(State.SKIN_SELECTION);
                 }
                 else {
-
                     GameStateContextHolder.GAME_MODE = selectedMode;
                     log.info("Selected game mode: {}", selectedMode);
-                    stateContext.changeState(State.PLAYING);
+                    stateContext.changeState(State.SKIN_SELECTION);
                 }
                 break;
             }
@@ -138,7 +118,7 @@ public class ModeSelectionState implements GameState {
 
         else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
             GameStateContextHolder.GAME_MODE = GameMode.OFFLINE;
-            stateContext.changeState(State.PLAYING);
+            stateContext.changeState(State.SKIN_SELECTION);
         }
     }
 

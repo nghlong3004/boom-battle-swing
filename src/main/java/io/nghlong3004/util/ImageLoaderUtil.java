@@ -58,7 +58,7 @@ public final class ImageLoaderUtil {
         }
         return images;
     }
-    
+
     public static BufferedImage[] loadBombSprites() {
         log.info("Loading bomb sprites");
         BufferedImage[] bombSprites = new BufferedImage[8];
@@ -68,7 +68,7 @@ public final class ImageLoaderUtil {
         }
         return bombSprites;
     }
-    
+
     public static BufferedImage[] loadExplosionSprites() {
         log.info("Loading explosion sprites");
         BufferedImage[] explosionSprites = new BufferedImage[9];
@@ -83,28 +83,39 @@ public final class ImageLoaderUtil {
         explosionSprites[8] = loadImage(EXPLOSION_RIGHT_2);
         return explosionSprites;
     }
-    
+
     public static BufferedImage[] loadExplosionAnimationFrames() {
         log.info("Loading explosion animation frames");
         BufferedImage explosionSheet = loadImage(EXPLOSION_ANIMATION);
         BufferedImage[] frames = new BufferedImage[EXPLOSION_FRAME_COUNT];
-        
+
         for (int i = 0; i < EXPLOSION_FRAME_COUNT; i++) {
-            frames[i] = explosionSheet.getSubimage(
-                i * EXPLOSION_FRAME_WIDTH, 
-                0, 
-                EXPLOSION_FRAME_WIDTH, 
-                EXPLOSION_FRAME_HEIGHT
-            );
+            frames[i] = explosionSheet.getSubimage(i * EXPLOSION_FRAME_WIDTH, 0, EXPLOSION_FRAME_WIDTH,
+                                                   EXPLOSION_FRAME_HEIGHT);
         }
-        
+
         return frames;
     }
-    
+
+    public static BufferedImage[] loadBomberDeathSprites() {
+        log.info("Loading bomber death animation sprites");
+        BufferedImage deathSheet = loadImage(BOMBER_DEAD);
+        BufferedImage[] frames = new BufferedImage[BOMBER_DEAD_FRAMES];
+
+        for (int i = 0; i < BOMBER_DEAD_FRAMES; i++) {
+            int col = i % BOMBER_DEAD_COLS;
+            frames[i] = deathSheet.getSubimage(col * BOMBER_DEAD_SPRITE_SIZE, 0, BOMBER_DEAD_SPRITE_SIZE,
+                                               BOMBER_DEAD_SPRITE_SIZE);
+        }
+
+        log.info("Loaded {} bomber death animation frames", BOMBER_DEAD_FRAMES);
+        return frames;
+    }
+
     public static BufferedImage[][][] loadSoldierSprites() {
         log.info("Loading soldier sprites");
         BufferedImage[][][] soldierSprites = new BufferedImage[SOLDIER_TYPES][4][1];
-        
+
         for (int type = 0; type < SOLDIER_TYPES; type++) {
             int folderIndex = type + 1;
             soldierSprites[type][0][0] = loadImage(SOLDIER_DOWN.formatted(folderIndex));
@@ -112,7 +123,7 @@ public final class ImageLoaderUtil {
             soldierSprites[type][2][0] = loadImage(SOLDIER_RIGHT.formatted(folderIndex));
             soldierSprites[type][3][0] = loadImage(SOLDIER_UP.formatted(folderIndex));
         }
-        
+
         log.info("Loaded {} soldier types with 4 directions each", SOLDIER_TYPES);
         return soldierSprites;
     }

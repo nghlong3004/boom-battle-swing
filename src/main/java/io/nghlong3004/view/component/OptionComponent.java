@@ -5,7 +5,6 @@ import io.nghlong3004.model.State;
 import io.nghlong3004.view.GameObject;
 import io.nghlong3004.view.button.GameButton;
 import io.nghlong3004.view.button.SpriteButton;
-import io.nghlong3004.view.state.PlayingState;
 import io.nghlong3004.view.state.StateContext;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,10 +16,8 @@ import static io.nghlong3004.constant.ButtonConstant.URM_BUTTON_SIZE;
 import static io.nghlong3004.constant.GameConstant.SCALE;
 
 @Slf4j
-public class SpriteComponent implements MouseComponent {
+public class OptionComponent implements MouseComponent {
 
-    private SpriteButton unpauseButton;
-    private SpriteButton replayButton;
     private SpriteButton homeButton;
 
     private final List<GameButton> buttons;
@@ -28,20 +25,17 @@ public class SpriteComponent implements MouseComponent {
 
     private final StateContext context;
 
-    public SpriteComponent(StateContext context) {
+    public OptionComponent(StateContext context) {
         this.context = context;
         createSpritesButton();
-        buttons = List.of(unpauseButton, replayButton, homeButton);
-        objects = List.of(unpauseButton, replayButton, homeButton);
+        buttons = List.of(homeButton);
+        objects = List.of(homeButton);
     }
 
     private void createSpritesButton() {
-        int homeX = (int) (321 * SCALE);
-        int unPauseX = (int) (homeX + URM_BUTTON_SIZE * 6 / 5);
-        int relayX = (int) (unPauseX + URM_BUTTON_SIZE * 6 / 5);
+        // Center the home button since there's only one button
+        int homeX = (int) (387 * SCALE); // Centered position
         int spriteY = (int) (325 * SCALE);
-        unpauseButton = new SpriteButton(unPauseX, spriteY, URM_BUTTON_SIZE, URM_BUTTON_SIZE, 0);
-        replayButton = new SpriteButton(relayX, spriteY, URM_BUTTON_SIZE, URM_BUTTON_SIZE, 1);
         homeButton = new SpriteButton(homeX, spriteY, URM_BUTTON_SIZE, URM_BUTTON_SIZE, 2);
     }
 
@@ -58,31 +52,7 @@ public class SpriteComponent implements MouseComponent {
     public void mouseReleased(MouseEvent e) {
         if (homeButton.isMouseOver(e)) {
             if (homeButton.isMousePressed()) {
-                // Reset game before going to menu
-                PlayingState playingState = context.getPlayingState();
-                if (playingState != null) {
-                    playingState.reset();
-                    log.info("Game reset, returning to menu");
-                }
                 context.changeState(State.MENU);
-            }
-        }
-        else if (unpauseButton.isMouseOver(e)) {
-            if (unpauseButton.isMousePressed()) {
-                // Continue game without reset
-                log.info("Unpausing game, continuing...");
-                context.changeState(State.PLAYING);
-            }
-        }
-        else if (replayButton.isMouseOver(e)) {
-            if (replayButton.isMousePressed()) {
-                // Reset and restart game
-                PlayingState playingState = context.getPlayingState();
-                if (playingState != null) {
-                    playingState.reset();
-                    log.info("Game reset, restarting...");
-                }
-                context.changeState(State.PLAYING);
             }
         }
 

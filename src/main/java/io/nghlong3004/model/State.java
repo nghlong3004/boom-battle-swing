@@ -4,6 +4,9 @@ public enum State {
     PLAYING,
     MENU,
     MODE_SELECTION,
+    SKIN_SELECTION,
+    MAP_SELECTION,
+    PAUSED,
     OPTION,
     QUIT;
 }

@@ -19,6 +19,11 @@ public class Bomber extends Entity {
     private int directionChangeCooldown = 0;
     private AIPathfindingMode pathfindingMode = AIPathfindingMode.BFS;
 
+
+    private int deathAnimationFrame = 0;
+    private int deathAnimationTick = 0;
+    private boolean isDead = false;
+
     public Bomber(float x, float y, int width, int height, boolean isPlayer) {
         super(x, y, width, height);
         this.isPlayer = isPlayer;
@@ -73,5 +78,36 @@ public class Bomber extends Entity {
         this.placeBombRequested = false;
         this.aiTick = 0;
         this.directionChangeCooldown = 0;
+        this.isDead = false;
+        this.deathAnimationFrame = 0;
+        this.deathAnimationTick = 0;
+    }
+
+
+    public void die() {
+        if (!isDead) {
+            this.isDead = true;
+            this.setAlive(false);
+            this.deathAnimationFrame = 0;
+            this.deathAnimationTick = 0;
+        }
+    }
+
+
+    public void updateDeathAnimation() {
+        if (!isDead) {
+            return;
+        }
+
+        deathAnimationTick++;
+        if (deathAnimationTick >= 100) {
+            deathAnimationTick = 0;
+            deathAnimationFrame = (deathAnimationFrame + 1) % 4;
+        }
+    }
+
+
+    public boolean isDeathAnimationComplete() {
+        return isDead && deathAnimationFrame >= 15;
     }
 }

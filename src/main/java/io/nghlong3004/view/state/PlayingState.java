@@ -5,6 +5,7 @@ import io.nghlong3004.constant.MapConstant;
 import io.nghlong3004.model.Bomber;
 import io.nghlong3004.model.Entity;
 import io.nghlong3004.model.SpawnPoint;
+import io.nghlong3004.model.State;
 import io.nghlong3004.system.GameStateContextHolder;
 import io.nghlong3004.system.GameSystem;
 import io.nghlong3004.util.ObjectContainer;
@@ -33,7 +34,6 @@ public class PlayingState implements GameState {
         this.random = new Random();
         this.gameSystem = new GameSystem();
 
-        loadMapAndSpawnEntities();
     }
 
     private void loadMapAndSpawnEntities() {
@@ -59,7 +59,7 @@ public class PlayingState implements GameState {
         var enemySpawns = gameSystem.getTileMap().getSoldierSpawns();
         int enemyCount = 0;
         for (SpawnPoint spawn : enemySpawns) {
-            int skinIndex = (enemyCount % 3) + 1;
+            int skinIndex = random.nextInt(3) + 1;
 
             float centerX = spawn.getCenteredX((int) BOMBER_WIDTH);
             float centerY = spawn.getCenteredY((int) BOMBER_HEIGHT);
@@ -75,6 +75,7 @@ public class PlayingState implements GameState {
     }
 
     public void reset() {
+        log.info("Resetting PlayingState - clearing all entities and reloading map");
         gameSystem.resetAll();
     }
 
@@ -95,6 +96,7 @@ public class PlayingState implements GameState {
 
     @Override
     public void enter() {
+        loadMapAndSpawnEntities();
         ObjectContainer.getAudioUtil().playSong(AudioConstant.GAME);
     }
 
@@ -106,9 +108,12 @@ public class PlayingState implements GameState {
             case KeyEvent.VK_W -> bomber.setUp(true);
             case KeyEvent.VK_S -> bomber.setDown(true);
             case KeyEvent.VK_SPACE -> {
-                if (bomber instanceof io.nghlong3004.model.Bomber) {
-                    ((io.nghlong3004.model.Bomber) bomber).requestPlaceBomb();
+                if (bomber instanceof Bomber) {
+                    ((Bomber) bomber).requestPlaceBomb();
                 }
+            }
+            case KeyEvent.VK_ENTER -> {
+                stateContext.changeState(State.PAUSED);
             }
         }
     }

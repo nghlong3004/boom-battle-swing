@@ -15,15 +15,22 @@ public final class StateContext implements GameObject {
     private GameState currentState;
 
     private final GameState menuState;
+    @Getter
     private final PlayingState playingState;
     private final GameState pausedState;
+    private final GameState optionState;
     private final GameState modeSelectionState;
+    private final GameState skinSelectionState;
+    private final GameState mapSelectionState;
 
     public StateContext() {
         menuState = new MenuState(this);
         playingState = new PlayingState(this);
         pausedState = new PausedState(this);
+        optionState = new OptionState(this);
         modeSelectionState = new ModeSelectionState(this);
+        skinSelectionState = new SkinSelectionState(this);
+        mapSelectionState = new MapSelectionState(this);
 
         changeState(State.MENU);
     }
@@ -35,19 +42,24 @@ public final class StateContext implements GameObject {
     }
 
     public void changeState(State state) {
-        if (currentState != null && state != State.OPTION) {
+        if (currentState != null && state != State.OPTION && state != State.PAUSED) {
             currentState.exit();
         }
 
         switch (state) {
             case MENU -> currentState = menuState;
             case MODE_SELECTION -> currentState = modeSelectionState;
+            case SKIN_SELECTION -> currentState = skinSelectionState;
+            case MAP_SELECTION -> currentState = mapSelectionState;
             case PLAYING -> currentState = playingState;
-            case OPTION -> currentState = pausedState;
+            case PAUSED -> currentState = pausedState;
+            case OPTION -> currentState = optionState;
             case QUIT -> System.exit(0);
         }
 
-        currentState.enter();
+        if (!(GameStateContextHolder.STATE == State.PAUSED && state == State.PLAYING)) {
+            currentState.enter();
+        }
         GameStateContextHolder.STATE = state;
     }
 

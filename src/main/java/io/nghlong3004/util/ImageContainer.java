@@ -13,6 +13,7 @@ public class ImageContainer {
     private final BufferedImage[] explosionSprites;
     private final BufferedImage[] explosionAnimationFrames;
     private final BufferedImage[][][] soldierSprites;
+    private final BufferedImage[] bomberDeathSprites;
 
     public static ImageContainer getInstance() {
         return Holder.INSTANCE;
@@ -25,6 +26,7 @@ public class ImageContainer {
         explosionSprites = ImageLoaderUtil.loadExplosionSprites();
         explosionAnimationFrames = ImageLoaderUtil.loadExplosionAnimationFrames();
         soldierSprites = ImageLoaderUtil.loadSoldierSprites();
+        bomberDeathSprites = ImageLoaderUtil.loadBomberDeathSprites();
     }
 
     private static class Holder {

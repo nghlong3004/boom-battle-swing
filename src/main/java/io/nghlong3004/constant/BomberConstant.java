@@ -21,15 +21,15 @@ public final class BomberConstant extends GameConstant {
     public static final int CRABBY_WIDTH = (int) (CRABBY_WIDTH_DEFAULT * SCALE);
     public static final int CRABBY_HEIGHT = (int) (CRABBY_HEIGHT_DEFAULT * SCALE);
 
-    public static final int BOMBER_WIDTH_DEFAULT = 50;
+    public static final int BOMBER_WIDTH_DEFAULT = 47;
     public static final int BOMBER_HEIGHT_DEFAULT = 30;
 
     public static final int BOMBER_WIDTH = (int) (BOMBER_WIDTH_DEFAULT * SCALE);
     public static final int BOMBER_HEIGHT = (int) (BOMBER_HEIGHT_DEFAULT * SCALE);
 
-    public static final int ANIMATION_SPEED = 15;
+    public static final int ANIMATION_SPEED = 25;
 
-    public static final float BOMBER_SPEED = 1f * SCALE;
+    public static final float BOMBER_SPEED = 0.6f * SCALE;
 
     public static final float X_DRAW_OFF_SET = 5f * SCALE;
     public static final float Y_DRAW_OFF_SET = 1f * SCALE;
@@ -38,8 +38,8 @@ public final class BomberConstant extends GameConstant {
     public static final int BOMBER_LENGTH_HEIGHT = 5;
 
     public static final float DIAGONAL_SPEED_MODIFIER = 0.70710678f;
-    
-    // AI Constants
-    public static final int AI_UPDATE_INTERVAL = 5; // Update AI every 5 ticks for better responsiveness
+
+
+    public static final int AI_UPDATE_INTERVAL = 15;
 
 }

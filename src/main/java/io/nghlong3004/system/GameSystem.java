@@ -1,6 +1,7 @@
 package io.nghlong3004.system;
 
 import io.nghlong3004.model.*;
+import io.nghlong3004.util.CollisionUtil;
 import io.nghlong3004.util.ObjectContainer;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +57,16 @@ public class GameSystem {
         bomberAISystem.setExplosions(explosions);
         bomberAISystem.setTileMap(tileMap);
 
+
+        List<Bomber> deadBombersToRemove = new ArrayList<>();
+
         for (var bomber : bombers) {
+
+            if (bomber.isDead()) {
+                bomber.updateDeathAnimation();
+                continue;
+            }
+
             if (!bomber.isPlayer()) {
                 bomberAISystem.update(bomber);
             }
@@ -67,7 +77,13 @@ public class GameSystem {
             }
 
             entityUpdater.update(bomber);
+
+
+            checkWalkOverDeadBomber(bomber, deadBombersToRemove);
         }
+
+
+        bombers.removeAll(deadBombersToRemove);
 
         checkBombExitStatus();
 
@@ -167,8 +183,8 @@ public class GameSystem {
                 break;
             }
 
-            if (io.nghlong3004.util.CollisionUtil.blocksExplosion(currentRow, currentCol, tileMap)) {
-                if (io.nghlong3004.util.CollisionUtil.isDestructible(currentRow, currentCol, tileMap)) {
+            if (CollisionUtil.blocksExplosion(currentRow, currentCol, tileMap)) {
+                if (CollisionUtil.isDestructible(currentRow, currentCol, tileMap)) {
                     boolean isEnd = true;
                     float tileX = currentCol * io.nghlong3004.constant.GameConstant.TILES_SIZE + xOffset;
                     float tileY = currentRow * io.nghlong3004.constant.GameConstant.TILES_SIZE + yOffset;
@@ -230,17 +246,22 @@ public class GameSystem {
     }
 
     public void removeAll() {
+        bomberAISystem.shutdown();
         bombers.clear();
         bombs.clear();
         explosions.clear();
     }
 
     public void resetAll() {
-        for (var bomber : bombers) {
-            bomber.reset();
-        }
         bombs.clear();
+        bombers.clear();
         explosions.clear();
+    }
+
+
+    public void cleanup() {
+        bomberAISystem.shutdown();
+        log.info("GameSystem cleaned up");
     }
 
     public List<SpawnPoint> getSpawnPoints() {
@@ -277,7 +298,7 @@ public class GameSystem {
 
             for (var explosionTile : explosion.getExplosionTiles()) {
                 if (isEntityInExplosionTile(bomber, explosionTile)) {
-                    bomber.setAlive(false);
+                    bomber.die();
                     String entityType = bomber.isPlayer() ? "Player" : "Enemy";
                     log.info("{} killed by explosion at grid [row={}, col={}]", entityType, explosionTile.getGridRow(),
                              explosionTile.getGridCol());
@@ -301,5 +322,24 @@ public class GameSystem {
         int entityGridRow = (int) (relativeY / io.nghlong3004.constant.GameConstant.TILES_SIZE);
 
         return entityGridRow == explosionTile.getGridRow() && entityGridCol == explosionTile.getGridCol();
+    }
+
+
+    private void checkWalkOverDeadBomber(Bomber aliveBomber, List<Bomber> deadBombersToRemove) {
+        if (!aliveBomber.isAlive() || aliveBomber.isDead()) {
+            return;
+        }
+
+
+        for (Bomber deadBomber : bombers) {
+            if (!deadBomber.isDead()) {
+                continue;
+            }
+
+
+            if (aliveBomber.getBox().intersects(deadBomber.getBox())) {
+                deadBombersToRemove.add(deadBomber);
+            }
+        }
     }
 }

@@ -1,5 +1,0 @@
-package io.nghlong3004.boom_battle_swing.view.game;
-
-public interface GameUpdater {
-    void update();
-}

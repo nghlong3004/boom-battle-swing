@@ -16,14 +16,13 @@ public abstract class Entity {
     @Setter
     private boolean moving;
     @Setter
+    private boolean alive;
+    @Setter
     private int direction;
-    // This is the tick used to do UPS
     @Setter
     private int tick;
-    // This is index for images entity
     @Setter
     private int index;
-    // This is speed for entity
     @Setter
     private float speed;
     protected float x;
@@ -38,15 +37,33 @@ public abstract class Entity {
         this.y = y;
         this.width = width;
         this.height = height;
-        reset();
+        initializeHitbox();
+        initializeState();
     }
+    
+    protected void initializeHitbox() {
+        float hitboxWidth = width - 40f;
+        float hitboxHeight = height - 11.5f;
+        float hitboxX = x + (width - hitboxWidth) / 2;
+        float hitboxY = y + (height - hitboxHeight) / 2;
+        this.box = new Rectangle2D.Float(hitboxX, hitboxY, hitboxWidth, hitboxHeight);
+    }
+    
+    protected void initializeState() {
+        this.moving = false;
+        this.alive = true;
+        this.direction = DOWN;
+        this.speed = getDefaultSpeed();
+        this.tick = 0;
+        this.index = 0;
+        resetDirection();
+    }
+    
+    protected abstract float getDefaultSpeed();
 
     public void reset() {
-        setBox(x, y, (int) (width - 27.5f), (int) (height - 11.5f));
-        this.moving = false;
-        this.direction = DOWN;
-        this.speed = BOMBER_SPEED;
-        resetDirection();
+        initializeHitbox();
+        initializeState();
     }
 
     public void resetDirection() {

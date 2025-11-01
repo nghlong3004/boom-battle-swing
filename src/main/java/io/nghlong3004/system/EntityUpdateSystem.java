@@ -1,18 +1,41 @@
 package io.nghlong3004.system;
 
 
+import io.nghlong3004.model.Bomb;
 import io.nghlong3004.model.Entity;
+import io.nghlong3004.model.TileMap;
+import io.nghlong3004.util.CollisionUtil;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.geom.Rectangle2D;
+import java.util.List;
 
 import static io.nghlong3004.constant.BomberConstant.*;
 
 @Slf4j
 public class EntityUpdateSystem implements UpdateSystem {
+
+    @Setter
+    private TileMap tileMap;
+    
+    @Setter
+    private List<Bomb> bombs;
+    
+    @Setter
+    private List<Entity> allEntities;
+
     @Override
     public void update(Object object) {
         Entity entity = (Entity) object;
+
+        if (!entity.isAlive()) {
+            if (entity.isMoving()) {
+                entity.setMoving(false);
+            }
+            return;
+        }
+
         updatePosition(entity);
         updateAnimationTick(entity);
         setAnimation(entity);
@@ -83,8 +106,58 @@ public class EntityUpdateSystem implements UpdateSystem {
         }
 
         Rectangle2D.Float hitbox = entity.getBox();
-        hitbox.x += xSpeed;
-        hitbox.y += ySpeed;
-        entity.setMoving(true);
+        float newX = hitbox.x + xSpeed;
+        float newY = hitbox.y + ySpeed;
+
+        if (tileMap != null && CollisionUtil.canMove(hitbox, newX, newY, tileMap)) {
+            Rectangle2D.Float newHitbox = new Rectangle2D.Float(newX, newY, hitbox.width, hitbox.height);
+            
+            if (!collidesWithBombs(newHitbox)) {
+                if (!collidesWithOtherEntities(entity, newHitbox)) {
+                    hitbox.x = newX;
+                    hitbox.y = newY;
+                    entity.setMoving(true);
+                }
+            }
+        }
+    }
+    
+    private boolean collidesWithBombs(Rectangle2D.Float hitbox) {
+        if (bombs == null) {
+            return false;
+        }
+        
+        for (Bomb bomb : bombs) {
+            if (bomb.isExploded()) {
+                continue;
+            }
+            
+            if (hitbox.intersects(bomb.getBox())) {
+                if (bomb.isAllowEntityExit()) {
+                    return false;
+                }
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    private boolean collidesWithOtherEntities(Entity currentEntity, Rectangle2D.Float hitbox) {
+        if (allEntities == null) {
+            return false;
+        }
+        
+        for (Entity other : allEntities) {
+            if (other == currentEntity || !other.isAlive()) {
+                continue;
+            }
+            
+            if (hitbox.intersects(other.getBox())) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 }

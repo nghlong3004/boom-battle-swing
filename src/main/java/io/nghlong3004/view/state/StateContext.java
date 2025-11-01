@@ -17,11 +17,13 @@ public final class StateContext implements GameObject {
     private final GameState menuState;
     private final PlayingState playingState;
     private final GameState pausedState;
+    private final GameState modeSelectionState;
 
     public StateContext() {
         menuState = new MenuState(this);
         playingState = new PlayingState(this);
         pausedState = new PausedState(this);
+        modeSelectionState = new ModeSelectionState(this);
 
         changeState(State.MENU);
     }
@@ -39,6 +41,7 @@ public final class StateContext implements GameObject {
 
         switch (state) {
             case MENU -> currentState = menuState;
+            case MODE_SELECTION -> currentState = modeSelectionState;
             case PLAYING -> currentState = playingState;
             case OPTION -> currentState = pausedState;
             case QUIT -> System.exit(0);

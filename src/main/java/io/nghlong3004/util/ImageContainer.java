@@ -8,7 +8,11 @@ import java.util.List;
 @Getter
 public class ImageContainer {
     private final List<BufferedImage[][]> bomberSkins;
-    private BufferedImage[][] tileSprites;
+    private final BufferedImage[][] tileSprites;
+    private final BufferedImage[] bombSprites;
+    private final BufferedImage[] explosionSprites;
+    private final BufferedImage[] explosionAnimationFrames;
+    private final BufferedImage[][][] soldierSprites;
 
     public static ImageContainer getInstance() {
         return Holder.INSTANCE;
@@ -17,6 +21,10 @@ public class ImageContainer {
     private ImageContainer() {
         bomberSkins = ImageLoaderUtil.loadBomberSkin();
         tileSprites = ImageLoaderUtil.loadTileSprites();
+        bombSprites = ImageLoaderUtil.loadBombSprites();
+        explosionSprites = ImageLoaderUtil.loadExplosionSprites();
+        explosionAnimationFrames = ImageLoaderUtil.loadExplosionAnimationFrames();
+        soldierSprites = ImageLoaderUtil.loadSoldierSprites();
     }
 
     private static class Holder {

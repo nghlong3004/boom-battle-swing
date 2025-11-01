@@ -9,6 +9,7 @@ public class AudioConstant {
     public static int SET_BOOM = 1;
     public static int START = 2;
     public static int CLICK = 3;
+    public static int BOOM_BANG = 4;
 
-    public static float VOLUME_START = 0.6f;
+    public static float VOLUME_START = 0.1f;
 }

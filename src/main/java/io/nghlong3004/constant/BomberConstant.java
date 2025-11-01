@@ -38,5 +38,8 @@ public final class BomberConstant extends GameConstant {
     public static final int BOMBER_LENGTH_HEIGHT = 5;
 
     public static final float DIAGONAL_SPEED_MODIFIER = 0.70710678f;
+    
+    // AI Constants
+    public static final int AI_UPDATE_INTERVAL = 5; // Update AI every 5 ticks for better responsiveness
 
 }

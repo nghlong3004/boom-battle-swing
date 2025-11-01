@@ -58,7 +58,7 @@ public class AudioUtil {
     }
 
     private void loadEffects() {
-        String[] effectNames = {"move", "set_boom", "start", "click"};
+        String[] effectNames = {"move", "set_boom", "start", "click", "boom_bang"};
         effects = new Clip[effectNames.length];
         for (int i = 0; i < effects.length; i++) {
             effects[i] = getClip(effectNames[i]);

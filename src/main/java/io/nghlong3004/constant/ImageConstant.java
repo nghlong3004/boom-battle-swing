@@ -33,7 +33,30 @@ public final class ImageConstant {
     public static final String PLUNK = "/images/player/plunk.png";
 
     public static final String BOMBER_SKIN_TEMPLATE = "/images/player/%s.png";
-
+    
+    public static final String SOLDIER_DOWN = "/images/boss/%d/boss_down.png";
+    public static final String SOLDIER_UP = "/images/boss/%d/boss_up.png";
+    public static final String SOLDIER_LEFT = "/images/boss/%d/boss_left.png";
+    public static final String SOLDIER_RIGHT = "/images/boss/%d/boss_right.png";
+    public static final String SOLDIER_DIE_TEMPLATE = "/images/boss/%d/boss_die_%d.png";
+    public static final int SOLDIER_TYPES = 3;
+    public static final int SOLDIER_DIE_FRAMES = 3;
+    
+    public static final String BOMB_TEMPLATE = "/images/boom/boom%d.png";
+    public static final String EXPLOSION_ANIMATION = "/images/boom/explosion.png";
+    public static final int EXPLOSION_FRAME_WIDTH = 102;
+    public static final int EXPLOSION_FRAME_HEIGHT = 103;
+    public static final int EXPLOSION_FRAME_COUNT = 10;
+    
+    public static final String EXPLOSION_MID = "/images/boom/explosion_mid_2.png";
+    public static final String EXPLOSION_UP_1 = "/images/boom/explosion_up_1.png";
+    public static final String EXPLOSION_UP_2 = "/images/boom/explosion_up_2.png";
+    public static final String EXPLOSION_DOWN_1 = "/images/boom/explosion_down_1.png";
+    public static final String EXPLOSION_DOWN_2 = "/images/boom/explosion_down_2.png";
+    public static final String EXPLOSION_LEFT_1 = "/images/boom/explosion_left_1.png";
+    public static final String EXPLOSION_LEFT_2 = "/images/boom/explosion_left_2.png";
+    public static final String EXPLOSION_RIGHT_1 = "/images/boom/explosion_right_1.png";
+    public static final String EXPLOSION_RIGHT_2 = "/images/boom/explosion_right_2.png";
 
     public static final int IMAGE_BOMBER_WIDTH = 58;
     public static final int IMAGE_BOMBER_HEIGHT = 71;

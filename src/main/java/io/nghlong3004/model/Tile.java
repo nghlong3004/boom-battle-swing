@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public enum Tile {
     STONE(0, "stone"),
-    BRICK(2, "brick"),
     FLOOR(1, "floor"),
+    BRICK(2, "brick"),
     GIFT_BOX(3, "gift_box"),
     M(4, "m");
 

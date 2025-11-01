@@ -37,11 +37,11 @@ public class MenuState implements GameState {
         menuButtons = new MenuButton[3];
         int x = GAME_WIDTH >>> 1;
         int factor = (int) ((MENU_BUTTON_WIDTH_DEFAULT) * SCALE);
-        State[] states = {State.PLAYING, State.OPTION, State.QUIT};
+
+        State[] states = {State.MODE_SELECTION, State.OPTION, State.QUIT};
         for (int i = 0; i < 3; ++i) {
             int y = factor * (i + 2) >>> 1;
             menuButtons[i] = new MenuButton(x, y, i, states[i]);
-            System.out.println(i);
         }
     }
 
@@ -96,7 +96,8 @@ public class MenuState implements GameState {
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-            stateContext.changeState(State.PLAYING);
+
+            stateContext.changeState(State.MODE_SELECTION);
         }
     }
 

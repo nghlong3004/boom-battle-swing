@@ -1,6 +1,8 @@
 package io.nghlong3004.constant;
 
-public final class ButtonConstant extends GameConstant {
+import static io.nghlong3004.constant.GameConstant.SCALE;
+
+public class ButtonConstant {
     public static final int MENU_BUTTON_WIDTH_DEFAULT = 140;
     public static final int MENU_BUTTON_HEIGHT_DEFAULT = 56;
     public static final int SOUND_BUTTON_SIZE_DEFAULT = 42;
@@ -16,5 +18,4 @@ public final class ButtonConstant extends GameConstant {
     public static final int VOLUME_BUTTON_WIDTH = (int) (VOLUME_BUTTON_WIDTH_DEFAULT * SCALE);
     public static final int VOLUME_BUTTON_HEIGHT = (int) (VOLUME_BUTTON_HEIGHT_DEFAULT * SCALE);
     public static final int SLIDER_BUTTON = (int) (SLIDER_BUTTON_DEFAULT * SCALE);
-
 }

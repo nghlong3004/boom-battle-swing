@@ -1,7 +1,6 @@
 package io.nghlong3004.constant;
 
-public final class ImageConstant {
-
+public class ImageConstant {
     public static final String MENU_BUTTON = "/images/buttons/button_atlas.png";
 
     public static final String BUTTON_EMPTY = "/images/buttons/button_empty.png";
@@ -17,14 +16,6 @@ public final class ImageConstant {
     public static final String URM_BUTTON = "/images/buttons/urm_buttons.png";
 
     public static final String VOLUME_BUTTON = "/images/buttons/volume_buttons.png";
-
-    public static final String CRABBY = "/images/player/crabby_sprite.png";
-
-    public static final String LEVEL_ONE_DATA = "/images/player/level_one_data.png";
-
-    public static final String LEVEL_ONE_DATA_LONG = "/images/map/level_one_data_long.png";
-
-    public static final String LEVEL_ATLAS = "/images/map/outside_sprites.png";
 
     public static final String TITLE = "/images/icon_titlebar.png";
 
@@ -65,7 +56,7 @@ public final class ImageConstant {
     public static final String EXPLOSION_LEFT_2 = "/images/boom/explosion_left_2.png";
     public static final String EXPLOSION_RIGHT_1 = "/images/boom/explosion_right_1.png";
     public static final String EXPLOSION_RIGHT_2 = "/images/boom/explosion_right_2.png";
-    
+
     public static final String ITEM_BOMB = "/images/items/item_bomb.png";
     public static final String ITEM_BOMB_SIZE = "/images/items/item_bombsize.png";
     public static final String ITEM_SHOE = "/images/items/item_shoe.png";

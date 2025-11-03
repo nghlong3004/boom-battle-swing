@@ -1,20 +1,21 @@
 package io.nghlong3004.constant;
 
-public class GameConstant {
-    public static final int TILE_DEFAULT_SIZE = 32;
-    public static final int TILES_IN_WIDTH = 26;
-    public static final int TILES_IN_HEIGHT = 14;
+import io.nghlong3004.configuration.Configuration;
 
-    public static final float SCALE = 1.5f;
+public final class GameConstant {
 
-    public static final int TILES_SIZE = (int) (TILE_DEFAULT_SIZE * SCALE);
-    public static final int GAME_WIDTH = TILES_SIZE * TILES_IN_WIDTH;
-    public static final int GAME_HEIGHT = TILES_SIZE * TILES_IN_HEIGHT;
+    public static final float SCALE = Configuration.getInstance().getScale();
 
-    public static final float SPEED_PLAYER = 1f * SCALE;
+    public static final int FPS = Configuration.getInstance().getFps();
+    public static final int UPS = Configuration.getInstance().getUps();
+    public static final int MAX_SCREEN_ROW = Configuration.getInstance().getMaxScreenRow();
+    public static final int MAX_SCREEN_COLUMN = Configuration.getInstance().getMaxScreenColumn();
+    public static final int ORIGINAL_TILE_SIZE = Configuration.getInstance().getOriginalTileSize();
 
-    public static final float HITBOX_WIDTH_OFF_SET = 40f * SCALE;
-    public static final float HITBOX_HEIGHT_OFF_SET = 12f * SCALE;
+    public static final int TILE_SIZE = (int) (ORIGINAL_TILE_SIZE * SCALE);
+    public static final int GAME_WIDTH = TILE_SIZE * MAX_SCREEN_COLUMN;
+    public static final int GAME_HEIGHT = TILE_SIZE * MAX_SCREEN_ROW;
 
-    public static final long MOVE_SFX_COOLDOWN_MS = 120;
+    private GameConstant() {
+    }
 }

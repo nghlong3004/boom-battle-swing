@@ -1,7 +1,7 @@
 package io.nghlong3004.component.button;
 
-import io.nghlong3004.entity.GameType;
 import io.nghlong3004.loader.ImageLoader;
+import io.nghlong3004.type.GameType;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 

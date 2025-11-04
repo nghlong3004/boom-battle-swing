@@ -1,12 +1,15 @@
-package io.nghlong3004.component;
+package io.nghlong3004.component.play;
 
+import io.nghlong3004.component.GameComponent;
+import io.nghlong3004.component.SpriteComponent;
+import io.nghlong3004.component.option.AudioComponent;
 import io.nghlong3004.constant.GameConstant;
 import io.nghlong3004.constant.ImageConstant;
 import io.nghlong3004.context.GameContext;
-import io.nghlong3004.context.state.GameStateID;
 import io.nghlong3004.context.state.PlayingState;
-import io.nghlong3004.input.KeyboardAdapter;
 import io.nghlong3004.loader.ImageLoader;
+import io.nghlong3004.type.GameStateType;
+import io.nghlong3004.type.PlayType;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -15,7 +18,7 @@ import java.awt.image.BufferedImage;
 
 import static io.nghlong3004.constant.GameConstant.SCALE;
 
-public class GamePausedComponent extends GameComponent implements KeyboardAdapter {
+public class GamePausedComponent extends PlayComponent {
     private BufferedImage background;
     private int xBackground, yBackground, widthBackground, heightBackground;
     private final GameComponent spriteComponent;
@@ -76,7 +79,7 @@ public class GamePausedComponent extends GameComponent implements KeyboardAdapte
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            ((PlayingState) context.getState(GameStateID.PLAYING)).setPaused(false);
+            ((PlayingState) context.getGameState(GameStateType.PLAYING)).setType(PlayType.PLAYING);
         }
     }
 

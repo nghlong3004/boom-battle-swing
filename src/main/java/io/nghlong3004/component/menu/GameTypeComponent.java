@@ -1,14 +1,16 @@
-package io.nghlong3004.context.state;
+package io.nghlong3004.component.menu;
 
+import io.nghlong3004.component.GameComponent;
 import io.nghlong3004.component.button.ModeButton;
 import io.nghlong3004.context.GameContext;
-import io.nghlong3004.context.GameStateContext;
-import io.nghlong3004.entity.GameType;
+import io.nghlong3004.context.state.MainMenuState;
 import io.nghlong3004.loader.ImageLoader;
+import io.nghlong3004.type.GameStateType;
+import io.nghlong3004.type.GameType;
+import io.nghlong3004.type.MenuType;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
@@ -17,13 +19,12 @@ import static io.nghlong3004.constant.GameConstant.*;
 import static io.nghlong3004.constant.ImageConstant.BACKGROUND;
 
 @Slf4j
-public class GameTypeSelectionState implements GameState {
+public class GameTypeComponent extends GameComponent {
     private ModeButton[] modeButtons;
     private BufferedImage background;
-    private final GameContext stateContext;
 
-    public GameTypeSelectionState(GameContext stateContext) {
-        this.stateContext = stateContext;
+    public GameTypeComponent(GameContext stateContext) {
+        super(stateContext);
         loadBackground();
         loadModeButtons();
     }
@@ -77,18 +78,9 @@ public class GameTypeSelectionState implements GameState {
         for (var modeButton : modeButtons) {
             if (modeButton.isMouseOver(e) && modeButton.isMousePressed()) {
                 GameType selectedMode = modeButton.getGameMode();
-
-                if (selectedMode == GameType.ONLINE) {
-                    log.info("Online mode selected, proceeding to skin selection");
-                    GameStateContext.GAME_TYPE = selectedMode;
-                    stateContext.changeState(GameStateID.SKIN_SELECTION);
-                }
-                else {
-                    GameStateContext.GAME_TYPE = selectedMode;
-                    log.info("Selected game mode: {}", selectedMode);
-                    stateContext.changeState(GameStateID.SKIN_SELECTION);
-                }
-                break;
+                context.setGameType(selectedMode);
+                ((MainMenuState) context.getGameState(GameStateType.MENU)).setType(MenuType.SKIN_TYPE);
+                log.info("{} mode selected, proceeding to skin selection", selectedMode.name());
             }
         }
         reset();
@@ -107,30 +99,6 @@ public class GameTypeSelectionState implements GameState {
         }
     }
 
-    @Override
-    public void keyPressed(KeyEvent e) {
-
-        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            stateContext.changeState(GameStateID.MENU);
-        }
-
-        else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-            GameStateContext.GAME_TYPE = GameType.OFFLINE;
-            stateContext.changeState(GameStateID.SKIN_SELECTION);
-        }
-    }
-
-    @Override
-    public void off() {
-
-    }
-
-    @Override
-    public void on() {
-
-        log.info("Entered mode selection screen");
-    }
-
     private void reset() {
         for (var modeButton : modeButtons) {
             modeButton.reset();
@@ -143,9 +111,5 @@ public class GameTypeSelectionState implements GameState {
 
     @Override
     public void mouseDragged(MouseEvent e) {
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
     }
 }

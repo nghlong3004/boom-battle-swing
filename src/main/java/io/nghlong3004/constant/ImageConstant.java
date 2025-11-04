@@ -11,6 +11,8 @@ public class ImageConstant {
 
     public static final String PAUSE_BACKGROUND = "/images/buttons/pause_menu.png";
 
+    public static final String OPTION_BACKGROUND = "/images/home/options_background.png";
+
     public static final String SOUND_BUTTON = "/images/buttons/sound_button.png";
 
     public static final String URM_BUTTON = "/images/buttons/urm_buttons.png";

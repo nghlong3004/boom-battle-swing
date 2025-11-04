@@ -1,14 +1,16 @@
-package io.nghlong3004.context.state;
+package io.nghlong3004.component.menu;
 
+import io.nghlong3004.component.GameComponent;
 import io.nghlong3004.component.button.SkinButton;
 import io.nghlong3004.context.GameContext;
-import io.nghlong3004.context.GameStateContext;
-import io.nghlong3004.entity.Skin;
+import io.nghlong3004.context.state.MainMenuState;
 import io.nghlong3004.loader.ImageLoader;
+import io.nghlong3004.type.GameStateType;
+import io.nghlong3004.type.MenuType;
+import io.nghlong3004.type.SkinType;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
@@ -16,13 +18,12 @@ import static io.nghlong3004.constant.GameConstant.*;
 import static io.nghlong3004.constant.ImageConstant.BACKGROUND;
 
 @Slf4j
-public class SkinSelectionState implements GameState {
+public class SkinTypeComponent extends GameComponent {
     private SkinButton[] skinButtons;
     private BufferedImage background;
-    private final GameContext stateContext;
 
-    public SkinSelectionState(GameContext stateContext) {
-        this.stateContext = stateContext;
+    public SkinTypeComponent(GameContext stateContext) {
+        super(stateContext);
         loadBackground();
         loadSkinButtons();
     }
@@ -32,7 +33,7 @@ public class SkinSelectionState implements GameState {
     }
 
     private void loadSkinButtons() {
-        Skin[] skins = Skin.values();
+        SkinType[] skins = SkinType.values();
         skinButtons = new SkinButton[skins.length];
 
         int buttonWidth = (int) (120 * SCALE);
@@ -77,11 +78,10 @@ public class SkinSelectionState implements GameState {
     public void mouseReleased(MouseEvent e) {
         for (var skinButton : skinButtons) {
             if (skinButton.isMouseOver(e) && skinButton.isMousePressed()) {
-                Skin selectedSkin = skinButton.getSkin();
-                GameStateContext.SKIN = selectedSkin;
-                log.info("Selected skin: {}", selectedSkin.getAssetKey());
-                stateContext.changeState(GameStateID.MAP_SELECTION);
-                break;
+                SkinType selectedSkin = skinButton.getSkin();
+                context.setSkinType(selectedSkin);
+                log.info("Selected skin: {}", selectedSkin.name());
+                ((MainMenuState) context.getGameState(GameStateType.MENU)).setType(MenuType.MAP_TYPE);
             }
         }
         reset();
@@ -100,33 +100,6 @@ public class SkinSelectionState implements GameState {
         }
     }
 
-    @Override
-    public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            stateContext.changeState(GameStateID.GAME_TYPE_SELECTION);
-        }
-
-        else if (e.getKeyCode() >= KeyEvent.VK_1 && e.getKeyCode() <= KeyEvent.VK_4) {
-            int index = e.getKeyCode() - KeyEvent.VK_1;
-            if (index < skinButtons.length) {
-                Skin selectedSkin = Skin.values()[index];
-                GameStateContext.SKIN = selectedSkin;
-                log.info("Selected skin via keyboard: {}", selectedSkin.getAssetKey());
-                stateContext.changeState(GameStateID.MAP_SELECTION);
-            }
-        }
-    }
-
-    @Override
-    public void off() {
-        log.info("Exiting skin selection screen");
-    }
-
-    @Override
-    public void on() {
-        log.info("Entered skin selection screen");
-    }
-
     private void reset() {
         for (var skinButton : skinButtons) {
             skinButton.reset();
@@ -139,9 +112,5 @@ public class SkinSelectionState implements GameState {
 
     @Override
     public void mouseDragged(MouseEvent e) {
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
     }
 }

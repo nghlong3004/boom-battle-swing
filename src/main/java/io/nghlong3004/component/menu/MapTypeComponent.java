@@ -1,14 +1,16 @@
-package io.nghlong3004.context.state;
+package io.nghlong3004.component.menu;
 
+import io.nghlong3004.component.GameComponent;
 import io.nghlong3004.component.button.MapButton;
 import io.nghlong3004.context.GameContext;
-import io.nghlong3004.context.GameStateContext;
-import io.nghlong3004.entity.MapType;
+import io.nghlong3004.context.state.MainMenuState;
 import io.nghlong3004.loader.ImageLoader;
+import io.nghlong3004.type.GameStateType;
+import io.nghlong3004.type.MapType;
+import io.nghlong3004.type.MenuType;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
@@ -16,13 +18,12 @@ import static io.nghlong3004.constant.GameConstant.*;
 import static io.nghlong3004.constant.ImageConstant.BACKGROUND;
 
 @Slf4j
-public class MapSelectionState implements GameState {
+public class MapTypeComponent extends GameComponent {
     private MapButton[] mapButtons;
     private BufferedImage background;
-    private final GameContext stateContext;
 
-    public MapSelectionState(GameContext stateContext) {
-        this.stateContext = stateContext;
+    public MapTypeComponent(GameContext stateContext) {
+        super(stateContext);
         loadBackground();
         loadMapButtons();
     }
@@ -84,9 +85,10 @@ public class MapSelectionState implements GameState {
         for (var mapButton : mapButtons) {
             if (mapButton.isMouseOver(e) && mapButton.isMousePressed()) {
                 MapType selectedMode = mapButton.getTileMode();
-                GameStateContext.MAP_TYPE = selectedMode;
+                context.setMapType(selectedMode);
                 log.info("Selected map: {}", selectedMode.getAssetKey());
-                stateContext.changeState(GameStateID.PLAYING);
+                ((MainMenuState) context.getGameState(GameStateType.MENU)).setType(MenuType.MENU);
+                context.changeState(GameStateType.PLAYING);
                 break;
             }
         }
@@ -106,33 +108,6 @@ public class MapSelectionState implements GameState {
         }
     }
 
-    @Override
-    public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            stateContext.changeState(GameStateID.SKIN_SELECTION);
-        }
-
-        else if (e.getKeyCode() >= KeyEvent.VK_1 && e.getKeyCode() <= KeyEvent.VK_5) {
-            int index = e.getKeyCode() - KeyEvent.VK_1;
-            if (index < mapButtons.length) {
-                MapType selectedMode = mapButtons[index].getTileMode();
-                GameStateContext.MAP_TYPE = selectedMode;
-                log.info("Selected map via keyboard: {}", selectedMode.getAssetKey());
-                stateContext.changeState(GameStateID.PLAYING);
-            }
-        }
-    }
-
-    @Override
-    public void off() {
-        log.info("Exiting map selection screen");
-    }
-
-    @Override
-    public void on() {
-        log.info("Entered map selection screen");
-    }
-
     private void reset() {
         for (var mapButton : mapButtons) {
             mapButton.reset();
@@ -145,9 +120,5 @@ public class MapSelectionState implements GameState {
 
     @Override
     public void mouseDragged(MouseEvent e) {
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
     }
 }

@@ -6,7 +6,12 @@ import io.nghlong3004.game.GameLogic;
 import io.nghlong3004.input.KeyboardAdapter;
 import io.nghlong3004.input.MouseAdapter;
 import io.nghlong3004.input.MouseMotionAdapter;
+import io.nghlong3004.type.GameStateType;
+import io.nghlong3004.type.GameType;
+import io.nghlong3004.type.MapType;
+import io.nghlong3004.type.SkinType;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
@@ -22,39 +27,47 @@ public class GameContext implements GameLogic, KeyboardAdapter, MouseAdapter, Mo
     private GameState currentState;
     @Getter
     private final AudioPlayer audio;
-    private final EnumMap<GameStateID, GameState> stateMap;
+    private final EnumMap<GameStateType, GameState> stateMap;
+    @Getter
+    private GameStateType state;
+    @Getter
+    @Setter
+    private SkinType skinType = SkinType.BOZ;
+    @Getter
+    @Setter
+    private MapType mapType = MapType.DESERT_MODE;
+    @Getter
+    @Setter
+    private GameType gameType = GameType.OFFLINE;
 
     public GameContext() {
-        this.stateMap = new EnumMap<>(GameStateID.class);
+        this.stateMap = new EnumMap<>(GameStateType.class);
         this.audio = new AudioPlayer();
         loadStates();
-        changeState(GameStateID.MENU);
+        changeState(GameStateType.MENU);
     }
 
-    public void changeState(GameStateID stateID) {
-        GameState newState = stateMap.get(stateID);
-        if (this.currentState != null && stateID != GameStateID.OPTION) {
+    public void changeState(GameStateType stateType) {
+        GameState newState = stateMap.get(stateType);
+        if (this.currentState != null && stateType != GameStateType.OPTION) {
             this.currentState.off();
         }
         this.currentState = newState;
-        if (GameStateContext.STATE != GameStateID.OPTION) {
+        if (state != GameStateType.OPTION) {
             this.currentState.on();
         }
-        GameStateContext.STATE = stateID;
+        state = stateType;
     }
 
-    public GameState getState(GameStateID stateID) {
+    public GameState getGameState(GameStateType stateID) {
         return stateMap.get(stateID);
     }
 
     private void loadStates() {
-        stateMap.put(GameStateID.MENU, new MenuState(this));
-        stateMap.put(GameStateID.PLAYING, new PlayingState(this));
-        stateMap.put(GameStateID.OPTION, new OptionState(this));
-        stateMap.put(GameStateID.SKIN_SELECTION, new SkinSelectionState(this));
-        stateMap.put(GameStateID.MAP_SELECTION, new MapSelectionState(this));
-        stateMap.put(GameStateID.GAME_TYPE_SELECTION, new GameTypeSelectionState(this));
-        stateMap.put(GameStateID.QUIT, new QuitState(this));
+        stateMap.put(GameStateType.MENU, new MainMenuState(this));
+        stateMap.put(GameStateType.PLAYING, new PlayingState(this));
+        stateMap.put(GameStateType.OPTION, new OptionState(this));
+        stateMap.put(GameStateType.QUIT, new QuitState(this));
     }
 
     @Override

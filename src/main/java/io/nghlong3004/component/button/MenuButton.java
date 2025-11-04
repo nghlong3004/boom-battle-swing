@@ -1,7 +1,7 @@
 package io.nghlong3004.component.button;
 
-import io.nghlong3004.context.state.GameStateID;
 import io.nghlong3004.loader.ImageLoader;
+import io.nghlong3004.type.GameStateType;
 import lombok.Getter;
 
 import java.awt.*;
@@ -12,11 +12,11 @@ import static io.nghlong3004.constant.ImageConstant.MENU_BUTTON;
 
 public class MenuButton extends GameButton {
     @Getter
-    private GameStateID state;
+    private GameStateType state;
     private BufferedImage[] images;
 
-    public MenuButton(int x, int y, int rowIndex, GameStateID state) {
-        super(x - MENU_BUTTON_WIDTH / 2, y, MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT, rowIndex);
+    public MenuButton(int x, int y, int rowIndex, GameStateType state) {
+        super(x, y, MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT, rowIndex);
         this.state = state;
         loadImage();
     }

@@ -1,9 +1,9 @@
-package io.nghlong3004.entity;
+package io.nghlong3004.type;
 
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public enum Skin {
+public enum SkinType {
     BOZ(0),
     EVIE(1),
     IKE(2),
@@ -11,6 +11,7 @@ public enum Skin {
     public final int id;
 
     public String getAssetKey() {
-        return this.name().toLowerCase();
+        return this.name()
+                   .toLowerCase();
     }
 }

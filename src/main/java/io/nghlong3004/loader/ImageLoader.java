@@ -2,9 +2,9 @@ package io.nghlong3004.loader;
 
 import io.nghlong3004.constant.EntityConstant;
 import io.nghlong3004.constant.MapConstant;
-import io.nghlong3004.entity.MapType;
-import io.nghlong3004.entity.Skin;
-import io.nghlong3004.entity.TileType;
+import io.nghlong3004.type.MapType;
+import io.nghlong3004.type.SkinType;
+import io.nghlong3004.type.TileType;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;
@@ -43,7 +43,7 @@ public class ImageLoader {
 
     public static List<BufferedImage[][]> loadBomberSkin() {
         var images = new ArrayList<BufferedImage[][]>();
-        for (var skin : Skin.values()) {
+        for (var skin : SkinType.values()) {
             String name = BOMBER_SKIN_TEMPLATE.formatted(skin.getAssetKey());
             var image = loadImageBomber(EntityConstant.ENTITY_WIDTH, EntityConstant.ENTITY_HEIGHT, IMAGE_BOMBER_WIDTH,
                                         IMAGE_BOMBER_HEIGHT, name);

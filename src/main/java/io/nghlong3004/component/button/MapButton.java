@@ -1,7 +1,7 @@
 package io.nghlong3004.component.button;
 
-import io.nghlong3004.entity.MapType;
 import io.nghlong3004.loader.ImageLoader;
+import io.nghlong3004.type.MapType;
 import lombok.Getter;
 
 import java.awt.*;

@@ -1,7 +1,7 @@
 package io.nghlong3004.component.button;
 
-import io.nghlong3004.entity.Skin;
 import io.nghlong3004.loader.ImageLoader;
+import io.nghlong3004.type.SkinType;
 import lombok.Getter;
 
 import java.awt.*;
@@ -10,9 +10,9 @@ import static io.nghlong3004.constant.ImageConstant.BOMBER_AVATAR_TEMPLATE;
 
 public class SkinButton extends MapButton {
     @Getter
-    private final Skin skin;
+    private final SkinType skin;
 
-    public SkinButton(int x, int y, int width, int height, Skin skin) {
+    public SkinButton(int x, int y, int width, int height, SkinType skin) {
         super(x, y, width, height, null);
         this.skin = skin;
         loadImage();

@@ -59,7 +59,7 @@ public class VolumeButton extends GameButton {
             this.buttonX = Math.min(buttonX, maxSlider);
         }
         updateFloatValue();
-        box.x = buttonX - VOLUME_BUTTON_WIDTH / 2;
+        box.x = this.buttonX - VOLUME_BUTTON_WIDTH / 2;
     }
 
     private void updateFloatValue() {

@@ -1,5 +1,6 @@
 package io.nghlong3004.entity;
 
+import io.nghlong3004.type.SkinType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +14,7 @@ public abstract class Entity {
     private boolean up, down, right, left, moving, alive;
     private int direction, tick, index;
     private float speed;
-    private Skin skin;
+    private SkinType skin;
     protected float x;
     protected float y;
     protected int width;

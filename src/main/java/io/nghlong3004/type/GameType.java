@@ -1,4 +1,4 @@
-package io.nghlong3004.entity;
+package io.nghlong3004.type;
 
 public enum GameType {
     OFFLINE,

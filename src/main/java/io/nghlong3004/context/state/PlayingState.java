@@ -1,84 +1,71 @@
 package io.nghlong3004.context.state;
 
-import io.nghlong3004.component.GameOverComponent;
-import io.nghlong3004.component.GamePausedComponent;
-import io.nghlong3004.component.GameWinComponent;
+import io.nghlong3004.component.play.*;
 import io.nghlong3004.constant.AudioConstant;
 import io.nghlong3004.context.GameContext;
-import io.nghlong3004.context.GameStateContext;
+import io.nghlong3004.type.PlayType;
 import lombok.Setter;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.util.EnumMap;
+import java.util.Map;
 
 public class PlayingState implements GameState {
 
     private final GameContext gameContext;
-    private final GameWinComponent gameWin;
-    private final GameOverComponent gameOver;
-    private final GamePausedComponent gamePaused;
+    private final Map<PlayType, PlayComponent> gameComponentMap;
     @Setter
-    private boolean isOver, isWin, isPaused;
+    private PlayType type;
 
     public PlayingState(GameContext gameContext) {
         this.gameContext = gameContext;
-        this.gameWin = new GameWinComponent(gameContext);
-        this.gameOver = new GameOverComponent(gameContext);
-        this.gamePaused = new GamePausedComponent(gameContext);
+        this.gameComponentMap = new EnumMap<>(PlayType.class);
+        loadGameComponentMap();
     }
 
-    public void reset() {
-        isOver = false;
-        isWin = false;
-        isPaused = false;
+    private void loadGameComponentMap() {
+        this.gameComponentMap.put(PlayType.WIN, new GameWinComponent(gameContext));
+        this.gameComponentMap.put(PlayType.OVER, new GameOverComponent(gameContext));
+        this.gameComponentMap.put(PlayType.PAUSED, new GamePausedComponent(gameContext));
+        this.gameComponentMap.put(PlayType.PLAYING, new GamePlayComponent(gameContext));
+        this.type = PlayType.PLAYING;
     }
 
     @Override
     public void on() {
-        gameContext.getAudio().playSong(GameStateContext.MAP_TYPE.id);
-        gameContext.getAudio().playEffect(AudioConstant.START);
+        gameContext.getAudio()
+                   .playSong(gameContext.getMapType().id);
+        gameContext.getAudio()
+                   .playEffect(AudioConstant.START);
     }
 
     @Override
     public void off() {
-        reset();
-        gameContext.getAudio().stopSong();
+        this.type = PlayType.PLAYING;
+        gameContext.getAudio()
+                   .stopSong();
     }
 
     @Override
     public void update() {
-        if (isWin) {
-            gameWin.update();
-        }
-        else if (isOver) {
-            gameOver.update();
-        }
-        else if (isPaused) {
-            gamePaused.update();
-        }
+        gameComponentMap.get(type)
+                        .update();
     }
 
     @Override
     public void render(Graphics g) {
-        if (isWin) {
-            gameWin.render(g);
-        }
-        else if (isOver) {
-            gameOver.render(g);
-        }
-        else if (isPaused) {
-            gamePaused.render(g);
-        }
+        gameComponentMap.get(type)
+                        .render(g);
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (isPaused) {
-            gamePaused.keyPressed(e);
-        }
+        gameComponentMap.get(type)
+                        .keyPressed(e);
         if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            isPaused = true;
+            type = PlayType.PAUSED;
         }
     }
 
@@ -93,53 +80,29 @@ public class PlayingState implements GameState {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if (isWin) {
-            gameWin.mousePressed(e);
-        }
-        else if (isOver) {
-            gameOver.mousePressed(e);
-        }
-        else if (isPaused) {
-            gamePaused.mousePressed(e);
-        }
+        gameComponentMap.get(type)
+                        .mousePressed(e);
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if (isWin) {
-            gameWin.mouseReleased(e);
-        }
-        else if (isOver) {
-            gameOver.mouseReleased(e);
-        }
-        else if (isPaused) {
-            gamePaused.mouseReleased(e);
-        }
+        gameComponentMap.get(type)
+                        .mouseReleased(e);
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        if (isWin) {
-            gameWin.mouseDragged(e);
-        }
-        else if (isOver) {
-            gameOver.mouseDragged(e);
-        }
-        else if (isPaused) {
-            gamePaused.mouseDragged(e);
-        }
+        gameComponentMap.get(type)
+                        .mouseDragged(e);
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        if (isWin) {
-            gameWin.mouseMoved(e);
-        }
-        else if (isOver) {
-            gameOver.mouseMoved(e);
-        }
-        else if (isPaused) {
-            gamePaused.mouseMoved(e);
-        }
+        gameComponentMap.get(type)
+                        .mouseMoved(e);
+    }
+
+    public void replay() {
+        
     }
 }

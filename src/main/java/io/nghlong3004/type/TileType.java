@@ -1,4 +1,4 @@
-package io.nghlong3004.entity;
+package io.nghlong3004.type;
 
 import lombok.AllArgsConstructor;
 
@@ -11,6 +11,7 @@ public enum TileType {
     public final int id;
 
     public String getAssetKey() {
-        return this.name().toLowerCase();
+        return this.name()
+                   .toLowerCase();
     }
 }

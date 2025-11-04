@@ -1,5 +1,6 @@
-package io.nghlong3004.component;
+package io.nghlong3004.component.option;
 
+import io.nghlong3004.component.GameComponent;
 import io.nghlong3004.component.button.SoundButton;
 import io.nghlong3004.component.button.VolumeButton;
 import io.nghlong3004.constant.ButtonConstant;
@@ -8,9 +9,8 @@ import io.nghlong3004.context.GameContext;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 
-import static io.nghlong3004.constant.ButtonConstant.SLIDER_BUTTON;
-import static io.nghlong3004.constant.ButtonConstant.VOLUME_BUTTON_HEIGHT;
-import static io.nghlong3004.constant.GameConstant.SCALE;
+import static io.nghlong3004.constant.ButtonConstant.*;
+import static io.nghlong3004.constant.GameConstant.*;
 
 public class AudioComponent extends GameComponent {
     private VolumeButton volumeButton;
@@ -23,17 +23,17 @@ public class AudioComponent extends GameComponent {
     }
 
     private void createSoundButton() {
-        int soundX = (int) (450 * SCALE);
-        int musicY = (int) (140 * SCALE);
-        int sfxY = (int) (186 * SCALE);
+        int soundX = GAME_WIDTH + ButtonConstant.SOUND_BUTTON_SIZE >>> 1;
+        int musicY = GAME_HEIGHT / 4 + SOUND_BUTTON_SIZE / 2;
+        int sfxY = GAME_HEIGHT / 4 + SOUND_BUTTON_SIZE / 2 + SOUND_BUTTON_SIZE;
         musicButton = new SoundButton(soundX, musicY, ButtonConstant.SOUND_BUTTON_SIZE,
                                       ButtonConstant.SOUND_BUTTON_SIZE);
         sfxButton = new SoundButton(soundX, sfxY, ButtonConstant.SOUND_BUTTON_SIZE, ButtonConstant.SOUND_BUTTON_SIZE);
     }
 
     private void createVolumeButton() {
-        int vX = (int) (309 * SCALE);
-        int vY = (int) (278 * SCALE);
+        int vX = GAME_WIDTH - SLIDER_BUTTON >>> 1;
+        int vY = (int) (262 * SCALE);
         volumeButton = new VolumeButton(vX, vY, SLIDER_BUTTON, VOLUME_BUTTON_HEIGHT);
     }
 
@@ -55,13 +55,15 @@ public class AudioComponent extends GameComponent {
         if (musicButton.isMouseOver(e)) {
             if (musicButton.isMousePressed()) {
                 musicButton.setMuted(!musicButton.isMuted());
-                context.getAudio().toggleSongMute();
+                context.getAudio()
+                       .toggleSongMute();
             }
         }
         else if (sfxButton.isMouseOver(e)) {
             if (sfxButton.isMousePressed()) {
                 sfxButton.setMuted(!sfxButton.isMuted());
-                context.getAudio().toggleEffectMute();
+                context.getAudio()
+                       .toggleEffectMute();
             }
         }
 
@@ -77,7 +79,8 @@ public class AudioComponent extends GameComponent {
             volumeButton.changeButtonX(e.getX());
             float valueAfter = volumeButton.getFloatValue();
             if (valueBefore != valueAfter) {
-                context.getAudio().setVolume(valueAfter);
+                context.getAudio()
+                       .setVolume(valueAfter);
             }
         }
     }

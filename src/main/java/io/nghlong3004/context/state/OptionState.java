@@ -1,8 +1,8 @@
 package io.nghlong3004.context.state;
 
-import io.nghlong3004.component.AudioComponent;
 import io.nghlong3004.component.GameComponent;
-import io.nghlong3004.component.OptionComponent;
+import io.nghlong3004.component.option.AudioComponent;
+import io.nghlong3004.component.option.OptionComponent;
 import io.nghlong3004.constant.GameConstant;
 import io.nghlong3004.constant.ImageConstant;
 import io.nghlong3004.context.GameContext;
@@ -29,7 +29,7 @@ public class OptionState implements GameState {
     }
 
     private void loadBackground() {
-        background = ImageLoader.loadImage(ImageConstant.PAUSE_BACKGROUND);
+        background = ImageLoader.loadImage(ImageConstant.OPTION_BACKGROUND);
         widthBackground = (int) (background.getWidth() * SCALE);
         heightBackground = (int) (background.getHeight() * SCALE);
         xBackground = GameConstant.GAME_WIDTH - widthBackground >>> 1;

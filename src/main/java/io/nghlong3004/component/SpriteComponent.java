@@ -3,8 +3,9 @@ package io.nghlong3004.component;
 import io.nghlong3004.component.button.GameButton;
 import io.nghlong3004.component.button.SpriteButton;
 import io.nghlong3004.context.GameContext;
-import io.nghlong3004.context.state.GameStateID;
 import io.nghlong3004.context.state.PlayingState;
+import io.nghlong3004.type.GameStateType;
+import io.nghlong3004.type.PlayType;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
@@ -12,7 +13,8 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 
 import static io.nghlong3004.constant.ButtonConstant.URM_BUTTON_SIZE;
-import static io.nghlong3004.constant.GameConstant.SCALE;
+import static io.nghlong3004.constant.GameConstant.GAME_HEIGHT;
+import static io.nghlong3004.constant.GameConstant.GAME_WIDTH;
 
 @Slf4j
 public class SpriteComponent extends GameComponent {
@@ -29,13 +31,14 @@ public class SpriteComponent extends GameComponent {
     }
 
     private void createSpritesButton() {
-        int homeX = (int) (321 * SCALE);
-        int unPauseX = (int) (homeX + URM_BUTTON_SIZE * 6 / 5);
-        int relayX = (int) (unPauseX + URM_BUTTON_SIZE * 6 / 5);
-        int spriteY = (int) (325 * SCALE);
-        unpauseButton = new SpriteButton(unPauseX, spriteY, URM_BUTTON_SIZE, URM_BUTTON_SIZE, 0);
-        replayButton = new SpriteButton(relayX, spriteY, URM_BUTTON_SIZE, URM_BUTTON_SIZE, 1);
-        homeButton = new SpriteButton(homeX, spriteY, URM_BUTTON_SIZE, URM_BUTTON_SIZE, 2);
+        // URM_BUTTON_SIZE + URM_BUTTON_SIZE * 6 / 5 + URM_BUTTON_SIZE * 6 / 5 = 17 / 5 * URM_BUTTON_SIZE
+        int homeX = GAME_WIDTH - URM_BUTTON_SIZE * 17 / 5 >>> 1;
+        int unPauseX = homeX + URM_BUTTON_SIZE * 6 / 5;
+        int relayX = unPauseX + URM_BUTTON_SIZE * 6 / 5;
+        int y = GAME_HEIGHT / 2 + URM_BUTTON_SIZE * 2;
+        unpauseButton = new SpriteButton(unPauseX, y, URM_BUTTON_SIZE, URM_BUTTON_SIZE, 0);
+        replayButton = new SpriteButton(relayX, y, URM_BUTTON_SIZE, URM_BUTTON_SIZE, 1);
+        homeButton = new SpriteButton(homeX, y, URM_BUTTON_SIZE, URM_BUTTON_SIZE, 2);
     }
 
     @Override
@@ -56,26 +59,20 @@ public class SpriteComponent extends GameComponent {
     public void mouseReleased(MouseEvent e) {
         if (homeButton.isMouseOver(e)) {
             if (homeButton.isMousePressed()) {
-                PlayingState playingState = (PlayingState) context.getState(GameStateID.PLAYING);
-                if (playingState != null) {
-                    playingState.reset();
-                    log.info("Game reset, returning to menu");
-                }
-                context.changeState(GameStateID.MENU);
+                ((PlayingState) context.getGameState(GameStateType.PLAYING)).setType(PlayType.PLAYING);
+                context.changeState(GameStateType.MENU);
             }
         }
         else if (unpauseButton.isMouseOver(e)) {
             if (unpauseButton.isMousePressed()) {
-                log.info("Unpausing game, continuing...");
+                ((PlayingState) context.getGameState(GameStateType.PLAYING)).setType(PlayType.PLAYING);
             }
         }
         else if (replayButton.isMouseOver(e)) {
             if (replayButton.isMousePressed()) {
-                PlayingState playingState = (PlayingState) context.getState(GameStateID.PLAYING);
-                if (playingState != null) {
-                    playingState.reset();
-                    log.info("Game reset, restarting...");
-                }
+                PlayingState playingState = (PlayingState) context.getGameState(GameStateType.PLAYING);
+                playingState.replay();
+                playingState.setType(PlayType.PLAYING);
             }
         }
 

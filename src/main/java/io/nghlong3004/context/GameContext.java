@@ -1,11 +1,11 @@
 package io.nghlong3004.context;
 
-import io.nghlong3004.audio.AudioPlayer;
 import io.nghlong3004.context.state.*;
 import io.nghlong3004.game.GameLogic;
 import io.nghlong3004.input.KeyboardAdapter;
 import io.nghlong3004.input.MouseAdapter;
 import io.nghlong3004.input.MouseMotionAdapter;
+import io.nghlong3004.loader.AudioLoader;
 import io.nghlong3004.type.GameStateType;
 import io.nghlong3004.type.GameType;
 import io.nghlong3004.type.MapType;
@@ -26,7 +26,7 @@ public class GameContext implements GameLogic, KeyboardAdapter, MouseAdapter, Mo
 
     private GameState currentState;
     @Getter
-    private final AudioPlayer audio;
+    private final AudioLoader audio;
     private final EnumMap<GameStateType, GameState> stateMap;
     @Getter
     private GameStateType state;
@@ -42,7 +42,7 @@ public class GameContext implements GameLogic, KeyboardAdapter, MouseAdapter, Mo
 
     public GameContext() {
         this.stateMap = new EnumMap<>(GameStateType.class);
-        this.audio = new AudioPlayer();
+        this.audio = new AudioLoader();
         loadStates();
         changeState(GameStateType.MENU);
     }

@@ -1,4 +1,4 @@
-package io.nghlong3004.audio;
+package io.nghlong3004.loader;
 
 import javax.sound.sampled.*;
 import java.io.IOException;
@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static io.nghlong3004.constant.AudioConstant.CLICK;
 import static io.nghlong3004.constant.AudioConstant.VOLUME_START;
 
-public class AudioPlayer {
+public class AudioLoader {
     private volatile Clip[] songs, effects;
     private volatile int currentSongId = 0;
     private volatile float volume = VOLUME_START;
@@ -28,7 +28,7 @@ public class AudioPlayer {
         }
     });
 
-    public AudioPlayer() {
+    public AudioLoader() {
         songMute = new AtomicBoolean(false);
         effectMute = new AtomicBoolean(false);
         loadSongs();
@@ -37,7 +37,8 @@ public class AudioPlayer {
             safeUpdateSongVolume();
             safeUpdateEffectsVolume();
         });
-        Runtime.getRuntime().addShutdownHook(new Thread(this::close, "audio-shutdown"));
+        Runtime.getRuntime()
+               .addShutdownHook(new Thread(this::close, "audio-shutdown"));
     }
 
     private void loadSongs() {

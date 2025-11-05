@@ -1,7 +1,7 @@
 package io.nghlong3004.component.menu;
 
 import io.nghlong3004.component.GameComponent;
-import io.nghlong3004.component.button.ModeButton;
+import io.nghlong3004.component.button.GameModeButton;
 import io.nghlong3004.context.GameContext;
 import io.nghlong3004.context.state.MainMenuState;
 import io.nghlong3004.loader.ImageLoader;
@@ -20,7 +20,7 @@ import static io.nghlong3004.constant.ImageConstant.BACKGROUND;
 
 @Slf4j
 public class GameTypeComponent extends GameComponent {
-    private ModeButton[] modeButtons;
+    private GameModeButton[] modeButtons;
     private BufferedImage background;
 
     public GameTypeComponent(GameContext stateContext) {
@@ -34,17 +34,17 @@ public class GameTypeComponent extends GameComponent {
     }
 
     private void loadModeButtons() {
-        modeButtons = new ModeButton[2];
+        modeButtons = new GameModeButton[2];
         int x = GAME_WIDTH >>> 1;
         int factor = (int) ((MENU_BUTTON_WIDTH_DEFAULT) * SCALE);
 
 
         int yOffline = factor * 3 >>> 1;
-        modeButtons[0] = new ModeButton(x, yOffline, GameType.OFFLINE, "OFFLINE");
+        modeButtons[0] = new GameModeButton(x, yOffline, GameType.OFFLINE, "OFFLINE");
 
 
         int yOnline = factor * 4 >>> 1;
-        modeButtons[1] = new ModeButton(x, yOnline, GameType.ONLINE, "ONLINE");
+        modeButtons[1] = new GameModeButton(x, yOnline, GameType.ONLINE, "ONLINE");
     }
 
     @Override
@@ -58,8 +58,7 @@ public class GameTypeComponent extends GameComponent {
     public void render(Graphics g) {
         g.drawImage(background, 0, 0, GAME_WIDTH, GAME_HEIGHT, null);
 
-        g.setColor(Color.WHITE);
-        for (ModeButton button : modeButtons) {
+        for (GameModeButton button : modeButtons) {
             button.render(g);
         }
     }
@@ -77,6 +76,7 @@ public class GameTypeComponent extends GameComponent {
     public void mouseReleased(MouseEvent e) {
         for (var modeButton : modeButtons) {
             if (modeButton.isMouseOver(e) && modeButton.isMousePressed()) {
+                modeButton.startBlinking();
                 GameType selectedMode = modeButton.getGameMode();
                 context.setGameType(selectedMode);
                 ((MainMenuState) context.getGameState(GameStateType.MENU)).setType(MenuType.SKIN_TYPE);

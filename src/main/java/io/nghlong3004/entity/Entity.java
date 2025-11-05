@@ -6,7 +6,7 @@ import lombok.Setter;
 
 import java.awt.geom.Rectangle2D;
 
-import static io.nghlong3004.constant.EntityConstant.DOWN;
+import static io.nghlong3004.constant.EntityConstant.*;
 
 @Getter
 @Setter
@@ -21,20 +21,21 @@ public abstract class Entity {
     protected int height;
     protected Rectangle2D.Float box;
 
-    protected Entity(float x, float y, int width, int height) {
+    protected Entity(float x, float y, int width, int height, SkinType skinType) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
+        this.skin = skinType;
         initializeHitbox();
         initializeState();
     }
 
     protected void initializeHitbox() {
-        float hitboxWidth = width - 40f;
-        float hitboxHeight = height - 11.5f;
-        float hitboxX = x + (width - hitboxWidth) / 2;
-        float hitboxY = y + (height - hitboxHeight) / 2;
+        float hitboxWidth = width + WIDTH_BOX_DRAW_OFF_SET;
+        float hitboxHeight = (height + HEIGHT_BOX_DRAW_OFF_SET) / 2;
+        float hitboxX = x + (width - hitboxWidth) / 2 + X_BOX_DRAW_OFF_SET;
+        float hitboxY = y + (height - hitboxHeight) / 2 + Y_BOX_DRAW_OFF_SET;
         this.box = new Rectangle2D.Float(hitboxX, hitboxY, hitboxWidth, hitboxHeight);
     }
 

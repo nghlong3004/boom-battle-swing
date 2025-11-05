@@ -1,6 +1,5 @@
 package io.nghlong3004.loader;
 
-import io.nghlong3004.constant.EntityConstant;
 import io.nghlong3004.type.SkinType;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,8 +16,7 @@ public class BomberLoader {
         var images = new ArrayList<BufferedImage[][]>();
         for (var skin : SkinType.values()) {
             String name = BOMBER_SKIN_TEMPLATE.formatted(skin.getAssetKey());
-            var image = loadBomberAsset(EntityConstant.ENTITY_WIDTH, EntityConstant.ENTITY_HEIGHT, IMAGE_BOMBER_WIDTH,
-                                        IMAGE_BOMBER_HEIGHT, name);
+            var image = loadBomberAsset(4, 5, IMAGE_BOMBER_WIDTH, IMAGE_BOMBER_HEIGHT, name);
             images.add(image);
         }
         return images;

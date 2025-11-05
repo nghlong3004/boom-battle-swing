@@ -79,7 +79,7 @@ public class SkinTypeComponent extends GameComponent {
         for (var skinButton : skinButtons) {
             if (skinButton.isMouseOver(e) && skinButton.isMousePressed()) {
                 SkinType selectedSkin = skinButton.getSkin();
-                context.setSkinType(selectedSkin);
+                context.setSkinType(new SkinType[]{selectedSkin});
                 log.info("Selected skin: {}", selectedSkin.name());
                 ((MainMenuState) context.getGameState(GameStateType.MENU)).setType(MenuType.MAP_TYPE);
             }

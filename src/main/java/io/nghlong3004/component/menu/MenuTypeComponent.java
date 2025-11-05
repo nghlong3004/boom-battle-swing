@@ -64,7 +64,7 @@ public class MenuTypeComponent extends GameComponent {
         for (var menuButton : menuButtons) {
             if (menuButton.isMouseOver(e)) {
                 if (menuButton.getState() == GameStateType.MENU) {
-                    ((MainMenuState) context.getGameState(GameStateType.MENU)).setType(MenuType.SKIN_TYPE);
+                    ((MainMenuState) context.getGameState(GameStateType.MENU)).setType(MenuType.GAME_TYPE);
                     break;
                 }
                 context.changeState(menuButton.getState());

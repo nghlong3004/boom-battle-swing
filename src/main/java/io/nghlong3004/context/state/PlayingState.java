@@ -39,6 +39,7 @@ public class PlayingState implements GameState {
                    .playSong(gameContext.getMapType().id);
         gameContext.getAudio()
                    .playEffect(AudioConstant.START);
+        ((GamePlayComponent) gameComponentMap.get(type)).play();
     }
 
     @Override
@@ -71,7 +72,8 @@ public class PlayingState implements GameState {
 
     @Override
     public void keyReleased(KeyEvent e) {
-
+        gameComponentMap.get(type)
+                        .keyReleased(e);
     }
 
     @Override
@@ -103,6 +105,6 @@ public class PlayingState implements GameState {
     }
 
     public void replay() {
-        
+
     }
 }

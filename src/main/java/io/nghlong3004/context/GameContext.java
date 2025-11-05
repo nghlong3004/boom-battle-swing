@@ -32,13 +32,16 @@ public class GameContext implements GameLogic, KeyboardAdapter, MouseAdapter, Mo
     private GameStateType state;
     @Getter
     @Setter
-    private SkinType skinType = SkinType.BOZ;
+    private SkinType[] skinType = new SkinType[2];
     @Getter
     @Setter
     private MapType mapType = MapType.DESERT_MODE;
     @Getter
     @Setter
     private GameType gameType = GameType.OFFLINE;
+    @Getter
+    @Setter
+    private int numberBomber = 1;
 
     public GameContext() {
         this.stateMap = new EnumMap<>(GameStateType.class);

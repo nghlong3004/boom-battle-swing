@@ -1,7 +1,11 @@
 package io.nghlong3004.entity;
 
+import io.nghlong3004.type.SkinType;
 import lombok.Getter;
 import lombok.Setter;
+
+import static io.nghlong3004.constant.BomberConstant.BOMBER_HEIGHT;
+import static io.nghlong3004.constant.BomberConstant.BOMBER_WIDTH;
 
 @Getter
 @Setter
@@ -12,15 +16,13 @@ public class Bomber extends Entity {
     private int explosionRange = 1;
     private float speedBoost = 0f;
     private boolean placeBombRequested = false;
-    private int skinIndex = 0;
 
-    protected Bomber(float x, float y, int width, int height, int skinIndex) {
-        super(x, y, width, height);
-        this.skinIndex = skinIndex;
+    public Bomber(float x, float y, SkinType skinType) {
+        super(x, y, BOMBER_WIDTH, BOMBER_HEIGHT, skinType);
     }
 
     @Override
     protected float getDefaultSpeed() {
-        return 0;
+        return 1;
     }
 }

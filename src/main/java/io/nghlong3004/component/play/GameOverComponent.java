@@ -70,12 +70,21 @@ public class GameOverComponent extends PlayComponent {
     public void mouseReleased(MouseEvent e) {
         if (homeButton.isMouseOver(e)) {
             if (homeButton.isMousePressed()) {
+                PlayingState playingState = (PlayingState) context.getGameState(GameStateType.PLAYING);
+                if (playingState instanceof PlayingState) {
+                    ((GamePlayComponent) playingState.getComponent(PlayType.PLAYING)).exit();
+                }
                 context.changeState(GameStateType.MENU);
             }
         }
         else if (replayButton.isMouseOver(e)) {
             if (replayButton.isMousePressed()) {
-                ((PlayingState) context.getGameState(GameStateType.PLAYING)).setType(PlayType.PLAYING);
+                PlayingState playingState = (PlayingState) context.getGameState(GameStateType.PLAYING);
+                if (playingState instanceof PlayingState) {
+                    ((GamePlayComponent) playingState.getComponent(PlayType.PLAYING)).play();
+                }
+                playingState.setType(PlayType.PLAYING);
+                resetAnimation();
                 log.info("Game reset from Game Over, restarting...");
             }
         }

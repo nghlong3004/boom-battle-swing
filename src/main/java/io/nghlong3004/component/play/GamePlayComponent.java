@@ -1,11 +1,14 @@
 package io.nghlong3004.component.play;
 
 import io.nghlong3004.context.GameContext;
+import io.nghlong3004.context.state.PlayingState;
 import io.nghlong3004.entity.Bomber;
 import io.nghlong3004.input.BomberKeyAction;
 import io.nghlong3004.manager.GameManager;
 import io.nghlong3004.manager.ManagerFactory;
+import io.nghlong3004.type.GameStateType;
 import io.nghlong3004.type.GameType;
+import io.nghlong3004.type.PlayType;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -30,6 +33,7 @@ public class GamePlayComponent extends PlayComponent {
     }
 
     public void play() {
+        gameManager.reset();
         loadBombers();
         if (context.getGameType() == GameType.OFFLINE) {
             loadEnemy();
@@ -64,6 +68,17 @@ public class GamePlayComponent extends PlayComponent {
     @Override
     public void update() {
         gameManager.update();
+
+        if (gameManager.getBomberManager()
+                       .getBombers()
+                       .isEmpty()) {
+            return;
+        }
+
+        if (!gameManager.isAnyPlayerAlive()) {
+            PlayingState playingState = (PlayingState) context.getGameState(GameStateType.PLAYING);
+            playingState.setType(PlayType.OVER);
+        }
     }
 
     @Override

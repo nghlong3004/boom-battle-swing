@@ -56,4 +56,9 @@ public class GameManager {
     public void render(Graphics g) {
         gameRender.render(g);
     }
+
+    public boolean isAnyPlayerAlive() {
+        return bomberManager.getBombers().stream()
+                .anyMatch(Bomber::isAlive);
+    }
 }

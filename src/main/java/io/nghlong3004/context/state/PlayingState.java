@@ -105,6 +105,10 @@ public class PlayingState implements GameState {
     }
 
     public void replay() {
+        ((GamePlayComponent) gameComponentMap.get(PlayType.PLAYING)).play();
+    }
 
+    public PlayComponent getComponent(PlayType playType) {
+        return gameComponentMap.get(playType);
     }
 }

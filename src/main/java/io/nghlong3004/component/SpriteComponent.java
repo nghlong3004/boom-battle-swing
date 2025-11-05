@@ -2,6 +2,7 @@ package io.nghlong3004.component;
 
 import io.nghlong3004.component.button.GameButton;
 import io.nghlong3004.component.button.SpriteButton;
+import io.nghlong3004.component.play.GamePlayComponent;
 import io.nghlong3004.context.GameContext;
 import io.nghlong3004.context.state.PlayingState;
 import io.nghlong3004.type.GameStateType;
@@ -59,7 +60,11 @@ public class SpriteComponent extends GameComponent {
     public void mouseReleased(MouseEvent e) {
         if (homeButton.isMouseOver(e)) {
             if (homeButton.isMousePressed()) {
-                ((PlayingState) context.getGameState(GameStateType.PLAYING)).setType(PlayType.PLAYING);
+                PlayingState playingState = (PlayingState) context.getGameState(GameStateType.PLAYING);
+                if (playingState.getComponent(PlayType.PLAYING) instanceof GamePlayComponent) {
+                    ((GamePlayComponent) playingState.getComponent(PlayType.PLAYING)).exit();
+                }
+                playingState.setType(PlayType.PLAYING);
                 context.changeState(GameStateType.MENU);
             }
         }

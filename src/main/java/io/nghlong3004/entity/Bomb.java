@@ -18,6 +18,7 @@ public class Bomb {
     private Bomber owner;
     private int animationTick;
     private int animationFrame;
+    private boolean solid;
     private static final int EXPLOSION_TIME = 180;
     private static final int ANIMATION_SPEED = 20;
 
@@ -33,6 +34,7 @@ public class Bomb {
         this.exploded = false;
         this.animationTick = 0;
         this.animationFrame = 0;
+        this.solid = false;
     }
 
     public void update() {

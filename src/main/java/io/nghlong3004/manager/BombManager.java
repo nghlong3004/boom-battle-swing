@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,22 +31,18 @@ public class BombManager {
             return;
         }
 
-        // Get bomber's center position
+
         float bomberCenterX = bomber.getBox().x;
         float bomberCenterY = bomber.getBox().y;
 
-        // Calculate which grid tile the bomber is on
         int gridX = (int) (bomberCenterY / TILE_SIZE);
         int gridY = (int) (bomberCenterX / TILE_SIZE);
-
-        // Check if there's already a bomb at this grid position
         for (Bomb existingBomb : bombs) {
             if (existingBomb.getGridX() == gridX && existingBomb.getGridY() == gridY) {
                 return;
             }
         }
 
-        // Create bomb at the grid position
         Bomb bomb = new Bomb(gridX, gridY, bomber.getExplosionRange(), bomber);
         bombs.add(bomb);
         bomber.setCurrentBombs(bomber.getCurrentBombs() + 1);
@@ -55,6 +52,21 @@ public class BombManager {
     public void update() {
         for (Bomb bomb : bombs) {
             bomb.update();
+            
+            if (!bomb.isSolid() && bomb.getOwner() != null) {
+                Rectangle2D.Float bombHitbox = new Rectangle2D.Float(
+                    bomb.getPixelX(), 
+                    bomb.getPixelY(), 
+                    TILE_SIZE, 
+                    TILE_SIZE
+                );
+                
+                Rectangle2D.Float ownerHitbox = bomb.getOwner().getBox();
+                if (!bombHitbox.intersects(ownerHitbox)) {
+                    bomb.setSolid(true);
+                    log.debug("Bomb at ({}, {}) became solid", bomb.getGridX(), bomb.getGridY());
+                }
+            }
         }
 
         bombs.removeIf(Bomb::shouldBeRemoved);

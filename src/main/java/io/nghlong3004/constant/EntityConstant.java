@@ -11,7 +11,7 @@ public class EntityConstant {
 
     public static final float DIAGONAL_SPEED_MODIFIER = 0.70710678f;
     public static final float WIDTH_BOX_DRAW_OFF_SET = -12 * SCALE;
-    public static final float HEIGHT_BOX_DRAW_OFF_SET = -14 * SCALE;
+    public static final float HEIGHT_BOX_DRAW_OFF_SET = -5 * SCALE;
     public static final float X_BOX_DRAW_OFF_SET = 2 * SCALE;
     public static final float Y_BOX_DRAW_OFF_SET = 4 * SCALE;
 

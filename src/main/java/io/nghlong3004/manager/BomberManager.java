@@ -3,6 +3,8 @@ package io.nghlong3004.manager;
 import io.nghlong3004.assets.BomberAssets;
 import io.nghlong3004.entity.Bomber;
 import io.nghlong3004.entity.Entity;
+import io.nghlong3004.util.CollisionChecker;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
@@ -17,8 +19,10 @@ import static io.nghlong3004.constant.EntityConstant.*;
 @Slf4j
 public class BomberManager {
 
+    @Getter
     private final List<Bomber> bombers;
-    private BombManager bombManager; // Will be set later
+    private BombManager bombManager;
+    private CollisionChecker collisionChecker;
 
     public BomberManager() {
         this.bombers = new ArrayList<>();
@@ -26,6 +30,10 @@ public class BomberManager {
 
     public void setBombManager(BombManager bombManager) {
         this.bombManager = bombManager;
+    }
+
+    public void setCollisionChecker(CollisionChecker collisionChecker) {
+        this.collisionChecker = collisionChecker;
     }
 
     public void addAll(List<Bomber> bombers) {
@@ -51,10 +59,9 @@ public class BomberManager {
 
     public void update() {
         for (var bomber : bombers) {
-            // Handle bomb placement request
             if (bomber.isPlaceBombRequested() && bombManager != null) {
                 bombManager.placeBomb(bomber);
-                bomber.setPlaceBombRequested(false); // Reset the request
+                bomber.setPlaceBombRequested(false);
             }
             
             updatePosition(bomber);
@@ -125,15 +132,20 @@ public class BomberManager {
             xSpeed *= DIAGONAL_SPEED_MODIFIER;
             ySpeed *= DIAGONAL_SPEED_MODIFIER;
         }
+        
         Rectangle2D.Float hitbox = entity.getBox();
         float newX = hitbox.x + xSpeed;
         float newY = hitbox.y + ySpeed;
-
         Rectangle2D.Float newHitbox = new Rectangle2D.Float(newX, newY, hitbox.width, hitbox.height);
+
+        if (collisionChecker != null && !collisionChecker.canMoveTo(newHitbox, (Bomber) entity)) {
+            log.debug("Collision detected at position ({}, {})", newX, newY);
+            return;
+        }
+
         hitbox.x = newX;
         hitbox.y = newY;
         entity.setMoving(true);
-
     }
 
     private BufferedImage getBufferedImage(Bomber bomber) {

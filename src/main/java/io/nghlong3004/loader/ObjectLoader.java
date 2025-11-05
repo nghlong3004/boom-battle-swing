@@ -11,12 +11,21 @@ import static io.nghlong3004.loader.ImageLoader.loadImage;
 public class ObjectLoader {
 
     public static BufferedImage[] loadBombAssets() {
-        log.info("Loading bomb sprites");
-        BufferedImage[] bombSprites = new BufferedImage[8];
-        for (int i = 0; i < 8; i++) {
-            String path = BOMB_TEMPLATE.formatted(i + 1);
-            bombSprites[i] = loadImage(path);
+        log.info("Loading custom bomb sprites");
+        BufferedImage bombSheet = loadImage(CUSTOM_BOMB);
+        BufferedImage[] bombSprites = new BufferedImage[CUSTOM_BOMB_FRAMES];
+        
+        if (bombSheet == null) {
+            log.error("Failed to load custom bomb sprite sheet");
+            return bombSprites;
         }
+        
+        for (int i = 0; i < CUSTOM_BOMB_FRAMES; i++) {
+            bombSprites[i] = bombSheet.getSubimage(i * CUSTOM_BOMB_SPRITE_SIZE, 0, 
+                                                    CUSTOM_BOMB_SPRITE_SIZE, CUSTOM_BOMB_SPRITE_SIZE);
+        }
+        
+        log.info("Loaded {} custom bomb frames", CUSTOM_BOMB_FRAMES);
         return bombSprites;
     }
 

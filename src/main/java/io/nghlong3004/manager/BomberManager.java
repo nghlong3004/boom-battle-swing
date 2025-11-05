@@ -18,9 +18,14 @@ import static io.nghlong3004.constant.EntityConstant.*;
 public class BomberManager {
 
     private final List<Bomber> bombers;
+    private BombManager bombManager; // Will be set later
 
     public BomberManager() {
         this.bombers = new ArrayList<>();
+    }
+
+    public void setBombManager(BombManager bombManager) {
+        this.bombManager = bombManager;
     }
 
     public void addAll(List<Bomber> bombers) {
@@ -46,6 +51,12 @@ public class BomberManager {
 
     public void update() {
         for (var bomber : bombers) {
+            // Handle bomb placement request
+            if (bomber.isPlaceBombRequested() && bombManager != null) {
+                bombManager.placeBomb(bomber);
+                bomber.setPlaceBombRequested(false); // Reset the request
+            }
+            
             updatePosition(bomber);
             updateAnimationTick(bomber);
             setAnimation(bomber);

@@ -15,7 +15,10 @@ public enum BomberKeyAction {
     MOVE_UP(new int[]{KeyEvent.VK_W, KeyEvent.VK_UP}, (bomber) -> bomber.setUp(true), (bomber) -> bomber.setUp(false)),
 
     MOVE_DOWN(new int[]{KeyEvent.VK_S, KeyEvent.VK_DOWN}, (bomber) -> bomber.setDown(true),
-              (bomber) -> bomber.setDown(false));
+              (bomber) -> bomber.setDown(false)),
+
+    PLACE_BOMB(new int[]{KeyEvent.VK_SPACE, KeyEvent.VK_NUMPAD0}, (bomber) -> bomber.setPlaceBombRequested(true),
+               (bomber) -> bomber.setPlaceBombRequested(false));
 
 
     public final int[] keys;

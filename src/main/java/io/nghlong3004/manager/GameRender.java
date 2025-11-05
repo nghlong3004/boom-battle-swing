@@ -2,18 +2,30 @@ package io.nghlong3004.manager;
 
 import io.nghlong3004.assets.MapAssets;
 import io.nghlong3004.constant.GameConstant;
+import io.nghlong3004.loader.ImageLoader;
 import lombok.RequiredArgsConstructor;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
+import static io.nghlong3004.constant.ImageConstant.GAME_BACKGROUND;
 import static io.nghlong3004.type.TileType.FLOOR;
 
 @RequiredArgsConstructor
 public class GameRender {
     private final MapManager mapManager;
     private final BomberManager bomberManager;
+    private final BombManager bombManager;
+    private BufferedImage background;
 
     public void render(Graphics g) {
+        if (background == null) {
+            background = ImageLoader.loadImage(GAME_BACKGROUND);
+        }
+        if (background != null) {
+            g.drawImage(background, 0, 0, GameConstant.GAME_WIDTH, GameConstant.GAME_HEIGHT, null);
+        }
+        
         int row = mapManager.getMap()
                             .getType().id;
         var data = mapManager.getMap()
@@ -35,6 +47,7 @@ public class GameRender {
                 }
             }
         }
+        bombManager.render(g);
         bomberManager.render(g);
     }
 

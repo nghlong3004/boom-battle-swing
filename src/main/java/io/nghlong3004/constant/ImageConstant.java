@@ -14,6 +14,8 @@ public class ImageConstant {
 
     public static final String BACKGROUND = "/images/home/boom-online-3.jpg";
 
+    public static final String GAME_BACKGROUND = "/images/home/back.jpg";
+
     public static final String PAUSE_BACKGROUND = "/images/buttons/pause_menu.png";
 
     public static final String OPTION_BACKGROUND = "/images/home/options_background.png";
@@ -49,6 +51,10 @@ public class ImageConstant {
     public static final int SOLDIER_DIE_FRAMES = 3;
 
     public static final String BOMB_TEMPLATE = "/images/boom/boom%d.png";
+    public static final String CUSTOM_BOMB = "/images/boom/custom_bubble_100.png";
+    public static final int CUSTOM_BOMB_SPRITE_SIZE = 73;
+    public static final int CUSTOM_BOMB_FRAMES = 3;
+
     public static final String EXPLOSION_ANIMATION = "/images/boom/explosion.png";
     public static final int EXPLOSION_FRAME_WIDTH = 102;
     public static final int EXPLOSION_FRAME_HEIGHT = 103;

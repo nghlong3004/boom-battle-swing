@@ -9,6 +9,7 @@ import io.nghlong3004.loader.AudioLoader;
 import io.nghlong3004.type.GameStateType;
 import io.nghlong3004.type.GameType;
 import io.nghlong3004.type.MapType;
+import io.nghlong3004.type.PlayerCountType;
 import io.nghlong3004.type.SkinType;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,6 +40,9 @@ public class GameContext implements GameLogic, KeyboardAdapter, MouseAdapter, Mo
     @Getter
     @Setter
     private GameType gameType = GameType.OFFLINE;
+    @Getter
+    @Setter
+    private PlayerCountType playerCount = PlayerCountType.ONE_PLAYER;
     @Getter
     @Setter
     private int numberBomber = 1;

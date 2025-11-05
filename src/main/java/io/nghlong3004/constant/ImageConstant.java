@@ -5,6 +5,11 @@ public class ImageConstant {
 
     public static final String BUTTON_EMPTY = "/images/buttons/button_empty.png";
 
+    public static final String BUTTON_1P = "/images/buttons/1P.png";
+    public static final String BUTTON_1P_TOUCH = "/images/buttons/1P_touch.png";
+    public static final String BUTTON_2P = "/images/buttons/2P.png";
+    public static final String BUTTON_2P_TOUCH = "/images/buttons/2P_touch.png";
+
     public static final String MENU_BACKGROUND = "/images/home/menu_background.png";
 
     public static final String BACKGROUND = "/images/home/boom-online-3.jpg";

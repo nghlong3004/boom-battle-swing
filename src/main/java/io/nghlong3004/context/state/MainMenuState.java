@@ -4,6 +4,7 @@ import io.nghlong3004.component.GameComponent;
 import io.nghlong3004.component.menu.GameTypeComponent;
 import io.nghlong3004.component.menu.MapTypeComponent;
 import io.nghlong3004.component.menu.MenuTypeComponent;
+import io.nghlong3004.component.menu.PlayerCountComponent;
 import io.nghlong3004.component.menu.SkinTypeComponent;
 import io.nghlong3004.constant.AudioConstant;
 import io.nghlong3004.context.GameContext;
@@ -44,6 +45,7 @@ public class MainMenuState implements GameState {
 
     private void loadGameComponentMap() {
         gameComponentMap.put(MenuType.GAME_TYPE, new GameTypeComponent(stateContext));
+        gameComponentMap.put(MenuType.PLAYER_COUNT, new PlayerCountComponent(stateContext));
         gameComponentMap.put(MenuType.MAP_TYPE, new MapTypeComponent(stateContext));
         gameComponentMap.put(MenuType.SKIN_TYPE, new SkinTypeComponent(stateContext));
         gameComponentMap.put(MenuType.MENU, new MenuTypeComponent(stateContext));

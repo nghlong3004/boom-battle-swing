@@ -79,8 +79,8 @@ public class GameTypeComponent extends GameComponent {
                 modeButton.startBlinking();
                 GameType selectedMode = modeButton.getGameMode();
                 context.setGameType(selectedMode);
-                ((MainMenuState) context.getGameState(GameStateType.MENU)).setType(MenuType.SKIN_TYPE);
-                log.info("{} mode selected, proceeding to skin selection", selectedMode.name());
+                ((MainMenuState) context.getGameState(GameStateType.MENU)).setType(MenuType.PLAYER_COUNT);
+                log.info("{} mode selected, proceeding to player count selection", selectedMode.name());
             }
         }
         reset();

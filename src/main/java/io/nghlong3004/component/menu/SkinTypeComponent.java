@@ -21,6 +21,8 @@ import static io.nghlong3004.constant.ImageConstant.BACKGROUND;
 public class SkinTypeComponent extends GameComponent {
     private SkinButton[] skinButtons;
     private BufferedImage background;
+    private int currentPlayerSelecting = 0;
+    private SkinType[] selectedSkins = new SkinType[2];
 
     public SkinTypeComponent(GameContext stateContext) {
         super(stateContext);
@@ -60,6 +62,21 @@ public class SkinTypeComponent extends GameComponent {
     public void render(Graphics g) {
         g.drawImage(background, 0, 0, GAME_WIDTH, GAME_HEIGHT, null);
 
+        if (context.getNumberBomber() == 2) {
+            g.setFont(new Font("Arial", Font.BOLD, 36));
+            String title = currentPlayerSelecting == 0 ? "PLAYER 1 - SELECT SKIN" : "PLAYER 2 - SELECT SKIN";
+            FontMetrics fm = g.getFontMetrics();
+            int titleWidth = fm.stringWidth(title);
+            int titleX = (GAME_WIDTH - titleWidth) / 2;
+            int titleY = (int) (100 * SCALE);
+
+            g.setColor(Color.BLACK);
+            g.drawString(title, titleX + 3, titleY + 3);
+
+            g.setColor(new Color(255, 200, 0)); 
+            g.drawString(title, titleX, titleY);
+        }
+
         for (SkinButton button : skinButtons) {
             button.render(g);
         }
@@ -79,9 +96,31 @@ public class SkinTypeComponent extends GameComponent {
         for (var skinButton : skinButtons) {
             if (skinButton.isMouseOver(e) && skinButton.isMousePressed()) {
                 SkinType selectedSkin = skinButton.getSkin();
-                context.setSkinType(new SkinType[]{selectedSkin});
-                log.info("Selected skin: {}", selectedSkin.name());
-                ((MainMenuState) context.getGameState(GameStateType.MENU)).setType(MenuType.MAP_TYPE);
+                if (context.getNumberBomber() == 1) {
+                    selectedSkins[0] = selectedSkin;
+                    context.setSkinType(new SkinType[]{selectedSkin});
+                    log.info("Selected skin for single player: {}", selectedSkin.name());
+                    ((MainMenuState) context.getGameState(GameStateType.MENU)).setType(MenuType.MAP_TYPE);
+                }
+                else {
+
+                    selectedSkins[currentPlayerSelecting] = selectedSkin;
+                    log.info("Player {} selected skin: {}", (currentPlayerSelecting + 1), selectedSkin.name());
+
+                    if (currentPlayerSelecting == 0) {
+
+                        currentPlayerSelecting = 1;
+                    }
+                    else {
+
+                        context.setSkinType(selectedSkins);
+                        log.info("Both players selected skins: P1={}, P2={}", selectedSkins[0].name(),
+                                 selectedSkins[1].name());
+                        ((MainMenuState) context.getGameState(GameStateType.MENU)).setType(MenuType.MAP_TYPE);
+
+                        currentPlayerSelecting = 0;
+                    }
+                }
             }
         }
         reset();

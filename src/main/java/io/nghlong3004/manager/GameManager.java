@@ -18,6 +18,8 @@ public class GameManager {
     private final BomberManager bomberManager;
     @Getter
     private final BombManager bombManager;
+    @Getter
+    private final ExplosionManager explosionManager;
     private final GameRender gameRender;
 
     public void play(MapType type, List<Bomber> bombers) {
@@ -42,11 +44,13 @@ public class GameManager {
     public void reset() {
         bomberManager.reset();
         bombManager.reset();
+        explosionManager.reset();
     }
 
     public void update() {
         bomberManager.update();
         bombManager.update();
+        explosionManager.update();
     }
 
     public void render(Graphics g) {

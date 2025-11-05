@@ -5,6 +5,7 @@ import io.nghlong3004.entity.Bomber;
 import io.nghlong3004.entity.Entity;
 import io.nghlong3004.util.CollisionChecker;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
@@ -21,19 +22,13 @@ public class BomberManager {
 
     @Getter
     private final List<Bomber> bombers;
+    @Setter
     private BombManager bombManager;
+    @Setter
     private CollisionChecker collisionChecker;
 
     public BomberManager() {
         this.bombers = new ArrayList<>();
-    }
-
-    public void setBombManager(BombManager bombManager) {
-        this.bombManager = bombManager;
-    }
-
-    public void setCollisionChecker(CollisionChecker collisionChecker) {
-        this.collisionChecker = collisionChecker;
     }
 
     public void addAll(List<Bomber> bombers) {
@@ -46,6 +41,10 @@ public class BomberManager {
 
     public void render(Graphics g) {
         for (var bomber : bombers) {
+            if (!bomber.isAlive()) {
+                continue;
+            }
+
             Graphics2D g2d = (Graphics2D) g;
             Rectangle2D.Float hitbox = bomber.getBox();
             BufferedImage sprite = getBufferedImage(bomber);
@@ -59,11 +58,15 @@ public class BomberManager {
 
     public void update() {
         for (var bomber : bombers) {
+            if (!bomber.isAlive()) {
+                continue;
+            }
+
             if (bomber.isPlaceBombRequested() && bombManager != null) {
                 bombManager.placeBomb(bomber);
                 bomber.setPlaceBombRequested(false);
             }
-            
+
             updatePosition(bomber);
             updateAnimationTick(bomber);
             setAnimation(bomber);
@@ -132,7 +135,7 @@ public class BomberManager {
             xSpeed *= DIAGONAL_SPEED_MODIFIER;
             ySpeed *= DIAGONAL_SPEED_MODIFIER;
         }
-        
+
         Rectangle2D.Float hitbox = entity.getBox();
         float newX = hitbox.x + xSpeed;
         float newY = hitbox.y + ySpeed;

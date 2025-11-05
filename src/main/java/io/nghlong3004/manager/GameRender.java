@@ -16,6 +16,7 @@ public class GameRender {
     private final MapManager mapManager;
     private final BomberManager bomberManager;
     private final BombManager bombManager;
+    private final ExplosionManager explosionManager;
     private BufferedImage background;
 
     public void render(Graphics g) {
@@ -48,6 +49,7 @@ public class GameRender {
             }
         }
         bombManager.render(g);
+        explosionManager.render(g);
         bomberManager.render(g);
     }
 

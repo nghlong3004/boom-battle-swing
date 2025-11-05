@@ -9,6 +9,7 @@ public class ManagerFactory {
         MapManager mapManager = new MapManager();
         BomberManager bomberManager = new BomberManager();
         BombManager bombManager = new BombManager(mapManager);
+        ExplosionManager explosionManager = new ExplosionManager(mapManager);
         
         MapCollisionChecker collisionChecker = new MapCollisionChecker(mapManager);
         collisionChecker.setBomberManager(bomberManager);
@@ -16,9 +17,11 @@ public class ManagerFactory {
         
         bomberManager.setBombManager(bombManager);
         bomberManager.setCollisionChecker(collisionChecker);
+        bombManager.setExplosionManager(explosionManager);
+        explosionManager.setBomberManager(bomberManager);
         
-        GameRender gameRender = new GameRender(mapManager, bomberManager, bombManager);
-        return new GameManager(mapManager, bomberManager, bombManager, gameRender);
+        GameRender gameRender = new GameRender(mapManager, bomberManager, bombManager, explosionManager);
+        return new GameManager(mapManager, bomberManager, bombManager, explosionManager, gameRender);
     }
 
 }

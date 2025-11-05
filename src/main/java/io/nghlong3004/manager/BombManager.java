@@ -4,6 +4,7 @@ import io.nghlong3004.assets.ObjectAssets;
 import io.nghlong3004.entity.Bomb;
 import io.nghlong3004.entity.Bomber;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
@@ -20,6 +21,8 @@ public class BombManager {
     @Getter
     private final List<Bomb> bombs;
     private final MapManager mapManager;
+    @Setter
+    private ExplosionManager explosionManager;
 
     public BombManager(MapManager mapManager) {
         this.bombs = new ArrayList<>();
@@ -51,20 +54,23 @@ public class BombManager {
 
     public void update() {
         for (Bomb bomb : bombs) {
-            bomb.update();
-            
-            if (!bomb.isSolid() && bomb.getOwner() != null) {
-                Rectangle2D.Float bombHitbox = new Rectangle2D.Float(
-                    bomb.getPixelX(), 
-                    bomb.getPixelY(), 
-                    TILE_SIZE, 
-                    TILE_SIZE
-                );
-                
-                Rectangle2D.Float ownerHitbox = bomb.getOwner().getBox();
-                if (!bombHitbox.intersects(ownerHitbox)) {
-                    bomb.setSolid(true);
-                    log.debug("Bomb at ({}, {}) became solid", bomb.getGridX(), bomb.getGridY());
+            if (!bomb.isExploded()) {
+                bomb.update();
+
+                if (!bomb.isSolid() && bomb.getOwner() != null) {
+                    Rectangle2D.Float bombHitbox = new Rectangle2D.Float(bomb.getPixelX(), bomb.getPixelY(), TILE_SIZE,
+                                                                         TILE_SIZE);
+
+                    Rectangle2D.Float ownerHitbox = bomb.getOwner()
+                                                        .getBox();
+                    if (!bombHitbox.intersects(ownerHitbox)) {
+                        bomb.setSolid(true);
+                        log.debug("Bomb at ({}, {}) became solid", bomb.getGridX(), bomb.getGridY());
+                    }
+                }
+
+                if (bomb.isExploded() && explosionManager != null) {
+                    explosionManager.createExplosion(bomb.getGridX(), bomb.getGridY(), bomb.getExplosionRange());
                 }
             }
         }

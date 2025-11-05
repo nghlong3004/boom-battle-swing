@@ -2,9 +2,11 @@ package io.nghlong3004.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import static io.nghlong3004.constant.GameConstant.TILE_SIZE;
 
+@Slf4j
 @Getter
 @Setter
 public class Bomb {
@@ -55,6 +57,7 @@ public class Bomb {
     public void explode() {
         if (!exploded) {
             exploded = true;
+            log.debug("Bomb exploding at grid ({}, {})", gridX, gridY);
 
             if (owner != null) {
                 owner.setCurrentBombs(owner.getCurrentBombs() - 1);

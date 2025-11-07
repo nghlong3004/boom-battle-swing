@@ -6,6 +6,7 @@ import io.nghlong3004.manager.BombManager;
 import io.nghlong3004.manager.BomberManager;
 import io.nghlong3004.manager.MapManager;
 import io.nghlong3004.type.TileType;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.geom.Rectangle2D;
@@ -16,19 +17,13 @@ import static io.nghlong3004.constant.GameConstant.TILE_SIZE;
 @Slf4j
 public class MapCollisionChecker implements CollisionChecker {
     private final MapManager mapManager;
+    @Setter
     private BomberManager bomberManager;
+    @Setter
     private BombManager bombManager;
 
     public MapCollisionChecker(MapManager mapManager) {
         this.mapManager = mapManager;
-    }
-
-    public void setBomberManager(BomberManager bomberManager) {
-        this.bomberManager = bomberManager;
-    }
-
-    public void setBombManager(BombManager bombManager) {
-        this.bombManager = bombManager;
     }
 
     @Override
@@ -36,21 +31,18 @@ public class MapCollisionChecker implements CollisionChecker {
         if (isCollidingWithSolid(newHitbox.x, newHitbox.y, newHitbox.width, newHitbox.height)) {
             return false;
         }
-        
+
         if (isCollidingWithBombs(newHitbox)) {
             return false;
         }
-        
-        if (isCollidingWithOtherBombers(newHitbox, currentBomber)) {
-            return false;
-        }
-        
+
         return true;
     }
 
     @Override
     public boolean isCollidingWithSolid(float x, float y, float width, float height) {
-        int[][] mapData = mapManager.getMap().getData();
+        int[][] mapData = mapManager.getMap()
+                                    .getData();
         int offsetX = CollisionUtil.calculateMapOffsetX(mapData[0].length);
         int offsetY = CollisionUtil.calculateMapOffsetY(mapData.length);
 
@@ -64,41 +56,33 @@ public class MapCollisionChecker implements CollisionChecker {
         leftCol = Math.max(0, Math.min(leftCol, mapData[0].length - 1));
         rightCol = Math.max(0, Math.min(rightCol, mapData[0].length - 1));
 
-        return isSolidTile(mapData[topRow][leftCol]) ||
-               isSolidTile(mapData[topRow][rightCol]) ||
-               isSolidTile(mapData[bottomRow][leftCol]) ||
-               isSolidTile(mapData[bottomRow][rightCol]);
+        return isSolidTile(mapData[topRow][leftCol]) || isSolidTile(mapData[topRow][rightCol]) || isSolidTile(
+                mapData[bottomRow][leftCol]) || isSolidTile(mapData[bottomRow][rightCol]);
     }
 
     private boolean isSolidTile(int tileId) {
-        return tileId == TileType.STONE.id || 
-               tileId == TileType.BRICK.id || 
-               tileId == TileType.GIFT_BOX.id;
+        return tileId == TileType.STONE.id || tileId == TileType.BRICK.id || tileId == TileType.GIFT_BOX.id;
     }
 
     private boolean isCollidingWithBombs(Rectangle2D.Float hitbox) {
         if (bombManager == null) {
             return false;
         }
-        
+
         List<Bomb> bombs = bombManager.getBombs();
         for (Bomb bomb : bombs) {
             if (bomb.isExploded() || !bomb.isSolid()) {
                 continue;
             }
-            
-            Rectangle2D.Float bombHitbox = new Rectangle2D.Float(
-                bomb.getPixelX(), 
-                bomb.getPixelY(), 
-                TILE_SIZE, 
-                TILE_SIZE
-            );
-            
+
+            Rectangle2D.Float bombHitbox = new Rectangle2D.Float(bomb.getPixelX(), bomb.getPixelY(), TILE_SIZE,
+                                                                 TILE_SIZE);
+
             if (hitbox.intersects(bombHitbox)) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -106,18 +90,18 @@ public class MapCollisionChecker implements CollisionChecker {
         if (bomberManager == null) {
             return false;
         }
-        
+
         List<Bomber> bombers = bomberManager.getBombers();
         for (Bomber bomber : bombers) {
-            if (bomber == currentBomber) {
+            if (bomber == currentBomber || !bomber.isAlive()) {
                 continue;
             }
-            
+
             if (hitbox.intersects(bomber.getBox())) {
                 return true;
             }
         }
-        
+
         return false;
     }
 }

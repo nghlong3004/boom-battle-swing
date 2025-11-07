@@ -21,7 +21,7 @@ public class Bomb {
     private int animationTick;
     private int animationFrame;
     private boolean solid;
-    private static final int EXPLOSION_TIME = 180;
+    private static final int EXPLOSION_TIME = 180 * 2;
     private static final int ANIMATION_SPEED = 20;
 
     public Bomb(int gridX, int gridY, int explosionRange, Bomber owner) {

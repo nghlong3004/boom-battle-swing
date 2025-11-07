@@ -1,11 +1,12 @@
 package io.nghlong3004.manager;
 
 import io.nghlong3004.assets.ObjectAssets;
+import io.nghlong3004.entity.Bomber;
 import io.nghlong3004.entity.Explosion;
 import io.nghlong3004.type.TileType;
 import io.nghlong3004.util.CollisionUtil;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
@@ -16,17 +17,14 @@ import java.util.List;
 import static io.nghlong3004.constant.GameConstant.TILE_SIZE;
 
 @Slf4j
+@RequiredArgsConstructor
 public class ExplosionManager {
     @Getter
-    private final List<Explosion> explosions;
+    private final List<Explosion> explosions = new ArrayList<>();
     private final MapManager mapManager;
-    @Setter
-    private BomberManager bomberManager;
-
-    public ExplosionManager(MapManager mapManager) {
-        this.explosions = new ArrayList<>();
-        this.mapManager = mapManager;
-    }
+    private final BomberManager bomberManager;
+    private final AgentManager agentManager;
+    private final ItemManager itemManager;
 
     public void createExplosion(int gridX, int gridY, int range) {
         log.debug("Creating explosion at grid ({}, {}) with range {}", gridX, gridY, range);
@@ -68,7 +66,15 @@ public class ExplosionManager {
             log.debug("Explosion created at grid ({}, {}) - map position [{}, {}] = {}", newGridX, newGridY, mapRow,
                       mapCol, tileType);
 
+            if (itemManager != null) {
+                itemManager.destroyItemAt(newGridX, newGridY);
+            }
+
             if (tileType == TileType.BRICK.id || tileType == TileType.GIFT_BOX.id) {
+                if (tileType == TileType.GIFT_BOX.id && itemManager != null) {
+                    itemManager.spawnItem(newGridX, newGridY);
+                }
+
                 mapData[mapRow][mapCol] = TileType.FLOOR.id;
                 log.debug("Tile destroyed at grid ({}, {}) - map position [{}, {}] - type: {}", newGridX, newGridY,
                           mapRow, mapCol, tileType == TileType.BRICK.id ? "BRICK" : "GIFT_BOX");
@@ -78,7 +84,8 @@ public class ExplosionManager {
     }
 
     public void update() {
-        checkBomberDamage();
+        checkBomberDamage(bomberManager.getBombers());
+        checkBomberDamage(agentManager.getAgents());
 
         for (Explosion explosion : explosions) {
             explosion.update();
@@ -86,8 +93,8 @@ public class ExplosionManager {
         explosions.removeIf(Explosion::shouldBeRemoved);
     }
 
-    private void checkBomberDamage() {
-        if (bomberManager == null || explosions.isEmpty()) {
+    private void checkBomberDamage(List<Bomber> bombers) {
+        if (explosions.isEmpty()) {
             return;
         }
 
@@ -95,7 +102,7 @@ public class ExplosionManager {
             int explosionPixelX = explosion.getPixelX();
             int explosionPixelY = explosion.getPixelY();
 
-            for (var bomber : bomberManager.getBombers()) {
+            for (var bomber : bombers) {
                 float bomberX = bomber.getBox().x;
                 float bomberY = bomber.getBox().y;
                 float bomberWidth = bomber.getBox().width;
@@ -114,12 +121,12 @@ public class ExplosionManager {
     public void render(Graphics g) {
         BufferedImage[] animationFrames = ObjectAssets.getInstance()
                                                       .getExplosionAnimationFrameAssets();
-
         if (animationFrames == null || animationFrames.length == 0) {
             return;
         }
 
-        for (Explosion explosion : explosions) {
+        List<Explosion> explosionsCopy = new ArrayList<>(explosions);
+        for (Explosion explosion : explosionsCopy) {
             int frameIndex = Math.min(explosion.getAnimationFrame(), animationFrames.length - 1);
             BufferedImage currentFrame = animationFrames[frameIndex];
 
@@ -127,6 +134,7 @@ public class ExplosionManager {
                 g.drawImage(currentFrame, explosion.getPixelX(), explosion.getPixelY(), TILE_SIZE, TILE_SIZE, null);
             }
         }
+        itemManager.render(g);
     }
 
     public void reset() {

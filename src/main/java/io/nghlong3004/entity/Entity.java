@@ -27,16 +27,15 @@ public abstract class Entity {
         this.width = width;
         this.height = height;
         this.skin = skinType;
-        initializeHitbox();
+        float hitboxX = x + HITBOX_OFFSET_X;
+        float hitboxY = y + HITBOX_OFFSET_Y;
+        this.box = new Rectangle2D.Float(hitboxX, hitboxY, HITBOX_WIDTH, HITBOX_HEIGHT);
         initializeState();
     }
 
-    protected void initializeHitbox() {
-        float hitboxWidth = width + WIDTH_BOX_DRAW_OFF_SET;
-        float hitboxHeight = (height + HEIGHT_BOX_DRAW_OFF_SET) / 2;
-        float hitboxX = x + (width - hitboxWidth) / 2 + X_BOX_DRAW_OFF_SET;
-        float hitboxY = y + (height - hitboxHeight) / 2 + Y_BOX_DRAW_OFF_SET;
-        this.box = new Rectangle2D.Float(hitboxX, hitboxY, hitboxWidth, hitboxHeight);
+    protected void updateHitboxPosition() {
+        this.box.x = x + HITBOX_OFFSET_X;
+        this.box.y = y + HITBOX_OFFSET_Y;
     }
 
     protected void initializeState() {
@@ -52,7 +51,7 @@ public abstract class Entity {
     protected abstract float getDefaultSpeed();
 
     public void reset() {
-        initializeHitbox();
+        updateHitboxPosition();
         initializeState();
     }
 

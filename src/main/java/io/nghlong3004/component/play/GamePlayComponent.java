@@ -6,9 +6,8 @@ import io.nghlong3004.entity.Bomber;
 import io.nghlong3004.input.BomberKeyAction;
 import io.nghlong3004.manager.GameManager;
 import io.nghlong3004.manager.ManagerFactory;
-import io.nghlong3004.type.GameStateType;
-import io.nghlong3004.type.GameType;
-import io.nghlong3004.type.PlayType;
+import io.nghlong3004.type.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -16,12 +15,13 @@ import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
 
+@Slf4j
 public class GamePlayComponent extends PlayComponent {
 
     private final GameManager gameManager;
     private Bomber[] bombers;
-    private final List<Bomber> enemyList;
     private final Map<Integer, BomberKeyAction> lookup;
+    private static final int MAX_CHARACTERS = 4;
 
     public GamePlayComponent(GameContext context) {
         super(context);
@@ -29,24 +29,22 @@ public class GamePlayComponent extends PlayComponent {
         this.lookup = new HashMap<>();
         initLookup();
         bombers = new Bomber[2];
-        enemyList = new ArrayList<>();
     }
 
     public void play() {
         gameManager.reset();
         loadBombers();
         if (context.getGameType() == GameType.OFFLINE) {
-            loadEnemy();
+            loadEnemies();
         }
-        gameManager.play(context.getMapType(), getAllBombers());
+        gameManager.play(context.getMapType(), getPlayers());
     }
 
-    private List<Bomber> getAllBombers() {
-        var bombers = new ArrayList<Bomber>();
-        bombers.addAll(Arrays.asList(this.bombers)
+    private List<Bomber> getPlayers() {
+        var players = new ArrayList<Bomber>();
+        players.addAll(Arrays.asList(this.bombers)
                              .subList(0, context.getNumberBomber()));
-        bombers.addAll(this.enemyList);
-        return bombers;
+        return players;
     }
 
     private void loadBombers() {
@@ -55,12 +53,24 @@ public class GamePlayComponent extends PlayComponent {
         }
     }
 
-    private void loadEnemy() {
+    private void loadEnemies() {
+        int playerCount = context.getNumberBomber();
+        int enemyCount = MAX_CHARACTERS - playerCount;
 
+        log.info("Loading {} enemies for {} player(s)", enemyCount, playerCount);
+
+        SkinType[] enemySkins = {SkinType.BOZ, SkinType.EVIE, SkinType.PLUNK};
+        EnemyAIType[] aiTypes = {EnemyAIType.EASY, EnemyAIType.NORMAL, EnemyAIType.HARD};
+
+        for (int i = 0; i < enemyCount; i++) {
+            SkinType skin = enemySkins[i % enemySkins.length];
+            EnemyAIType aiType = aiTypes[i % aiTypes.length];
+
+            log.info("Created enemy {} with AI type: {}", i + 1, aiType);
+        }
     }
 
     public void exit() {
-        enemyList.clear();
         gameManager.reset();
     }
 

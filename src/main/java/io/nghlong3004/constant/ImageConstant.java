@@ -76,6 +76,11 @@ public class ImageConstant {
     public static final String ITEM_EFFECT_TEMPLATE = "/images/items/effect_%d.png";
     public static final int ITEM_EFFECT_FRAMES = 8;
 
+    public static final String MOVE_EFFECT = "/images/items/move_1.png";
+    public static final int MOVE_EFFECT_FRAMES = 6;
+    public static final int MOVE_EFFECT_FRAME_WIDTH = 64;
+    public static final int MOVE_EFFECT_FRAME_HEIGHT = 64;
+
     public static final int IMAGE_BOMBER_WIDTH = 58;
     public static final int IMAGE_BOMBER_HEIGHT = 71;
 }

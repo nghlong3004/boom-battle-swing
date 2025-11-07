@@ -14,7 +14,7 @@ public class ImageLoader {
         log.info("Loading file name={}", name);
         try (InputStream inputStream = ImageLoader.class.getResourceAsStream(name)) {
             if (inputStream == null) {
-                throw new RuntimeException("Input Stream is null");
+                throw new RuntimeException("%s not found!".formatted(name));
             }
             return ImageIO.read(inputStream);
         } catch (IOException e) {

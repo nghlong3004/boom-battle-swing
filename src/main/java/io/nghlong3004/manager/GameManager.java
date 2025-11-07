@@ -2,15 +2,17 @@ package io.nghlong3004.manager;
 
 import io.nghlong3004.entity.Bomber;
 import io.nghlong3004.type.MapType;
+import io.nghlong3004.type.SkinType;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-@RequiredArgsConstructor
+@Builder
 public class GameManager {
     @Getter
     private final MapManager mapManager;
@@ -20,17 +22,24 @@ public class GameManager {
     private final BombManager bombManager;
     @Getter
     private final ExplosionManager explosionManager;
+    @Getter
+    private final ItemManager itemManager;
+    private final AgentManager agentManager;
     private final GameRender gameRender;
+    private List<Bomber> bombers;
+    private List<Bomber> agents;
 
     public void play(MapType type, List<Bomber> bombers) {
         mapManager.setType(type);
         mapManager.loadMap();
         setSpawnBombers(bombers);
+        this.bombers = bombers;
         bomberManager.addAll(bombers);
+        agentManager.start();
     }
 
     private void setSpawnBombers(List<Bomber> bombers) {
-        List<Point> points = mapManager.getSpawns(6);
+        var points = mapManager.getSpawns(6);
         for (int i = 0; i < bombers.size(); ++i) {
             bombers.get(i)
                    .setX(points.get(i).x);
@@ -39,18 +48,34 @@ public class GameManager {
             bombers.get(i)
                    .reset();
         }
+        agents = new ArrayList<Bomber>();
+        for (int i = bombers.size(); i < points.size(); ++i) {
+            Bomber agent = new Bomber(points.get(i).x, points.get(i).y, SkinType.BOZ);
+            agent.reset();
+            agents.add(agent);
+        }
+        agentManager.setAgents(agents);
+        agentManager.setTickMillis(5);
     }
 
     public void reset() {
+        agentManager.stop();
         bomberManager.reset();
         bombManager.reset();
         explosionManager.reset();
+        itemManager.reset();
+        bombers = null;
+        agents = null;
     }
 
     public void update() {
+        agentManager.update();
         bomberManager.update();
         bombManager.update();
         explosionManager.update();
+        itemManager.update();
+        itemManager.checkCollisions(bombers);
+        itemManager.checkCollisions(agents);
     }
 
     public void render(Graphics g) {
@@ -58,7 +83,10 @@ public class GameManager {
     }
 
     public boolean isAnyPlayerAlive() {
-        return bomberManager.getBombers().stream()
-                .anyMatch(Bomber::isAlive);
+        if (bombers == null) {
+            return true;
+        }
+        return bombers.stream()
+                      .anyMatch(Bomber::isAlive);
     }
 }

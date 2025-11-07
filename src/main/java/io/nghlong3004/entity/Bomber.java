@@ -25,4 +25,8 @@ public class Bomber extends Entity {
     protected float getDefaultSpeed() {
         return 1;
     }
+
+    public void setHasSpeedBoost(boolean b) {
+
+    }
 }

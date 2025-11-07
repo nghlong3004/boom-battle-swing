@@ -77,6 +77,25 @@ public class ObjectLoader {
         return effects;
     }
 
+    public static BufferedImage[] loadMoveEffectAssets() {
+        log.info("Loading move effect frames");
+        BufferedImage moveSheet = loadImage(MOVE_EFFECT);
+        BufferedImage[] frames = new BufferedImage[MOVE_EFFECT_FRAMES];
+
+        if (moveSheet == null) {
+            log.error("Failed to load move effect sprite sheet");
+            return frames;
+        }
+
+        for (int i = 0; i < MOVE_EFFECT_FRAMES; i++) {
+            frames[i] = moveSheet.getSubimage(i * MOVE_EFFECT_FRAME_WIDTH, 0, 
+                                              MOVE_EFFECT_FRAME_WIDTH, MOVE_EFFECT_FRAME_HEIGHT);
+        }
+
+        log.info("Loaded {} move effect frames", MOVE_EFFECT_FRAMES);
+        return frames;
+    }
+
     private ObjectLoader() {
     }
 }

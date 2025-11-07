@@ -15,6 +15,7 @@ public class ObjectAssets {
 
     private final BufferedImage[] itemAssets;
     private final BufferedImage[] itemEffectFramesAssets;
+    private final BufferedImage[] moveEffectAssets;
 
 
     public static ObjectAssets getInstance() {
@@ -27,6 +28,7 @@ public class ObjectAssets {
         explosionAnimationFrameAssets = ObjectLoader.loadExplosionAnimationFrameAssets();
         itemAssets = ObjectLoader.loadItemAssets();
         itemEffectFramesAssets = ObjectLoader.loadItemEffectFramesAssets();
+        moveEffectAssets = ObjectLoader.loadMoveEffectAssets();
     }
 
     private static class Holder {

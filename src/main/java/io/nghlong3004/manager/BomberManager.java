@@ -24,6 +24,7 @@ public class BomberManager {
     private final List<Bomber> bombers;
     @Setter
     private BombManager bombManager;
+    @Getter
     @Setter
     private CollisionChecker collisionChecker;
 
@@ -44,16 +45,20 @@ public class BomberManager {
             if (!bomber.isAlive()) {
                 continue;
             }
-
-            Graphics2D g2d = (Graphics2D) g;
-            Rectangle2D.Float hitbox = bomber.getBox();
-            BufferedImage sprite = getBufferedImage(bomber);
-            if (sprite != null) {
-                g2d.drawImage(sprite, (int) hitbox.getX() - 8, (int) hitbox.getY() - 30, (int) bomber.getWidth(),
-                              (int) bomber.getHeight(), null);
-            }
-            drawHitbox(g, hitbox);
+            renderBomber(g, bomber);
         }
+    }
+
+    public void renderBomber(Graphics g, Bomber bomber) {
+        Graphics2D g2d = (Graphics2D) g;
+        Rectangle2D.Float hitbox = bomber.getBox();
+        BufferedImage sprite = getBufferedImage(bomber);
+        if (sprite != null) {
+            int spriteX = (int) bomber.getX();
+            int spriteY = (int) bomber.getY();
+            g2d.drawImage(sprite, spriteX, spriteY, (int) bomber.getWidth(), (int) bomber.getHeight(), null);
+        }
+        drawHitbox(g, hitbox);
     }
 
     public void update() {
@@ -73,7 +78,7 @@ public class BomberManager {
         }
     }
 
-    private void updateAnimationTick(Entity entity) {
+    protected void updateAnimationTick(Entity entity) {
         entity.setTick(entity.getTick() + 1);
 
         if (entity.getTick() >= ANIMATION_SPEED) {
@@ -82,7 +87,7 @@ public class BomberManager {
         }
     }
 
-    private void setAnimation(Entity entity) {
+    protected void setAnimation(Entity entity) {
         int currentDirection = entity.getDirection();
 
         if (entity.isMoving()) {
@@ -109,7 +114,7 @@ public class BomberManager {
         }
     }
 
-    private void updatePosition(Entity entity) {
+    protected void updatePosition(Entity entity) {
         entity.setMoving(false);
 
         if (!entity.isLeft() && !entity.isRight() && !entity.isUp() && !entity.isDown()) {
@@ -135,6 +140,7 @@ public class BomberManager {
             xSpeed *= DIAGONAL_SPEED_MODIFIER;
             ySpeed *= DIAGONAL_SPEED_MODIFIER;
         }
+        entity.setMoving(true);
 
         Rectangle2D.Float hitbox = entity.getBox();
         float newX = hitbox.x + xSpeed;
@@ -142,13 +148,32 @@ public class BomberManager {
         Rectangle2D.Float newHitbox = new Rectangle2D.Float(newX, newY, hitbox.width, hitbox.height);
 
         if (collisionChecker != null && !collisionChecker.canMoveTo(newHitbox, (Bomber) entity)) {
-            log.debug("Collision detected at position ({}, {})", newX, newY);
-            return;
+            if (xSpeed != 0 && ySpeed != 0) {
+                Rectangle2D.Float xOnlyHitbox = new Rectangle2D.Float(newX, hitbox.y, hitbox.width, hitbox.height);
+                if (collisionChecker.canMoveTo(xOnlyHitbox, (Bomber) entity)) {
+                    ySpeed = 0;
+                }
+                else {
+                    Rectangle2D.Float yOnlyHitbox = new Rectangle2D.Float(hitbox.x, newY, hitbox.width, hitbox.height);
+                    if (collisionChecker.canMoveTo(yOnlyHitbox, (Bomber) entity)) {
+                        xSpeed = 0;
+                    }
+                    else {
+                        log.debug("Collision detected at position ({}, {})", newX, newY);
+                        return;
+                    }
+                }
+            }
+            else {
+                return;
+            }
         }
 
-        hitbox.x = newX;
-        hitbox.y = newY;
-        entity.setMoving(true);
+        entity.setX(entity.getX() + xSpeed);
+        entity.setY(entity.getY() + ySpeed);
+
+        hitbox.x = entity.getX() + HITBOX_OFFSET_X;
+        hitbox.y = entity.getY() + HITBOX_OFFSET_Y;
     }
 
     private BufferedImage getBufferedImage(Bomber bomber) {

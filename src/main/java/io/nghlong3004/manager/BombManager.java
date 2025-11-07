@@ -20,13 +20,11 @@ import static io.nghlong3004.constant.GameConstant.TILE_SIZE;
 public class BombManager {
     @Getter
     private final List<Bomb> bombs;
-    private final MapManager mapManager;
     @Setter
     private ExplosionManager explosionManager;
 
-    public BombManager(MapManager mapManager) {
+    public BombManager() {
         this.bombs = new ArrayList<>();
-        this.mapManager = mapManager;
     }
 
     public void placeBomb(Bomber bomber) {
@@ -34,12 +32,12 @@ public class BombManager {
             return;
         }
 
-
         float bomberCenterX = bomber.getBox().x;
         float bomberCenterY = bomber.getBox().y;
 
         int gridX = (int) (bomberCenterY / TILE_SIZE);
         int gridY = (int) (bomberCenterX / TILE_SIZE);
+
         for (Bomb existingBomb : bombs) {
             if (existingBomb.getGridX() == gridX && existingBomb.getGridY() == gridY) {
                 return;

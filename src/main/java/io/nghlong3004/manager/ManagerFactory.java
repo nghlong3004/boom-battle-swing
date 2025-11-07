@@ -30,6 +30,10 @@ public class ManagerFactory {
         log.debug("Init ExplosionManager");
         ExplosionManager explosionManager = new ExplosionManager(mapManager, bomberManager, agentManager, itemManager);
         bombManager.setExplosionManager(explosionManager);
+        log.debug("Set dependencies for AgentManager");
+        agentManager.setItemManager(itemManager);
+        agentManager.setBombManager(bombManager);
+        agentManager.setExplosionManager(explosionManager);
         log.debug("Init GameRender");
         GameRender gameRender = new GameRender(mapManager, bomberManager, bombManager, explosionManager, agentManager);
         return GameManager.builder()

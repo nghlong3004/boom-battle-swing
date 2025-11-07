@@ -89,4 +89,12 @@ public class GameManager {
         return bombers.stream()
                       .anyMatch(Bomber::isAlive);
     }
+
+    public boolean isAnyAgentAlive() {
+        if (agents == null || agents.isEmpty()) {
+            return false;
+        }
+        return agents.stream()
+                     .anyMatch(Bomber::isAlive);
+    }
 }

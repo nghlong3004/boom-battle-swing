@@ -16,6 +16,8 @@ import java.util.List;
 
 import static io.nghlong3004.constant.BomberConstant.ANIMATION_SPEED;
 import static io.nghlong3004.constant.EntityConstant.*;
+import static io.nghlong3004.constant.GameConstant.SCALE;
+import static io.nghlong3004.constant.GameConstant.TILE_SIZE;
 
 @Slf4j
 public class BomberManager {
@@ -42,7 +44,7 @@ public class BomberManager {
 
     public void render(Graphics g) {
         for (var bomber : bombers) {
-            if (!bomber.isAlive()) {
+            if (!bomber.isAlive() && !bomber.isDying()) {
                 continue;
             }
             renderBomber(g, bomber);
@@ -56,13 +58,30 @@ public class BomberManager {
         if (sprite != null) {
             int spriteX = (int) bomber.getX();
             int spriteY = (int) bomber.getY();
-            g2d.drawImage(sprite, spriteX, spriteY, (int) bomber.getWidth(), (int) bomber.getHeight(), null);
+            int width = (int) bomber.getWidth();
+            int height = (int) bomber.getHeight();
+
+            if (bomber.isDying()) {
+                width = (int) (TILE_SIZE * SCALE);
+                height = (int) (TILE_SIZE * SCALE);
+                int offsetX = ((int) bomber.getWidth() - width) / 2;
+                int offsetY = ((int) bomber.getHeight() - height) / 2;
+                spriteX += offsetX;
+                spriteY += offsetY;
+            }
+
+            g2d.drawImage(sprite, spriteX, spriteY, width, height, null);
         }
         drawHitbox(g, hitbox);
     }
 
     public void update() {
         for (var bomber : bombers) {
+            if (bomber.isDying()) {
+                bomber.updateDeathAnimation();
+                continue;
+            }
+
             if (!bomber.isAlive()) {
                 continue;
             }
@@ -177,6 +196,15 @@ public class BomberManager {
     }
 
     private BufferedImage getBufferedImage(Bomber bomber) {
+        if (bomber.isDying()) {
+            BufferedImage[] deathSprites = BomberAssets.getInstance()
+                                                       .getBomberDeathAssets();
+            if (deathSprites != null && deathSprites.length > 0) {
+                int frameIndex = Math.min(bomber.getDeathAnimationFrame(), deathSprites.length - 1);
+                return deathSprites[frameIndex];
+            }
+        }
+
         int direction = bomber.getDirection();
         int index = bomber.getIndex();
         return BomberAssets.getInstance()

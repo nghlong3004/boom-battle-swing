@@ -14,7 +14,8 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 
 import static io.nghlong3004.constant.ButtonConstant.URM_BUTTON_SIZE;
-import static io.nghlong3004.constant.GameConstant.*;
+import static io.nghlong3004.constant.GameConstant.GAME_WIDTH;
+import static io.nghlong3004.constant.GameConstant.SCALE;
 
 @Slf4j
 public class GameOverComponent extends PlayComponent {
@@ -141,10 +142,6 @@ public class GameOverComponent extends PlayComponent {
 
     @Override
     public void render(Graphics g) {
-
-        g.setColor(new Color(0, 0, 0, 150));
-        g.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-
         Graphics2D g2d = (Graphics2D) g;
 
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

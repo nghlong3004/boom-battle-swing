@@ -57,8 +57,18 @@ public class PlayingState implements GameState {
 
     @Override
     public void render(Graphics g) {
-        gameComponentMap.get(type)
-                        .render(g);
+        // Nếu đang ở Game Over hoặc Win, render playing phía dưới trước
+        if (type == PlayType.OVER || type == PlayType.WIN) {
+            gameComponentMap.get(PlayType.PLAYING).render(g);
+            
+            // Vẽ overlay mờ lên trên
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setColor(new Color(0, 0, 0, 180)); // Màu đen mờ 70%
+            g2d.fillRect(0, 0, g.getClipBounds().width, g.getClipBounds().height);
+        }
+        
+        // Render component hiện tại
+        gameComponentMap.get(type).render(g);
     }
 
     @Override

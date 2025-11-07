@@ -110,9 +110,11 @@ public class ExplosionManager {
 
                 if (bomberX < explosionPixelX + TILE_SIZE && bomberX + bomberWidth > explosionPixelX && bomberY < explosionPixelY + TILE_SIZE && bomberY + bomberHeight > explosionPixelY) {
 
-                    bomber.setAlive(false);
-                    log.info("Bomber at ({}, {}) killed by explosion at grid ({}, {})", bomberX, bomberY,
-                             explosion.getGridX(), explosion.getGridY());
+                    if (!bomber.isDying() && bomber.isAlive()) {
+                        bomber.startDying();
+                        log.info("Bomber at ({}, {}) killed by explosion at grid ({}, {})", bomberX, bomberY,
+                                 explosion.getGridX(), explosion.getGridY());
+                    }
                 }
             }
         }

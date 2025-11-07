@@ -85,9 +85,16 @@ public class GamePlayComponent extends PlayComponent {
             return;
         }
 
+        PlayingState playingState = (PlayingState) context.getGameState(GameStateType.PLAYING);
+
         if (!gameManager.isAnyPlayerAlive()) {
-            PlayingState playingState = (PlayingState) context.getGameState(GameStateType.PLAYING);
             playingState.setType(PlayType.OVER);
+            return;
+        }
+
+        if (!gameManager.isAnyAgentAlive()) {
+            playingState.setType(PlayType.WIN);
+            log.info("All agents defeated! Player wins!");
         }
     }
 

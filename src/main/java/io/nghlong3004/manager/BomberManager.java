@@ -3,6 +3,7 @@ package io.nghlong3004.manager;
 import io.nghlong3004.assets.BomberAssets;
 import io.nghlong3004.entity.Bomber;
 import io.nghlong3004.entity.Entity;
+import io.nghlong3004.util.AudioHelper;
 import io.nghlong3004.util.CollisionChecker;
 import lombok.Getter;
 import lombok.Setter;
@@ -193,6 +194,10 @@ public class BomberManager {
 
         hitbox.x = entity.getX() + HITBOX_OFFSET_X;
         hitbox.y = entity.getY() + HITBOX_OFFSET_Y;
+        
+        if ((xSpeed != 0 || ySpeed != 0) && entity.getIndex() == 0) {
+            AudioHelper.playMoveSound();
+        }
     }
 
     private BufferedImage getBufferedImage(Bomber bomber) {

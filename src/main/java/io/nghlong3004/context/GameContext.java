@@ -1,16 +1,15 @@
 package io.nghlong3004.context;
 
+import io.nghlong3004.component.GameComponent;
+import io.nghlong3004.component.option.AudioComponent;
 import io.nghlong3004.context.state.*;
 import io.nghlong3004.game.GameLogic;
 import io.nghlong3004.input.KeyboardAdapter;
 import io.nghlong3004.input.MouseAdapter;
 import io.nghlong3004.input.MouseMotionAdapter;
 import io.nghlong3004.loader.AudioLoader;
-import io.nghlong3004.type.GameStateType;
-import io.nghlong3004.type.GameType;
-import io.nghlong3004.type.MapType;
-import io.nghlong3004.type.PlayerCountType;
-import io.nghlong3004.type.SkinType;
+import io.nghlong3004.type.*;
+import io.nghlong3004.util.AudioHelper;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +18,6 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.EnumMap;
-
-import static io.nghlong3004.constant.AudioConstant.CLICK;
 
 @Slf4j
 public class GameContext implements GameLogic, KeyboardAdapter, MouseAdapter, MouseMotionAdapter {
@@ -50,6 +47,7 @@ public class GameContext implements GameLogic, KeyboardAdapter, MouseAdapter, Mo
     public GameContext() {
         this.stateMap = new EnumMap<>(GameStateType.class);
         this.audio = new AudioLoader();
+        AudioHelper.setAudioLoader(this.audio);
         loadStates();
         changeState(GameStateType.MENU);
     }
@@ -71,9 +69,10 @@ public class GameContext implements GameLogic, KeyboardAdapter, MouseAdapter, Mo
     }
 
     private void loadStates() {
+        GameComponent audioComponent = new AudioComponent(this);
         stateMap.put(GameStateType.MENU, new MainMenuState(this));
-        stateMap.put(GameStateType.PLAYING, new PlayingState(this));
-        stateMap.put(GameStateType.OPTION, new OptionState(this));
+        stateMap.put(GameStateType.PLAYING, new PlayingState(this, audioComponent));
+        stateMap.put(GameStateType.OPTION, new OptionState(this, audioComponent));
         stateMap.put(GameStateType.QUIT, new QuitState(this));
     }
 
@@ -99,7 +98,7 @@ public class GameContext implements GameLogic, KeyboardAdapter, MouseAdapter, Mo
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        audio.playEffect(CLICK);
+        AudioHelper.playClickSound();
         currentState.mouseClicked(e);
     }
 

@@ -1,7 +1,7 @@
 package io.nghlong3004.component.menu;
 
 import io.nghlong3004.component.GameComponent;
-import io.nghlong3004.component.button.MenuButton;
+import io.nghlong3004.component.button.TextMenuButton;
 import io.nghlong3004.context.GameContext;
 import io.nghlong3004.context.state.MainMenuState;
 import io.nghlong3004.type.GameStateType;
@@ -17,7 +17,7 @@ import static io.nghlong3004.constant.GameConstant.GAME_WIDTH;
 
 public class MenuTypeComponent extends GameComponent {
 
-    private MenuButton[] menuButtons;
+    private TextMenuButton[] menuButtons;
 
     public MenuTypeComponent(GameContext context) {
         super(context);
@@ -25,14 +25,18 @@ public class MenuTypeComponent extends GameComponent {
     }
 
     private void loadMenuButtons() {
-        menuButtons = new MenuButton[3];
-        int x = GAME_WIDTH - MENU_BUTTON_WIDTH - 10 >>> 1;
-        int factor = GAME_HEIGHT - MENU_BUTTON_HEIGHT >>> 1;
+        menuButtons = new TextMenuButton[3];
 
+        int x = GAME_WIDTH - MENU_BUTTON_WIDTH >>> 1;
+        int factor = GAME_HEIGHT - MENU_BUTTON_HEIGHT >>> 1;
+        int spacing = MENU_BUTTON_HEIGHT * 5 / 4;
+
+        String[] texts = {"START", "SETTING", "EXIT"};
         GameStateType[] states = {GameStateType.MENU, GameStateType.OPTION, GameStateType.QUIT};
-        for (int i = 0; i < 3; ++i) {
-            int y = factor + i * MENU_BUTTON_HEIGHT * 5 / 4;
-            menuButtons[i] = new MenuButton(x, y, i, states[i]);
+
+        for (int i = 0; i < 3; i++) {
+            int y = factor + i * spacing;
+            menuButtons[i] = new TextMenuButton(x, y, texts[i], states[i]);
         }
     }
 
@@ -45,7 +49,7 @@ public class MenuTypeComponent extends GameComponent {
 
     @Override
     public void render(Graphics g) {
-        for (MenuButton button : menuButtons) {
+        for (TextMenuButton button : menuButtons) {
             button.render(g);
         }
     }

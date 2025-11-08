@@ -29,7 +29,7 @@ public class AudioLoader {
     });
 
     public AudioLoader() {
-        songMute = new AtomicBoolean(false);
+        songMute = new AtomicBoolean(true);
         effectMute = new AtomicBoolean(false);
         loadSongs();
         loadEffects();
@@ -50,7 +50,8 @@ public class AudioLoader {
     }
 
     private void loadEffects() {
-        String[] effectNames = {"move", "set_boom", "start", "click", "boom_bang", "item", "win"};
+        String[] effectNames = {"move", "set_boom", "start", "click", "boom_bang", "item", "win", "touch", "lose",
+                "win", "eat_item"};
         effects = new Clip[effectNames.length];
         for (int i = 0; i < effects.length; i++) {
             effects[i] = getClip(effectNames[i]);
@@ -192,6 +193,14 @@ public class AudioLoader {
                 playEffect(CLICK);
             }
         });
+    }
+
+    public boolean isSongMuted() {
+        return songMute.get();
+    }
+
+    public boolean isEffectMuted() {
+        return effectMute.get();
     }
 
     public void close() {

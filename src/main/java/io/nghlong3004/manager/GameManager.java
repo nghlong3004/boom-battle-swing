@@ -26,6 +26,8 @@ public class GameManager {
     private final ItemManager itemManager;
     private final AgentManager agentManager;
     private final GameRender gameRender;
+    @Getter
+    private final GameTimer gameTimer;
     private List<Bomber> bombers;
     private List<Bomber> agents;
 
@@ -35,6 +37,8 @@ public class GameManager {
         setSpawnBombers(bombers);
         this.bombers = bombers;
         bomberManager.addAll(bombers);
+        gameTimer.reset();
+        gameTimer.start();
         agentManager.start();
     }
 
@@ -64,11 +68,13 @@ public class GameManager {
         bombManager.reset();
         explosionManager.reset();
         itemManager.reset();
+        gameTimer.reset();
         bombers = null;
         agents = null;
     }
 
     public void update() {
+        gameTimer.update();
         agentManager.update();
         bomberManager.update();
         bombManager.update();

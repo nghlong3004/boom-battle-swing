@@ -4,6 +4,7 @@ import io.nghlong3004.assets.ObjectAssets;
 import io.nghlong3004.entity.Bomber;
 import io.nghlong3004.entity.Explosion;
 import io.nghlong3004.type.TileType;
+import io.nghlong3004.util.AudioHelper;
 import io.nghlong3004.util.CollisionUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class ExplosionManager {
         log.debug("Creating explosion at grid ({}, {}) with range {}", gridX, gridY, range);
 
         explosions.add(new Explosion(gridX, gridY));
+        AudioHelper.playBombExplosionSound();
 
         createExplosionLine(gridX, gridY, 0, -1, range);
         createExplosionLine(gridX, gridY, 0, 1, range);

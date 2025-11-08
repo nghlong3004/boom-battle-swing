@@ -1,9 +1,11 @@
 package io.nghlong3004.manager;
 
 import io.nghlong3004.assets.ObjectAssets;
+import io.nghlong3004.constant.AudioConstant;
 import io.nghlong3004.entity.Bomber;
 import io.nghlong3004.entity.Item;
 import io.nghlong3004.type.ItemType;
+import io.nghlong3004.util.AudioHelper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -62,6 +64,7 @@ public class ItemManager {
                 if (item.getGridX() == bomberGridX && item.getGridY() == bomberGridY) {
                     item.applyEffect(bomber);
                     iterator.remove();
+                    AudioHelper.playEatItemSound();
                     log.info("Bomber collected {}", item.getType());
                 }
             }

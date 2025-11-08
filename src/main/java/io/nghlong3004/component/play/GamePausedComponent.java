@@ -2,7 +2,6 @@ package io.nghlong3004.component.play;
 
 import io.nghlong3004.component.GameComponent;
 import io.nghlong3004.component.SpriteComponent;
-import io.nghlong3004.component.option.AudioComponent;
 import io.nghlong3004.constant.GameConstant;
 import io.nghlong3004.constant.ImageConstant;
 import io.nghlong3004.context.GameContext;
@@ -16,27 +15,20 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
-import static io.nghlong3004.constant.GameConstant.SCALE;
-
 public class GamePausedComponent extends PlayComponent {
-    private BufferedImage background;
-    private int xBackground, yBackground, widthBackground, heightBackground;
+    private BufferedImage backgroundOption;
     private final GameComponent spriteComponent;
     private final GameComponent audioComponent;
 
-    public GamePausedComponent(GameContext stateContext) {
+    public GamePausedComponent(GameContext stateContext, GameComponent audioComponent) {
         super(stateContext);
         loadBackground();
         this.spriteComponent = new SpriteComponent(stateContext);
-        this.audioComponent = new AudioComponent(stateContext);
+        this.audioComponent = audioComponent;
     }
 
     private void loadBackground() {
-        background = ImageLoader.loadImage(ImageConstant.PAUSE_BACKGROUND);
-        widthBackground = (int) (background.getWidth() * SCALE);
-        heightBackground = (int) (background.getHeight() * SCALE);
-        xBackground = GameConstant.GAME_WIDTH - widthBackground >>> 1;
-        yBackground = GameConstant.GAME_HEIGHT - heightBackground >>> 1;
+        backgroundOption = ImageLoader.loadImage(ImageConstant.OPTION_BACKGROUND);
     }
 
 
@@ -48,7 +40,9 @@ public class GamePausedComponent extends PlayComponent {
 
     @Override
     public void render(Graphics g) {
-        g.drawImage(background, xBackground, yBackground, widthBackground, heightBackground, null);
+        if (backgroundOption != null) {
+            g.drawImage(backgroundOption, 0, 0, GameConstant.GAME_WIDTH, GameConstant.GAME_HEIGHT, null);
+        }
         spriteComponent.render(g);
         audioComponent.render(g);
     }

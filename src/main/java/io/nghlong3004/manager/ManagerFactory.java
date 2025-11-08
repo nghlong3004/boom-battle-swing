@@ -34,8 +34,10 @@ public class ManagerFactory {
         agentManager.setItemManager(itemManager);
         agentManager.setBombManager(bombManager);
         agentManager.setExplosionManager(explosionManager);
+        log.debug("Init GameTimer");
+        GameTimer gameTimer = new GameTimer();
         log.debug("Init GameRender");
-        GameRender gameRender = new GameRender(mapManager, bomberManager, bombManager, explosionManager, agentManager);
+        GameRender gameRender = new GameRender(mapManager, bomberManager, bombManager, explosionManager, agentManager, gameTimer);
         return GameManager.builder()
                           .bomberManager(bomberManager)
                           .mapManager(mapManager)
@@ -44,6 +46,7 @@ public class ManagerFactory {
                           .gameRender(gameRender)
                           .bombManager(bombManager)
                           .agentManager(agentManager)
+                          .gameTimer(gameTimer)
                           .build();
     }
 

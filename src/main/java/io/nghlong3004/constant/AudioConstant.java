@@ -12,6 +12,10 @@ public class AudioConstant {
     public static int BOOM_BANG = 4;
     public static int ITEM = 5;
     public static int WIN = 6;
+    public static int TOUCH = 7;
+    public static int LOSE = 8;
+    public static int VICTORY = 9;
+    public static int EAT_ITEM = 10;
 
     public static float VOLUME_START = 0.1f;
 }

@@ -20,6 +20,7 @@ public class GameRender {
     private final BombManager bombManager;
     private final ExplosionManager explosionManager;
     private final AgentManager agentManager;
+    private final GameTimer gameTimer;
     private BufferedImage background;
 
     public void render(Graphics g) {
@@ -52,6 +53,8 @@ public class GameRender {
 
         renderWithDepthSorting(g, images, row, data, spaceX, spaceY, bomberManager.getBombers(), bomberManager);
         renderWithDepthSorting(g, images, row, data, spaceX, spaceY, agentManager.getAgents(), agentManager);
+        
+        gameTimer.render(g);
     }
 
     private void renderWithDepthSorting(Graphics g, BufferedImage[][] images, int row, int[][] data, int spaceX,

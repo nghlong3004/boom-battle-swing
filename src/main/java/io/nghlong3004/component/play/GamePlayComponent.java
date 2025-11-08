@@ -6,7 +6,8 @@ import io.nghlong3004.entity.Bomber;
 import io.nghlong3004.input.BomberKeyAction;
 import io.nghlong3004.manager.GameManager;
 import io.nghlong3004.manager.ManagerFactory;
-import io.nghlong3004.type.*;
+import io.nghlong3004.type.GameStateType;
+import io.nghlong3004.type.PlayType;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
@@ -19,7 +20,7 @@ import java.util.List;
 public class GamePlayComponent extends PlayComponent {
 
     private final GameManager gameManager;
-    private Bomber[] bombers;
+    private final Bomber[] bombers;
     private final Map<Integer, BomberKeyAction> lookup;
     private static final int MAX_CHARACTERS = 4;
 
@@ -34,39 +35,17 @@ public class GamePlayComponent extends PlayComponent {
     public void play() {
         gameManager.reset();
         loadBombers();
-        if (context.getGameType() == GameType.OFFLINE) {
-            loadEnemies();
-        }
         gameManager.play(context.getMapType(), getPlayers());
     }
 
     private List<Bomber> getPlayers() {
-        var players = new ArrayList<Bomber>();
-        players.addAll(Arrays.asList(this.bombers)
-                             .subList(0, context.getNumberBomber()));
-        return players;
+        return new ArrayList<Bomber>(Arrays.asList(this.bombers)
+                                           .subList(0, context.getNumberBomber()));
     }
 
     private void loadBombers() {
         for (int i = 0; i < context.getNumberBomber(); ++i) {
             bombers[i] = new Bomber(0, 0, context.getSkinType()[i]);
-        }
-    }
-
-    private void loadEnemies() {
-        int playerCount = context.getNumberBomber();
-        int enemyCount = MAX_CHARACTERS - playerCount;
-
-        log.info("Loading {} enemies for {} player(s)", enemyCount, playerCount);
-
-        SkinType[] enemySkins = {SkinType.BOZ, SkinType.EVIE, SkinType.PLUNK};
-        EnemyAIType[] aiTypes = {EnemyAIType.EASY, EnemyAIType.NORMAL, EnemyAIType.HARD};
-
-        for (int i = 0; i < enemyCount; i++) {
-            SkinType skin = enemySkins[i % enemySkins.length];
-            EnemyAIType aiType = aiTypes[i % aiTypes.length];
-
-            log.info("Created enemy {} with AI type: {}", i + 1, aiType);
         }
     }
 

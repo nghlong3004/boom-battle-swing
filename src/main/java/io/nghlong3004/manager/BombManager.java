@@ -3,6 +3,7 @@ package io.nghlong3004.manager;
 import io.nghlong3004.assets.ObjectAssets;
 import io.nghlong3004.entity.Bomb;
 import io.nghlong3004.entity.Bomber;
+import io.nghlong3004.util.AudioHelper;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,7 @@ public class BombManager {
         Bomb bomb = new Bomb(gridX, gridY, bomber.getExplosionRange(), bomber);
         bombs.add(bomb);
         bomber.setCurrentBombs(bomber.getCurrentBombs() + 1);
+        AudioHelper.playSetBombSound();
         log.debug("Bomb placed at grid position ({}, {}) by bomber", gridX, gridY);
     }
 

@@ -8,14 +8,16 @@ import io.nghlong3004.type.GameStateType;
 import io.nghlong3004.type.PlayType;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.List;
 
 import static io.nghlong3004.constant.ButtonConstant.URM_BUTTON_SIZE;
-import static io.nghlong3004.constant.GameConstant.GAME_WIDTH;
-import static io.nghlong3004.constant.GameConstant.SCALE;
+import static io.nghlong3004.constant.GameConstant.*;
 
 @Slf4j
 public class GameOverComponent extends PlayComponent {
@@ -24,22 +26,32 @@ public class GameOverComponent extends PlayComponent {
 
     private final List<GameButton> buttons;
 
-
+    private BufferedImage loseImage;
     private int animationTick = 0;
-    private float textAlpha = 0f;
-    private float textScale = 0.5f;
+    private float imageAlpha = 0f;
+    private float imageScale = 0.5f;
     private boolean scaleGrowing = true;
 
     public GameOverComponent(GameContext context) {
         super(context);
+        loadImages();
         createSpritesButton();
         buttons = List.of(replayButton, homeButton);
     }
 
+    private void loadImages() {
+        try {
+            loseImage = ImageIO.read(getClass().getResourceAsStream("/images/component/lose.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.error("Failed to load lose image");
+        }
+    }
+
     public void resetAnimation() {
         animationTick = 0;
-        textAlpha = 0f;
-        textScale = 0.5f;
+        imageAlpha = 0f;
+        imageScale = 0.5f;
         scaleGrowing = true;
     }
 
@@ -114,64 +126,67 @@ public class GameOverComponent extends PlayComponent {
             gameObject.update();
         }
         animationTick++;
-        if (textAlpha < 1f) {
-            textAlpha += 0.02f;
-            if (textAlpha > 1f) {
-                textAlpha = 1f;
+        if (imageAlpha < 1f) {
+            imageAlpha += 0.02f;
+            if (imageAlpha > 1f) {
+                imageAlpha = 1f;
             }
         }
         if (animationTick < 40) {
-            textScale += 0.035f;
-            if (textScale > 1.2f) {
-                textScale = 1.2f;
+            imageScale += 0.035f;
+            if (imageScale > 1.2f) {
+                imageScale = 1.2f;
                 scaleGrowing = false;
             }
         }
         else if (animationTick < 60) {
-            textScale -= 0.01f;
-            if (textScale < 1.0f) {
-                textScale = 1.0f;
+            imageScale -= 0.01f;
+            if (imageScale < 1.0f) {
+                imageScale = 1.0f;
             }
         }
         else {
 
             float pulseAmount = (float) Math.sin(animationTick * 0.05) * 0.03f;
-            textScale = 1.0f + pulseAmount;
+            imageScale = 1.0f + pulseAmount;
         }
     }
 
     @Override
     public void render(Graphics g) {
+
+
         Graphics2D g2d = (Graphics2D) g;
 
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
-        String gameOverText = "GAME OVER";
-        int baseFontSize = (int) (60 * SCALE);
-        int scaledFontSize = (int) (baseFontSize * textScale);
-        Font gameOverFont = new Font("Arial", Font.BOLD, scaledFontSize);
-        g2d.setFont(gameOverFont);
+        if (loseImage != null) {
+            int originalWidth = loseImage.getWidth();
+            int originalHeight = loseImage.getHeight();
+            
+            int scaledWidth = (int) (originalWidth * SCALE * imageScale);
+            int scaledHeight = (int) (originalHeight * SCALE * imageScale);
+            
+            int imageX = (GAME_WIDTH - scaledWidth) / 2;
+            int imageY = (int) (150 * SCALE);
 
-        FontMetrics fm = g2d.getFontMetrics();
-        int textWidth = fm.stringWidth(gameOverText);
-        int textHeight = fm.getHeight();
-        int textX = (GAME_WIDTH - textWidth) / 2;
-        int textY = (int) (200 * SCALE);
+            int alpha = (int) (imageAlpha * 255);
+            AlphaComposite alphaComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, imageAlpha);
+            g2d.setComposite(alphaComposite);
 
-        int alpha = (int) (textAlpha * 255);
-        Color color1 = new Color(255, 50, 50, alpha);
-        Color color2 = new Color(200, 0, 0, alpha);
+            if (imageAlpha > 0.5f) {
+                AlphaComposite shadowComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, imageAlpha * 0.4f);
+                g2d.setComposite(shadowComposite);
+                g2d.drawImage(loseImage, imageX + 5, imageY + 5, scaledWidth, scaledHeight, null);
+                
+                g2d.setComposite(alphaComposite);
+            }
 
-        GradientPaint gradient = new GradientPaint(textX, textY - textHeight, color1, textX, textY, color2);
-
-        if (textAlpha > 0.5f) {
-            g2d.setColor(new Color(0, 0, 0, (int) (textAlpha * 100)));
-            g2d.drawString(gameOverText, textX + 3, textY + 3);
+            g2d.drawImage(loseImage, imageX, imageY, scaledWidth, scaledHeight, null);
+            
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
         }
-
-        g2d.setPaint(gradient);
-        g2d.drawString(gameOverText, textX, textY);
 
         for (var gameObject : buttons) {
             gameObject.render(g);

@@ -5,6 +5,9 @@ public class ImageConstant {
 
     public static final String BUTTON_EMPTY = "/images/buttons/button_empty.png";
 
+    public static final String BUTTON = "/images/buttons/button.png";
+    public static final String BUTTON_TOUCH = "/images/buttons/button_touch.png";
+
     public static final String BUTTON_1P = "/images/buttons/1P.png";
     public static final String BUTTON_1P_TOUCH = "/images/buttons/1P_touch.png";
     public static final String BUTTON_2P = "/images/buttons/2P.png";
@@ -18,7 +21,7 @@ public class ImageConstant {
 
     public static final String PAUSE_BACKGROUND = "/images/buttons/pause_menu.png";
 
-    public static final String OPTION_BACKGROUND = "/images/home/options_background.png";
+    public static final String OPTION_BACKGROUND = "/images/home/background_option.jpg";
 
     public static final String SOUND_BUTTON = "/images/buttons/sound_button.png";
 

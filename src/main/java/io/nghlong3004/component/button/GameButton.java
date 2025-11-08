@@ -1,6 +1,7 @@
 package io.nghlong3004.component.button;
 
 import io.nghlong3004.game.GameLogic;
+import io.nghlong3004.util.AudioHelper;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,9 +12,12 @@ public abstract class GameButton implements GameLogic {
     @Getter
     @Setter
     protected boolean mousePressed, mouseOver;
+    @Getter
     protected int x, y, width, height;
     protected int rowIndex, columnIndex;
     protected Rectangle box;
+
+    private boolean wasMouseOver = false;
 
     protected GameButton(int x, int y, int width, int height, int rowIndex) {
         this.x = x;
@@ -34,6 +38,19 @@ public abstract class GameButton implements GameLogic {
     public void reset() {
         setMouseOver(false);
         setMousePressed(false);
+        wasMouseOver = false;
+    }
+
+    public void setMouseOver(boolean mouseOver) {
+        if (!wasMouseOver && mouseOver) {
+            playHoverSound();
+        }
+        this.wasMouseOver = this.mouseOver;
+        this.mouseOver = mouseOver;
+    }
+
+    protected void playHoverSound() {
+        AudioHelper.playTouchSound();
     }
 
     public boolean isMouseOver(MouseEvent e) {

@@ -8,14 +8,16 @@ import io.nghlong3004.type.GameStateType;
 import io.nghlong3004.type.PlayType;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.List;
 
 import static io.nghlong3004.constant.ButtonConstant.URM_BUTTON_SIZE;
-import static io.nghlong3004.constant.GameConstant.GAME_WIDTH;
-import static io.nghlong3004.constant.GameConstant.SCALE;
+import static io.nghlong3004.constant.GameConstant.*;
 
 @Slf4j
 public class GameWinComponent extends PlayComponent {
@@ -24,22 +26,33 @@ public class GameWinComponent extends PlayComponent {
 
     private final List<GameButton> buttons;
 
+    private BufferedImage winImage;
     private int animationTick = 0;
-    private float textAlpha = 0f;
-    private float textScale = 0.5f;
+    private float imageAlpha = 0f;
+    private float imageScale = 0.5f;
     private float starScale = 0f;
     private int starRotation = 0;
 
     public GameWinComponent(GameContext context) {
         super(context);
+        loadImages();
         createSpritesButton();
         buttons = List.of(replayButton, homeButton);
     }
 
+    private void loadImages() {
+        try {
+            winImage = ImageIO.read(getClass().getResourceAsStream("/images/component/win.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.error("Failed to load win image");
+        }
+    }
+
     public void resetAnimation() {
         animationTick = 0;
-        textAlpha = 0f;
-        textScale = 0.5f;
+        imageAlpha = 0f;
+        imageScale = 0.5f;
         starScale = 0f;
         starRotation = 0;
     }
@@ -106,29 +119,29 @@ public class GameWinComponent extends PlayComponent {
             gameObject.update();
         }
         animationTick++;
-        if (textAlpha < 1f) {
-            textAlpha += 0.02f;
-            if (textAlpha > 1f) {
-                textAlpha = 1f;
+        if (imageAlpha < 1f) {
+            imageAlpha += 0.02f;
+            if (imageAlpha > 1f) {
+                imageAlpha = 1f;
             }
         }
 
         if (animationTick < 40) {
-            textScale += 0.035f;
-            if (textScale > 1.2f) {
-                textScale = 1.2f;
+            imageScale += 0.035f;
+            if (imageScale > 1.2f) {
+                imageScale = 1.2f;
             }
         }
         else if (animationTick < 60) {
-            textScale -= 0.01f;
-            if (textScale < 1.0f) {
-                textScale = 1.0f;
+            imageScale -= 0.01f;
+            if (imageScale < 1.0f) {
+                imageScale = 1.0f;
             }
         }
         else {
 
             float pulseAmount = (float) Math.sin(animationTick * 0.05) * 0.03f;
-            textScale = 1.0f + pulseAmount;
+            imageScale = 1.0f + pulseAmount;
         }
 
         if (starScale < 1f) {
@@ -143,58 +156,44 @@ public class GameWinComponent extends PlayComponent {
 
     @Override
     public void render(Graphics g) {
+
+
         Graphics2D g2d = (Graphics2D) g;
 
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
-        String victoryText = "VICTORY!";
-        int baseFontSize = (int) (70 * SCALE);
-        int scaledFontSize = (int) (baseFontSize * textScale);
-        Font victoryFont = new Font("Arial", Font.BOLD, scaledFontSize);
-        g2d.setFont(victoryFont);
+        if (winImage != null) {
+            int originalWidth = winImage.getWidth();
+            int originalHeight = winImage.getHeight();
+            
+            int scaledWidth = (int) (originalWidth * SCALE * imageScale);
+            int scaledHeight = (int) (originalHeight * SCALE * imageScale);
+            
+            int imageX = (GAME_WIDTH - scaledWidth) / 2;
+            int imageY = (int) (120 * SCALE);
 
-        FontMetrics fm = g2d.getFontMetrics();
-        int textWidth = fm.stringWidth(victoryText);
-        int textHeight = fm.getHeight();
-        int textX = (GAME_WIDTH - textWidth) / 2;
-        int textY = (int) (180 * SCALE);
+            int alpha = (int) (imageAlpha * 255);
+            AlphaComposite alphaComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, imageAlpha);
+            
+            if (imageAlpha > 0.5f) {
+                AlphaComposite shadowComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, imageAlpha * 0.3f);
+                g2d.setComposite(shadowComposite);
+                g2d.drawImage(winImage, imageX + 4, imageY + 4, scaledWidth, scaledHeight, null);
+            }
 
-        int alpha = (int) (textAlpha * 255);
-        Color color1 = new Color(255, 215, 0, alpha);
-        Color color2 = new Color(255, 165, 0, alpha);
+            g2d.setComposite(alphaComposite);
+            g2d.drawImage(winImage, imageX, imageY, scaledWidth, scaledHeight, null);
+            
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
 
-        GradientPaint gradient = new GradientPaint(textX, textY - textHeight, color1, textX, textY, color2);
-
-
-        if (textAlpha > 0.5f) {
-            g2d.setColor(new Color(0, 0, 0, (int) (textAlpha * 120)));
-            g2d.drawString(victoryText, textX + 4, textY + 4);
+            if (starScale > 0.1f && imageAlpha > 0.5f) {
+                drawStar(g2d, imageX - 40, imageY + scaledHeight / 2, 20, starScale, starRotation,
+                         new Color(255, 215, 0, (int) (imageAlpha * 200)));
+                drawStar(g2d, imageX + scaledWidth + 20, imageY + scaledHeight / 2, 20, starScale, -starRotation,
+                         new Color(255, 215, 0, (int) (imageAlpha * 200)));
+            }
         }
-
-
-        g2d.setPaint(gradient);
-        g2d.drawString(victoryText, textX, textY);
-
-
-        if (starScale > 0.1f) {
-            drawStar(g2d, textX - 40, textY - 40, 20, starScale, starRotation,
-                     new Color(255, 215, 0, (int) (textAlpha * 200)));
-            drawStar(g2d, textX + textWidth + 20, textY - 40, 20, starScale, -starRotation,
-                     new Color(255, 215, 0, (int) (textAlpha * 200)));
-        }
-
-
-        if (textAlpha > 0.7f) {
-            Font subtitleFont = new Font("Arial", Font.PLAIN, (int) (30 * SCALE));
-            g2d.setFont(subtitleFont);
-            g2d.setColor(new Color(255, 255, 255, (int) (textAlpha * 200)));
-            String subtitle = "You Win!";
-            FontMetrics subFm = g2d.getFontMetrics();
-            int subWidth = subFm.stringWidth(subtitle);
-            g2d.drawString(subtitle, (GAME_WIDTH - subWidth) / 2, (int) (250 * SCALE));
-        }
-
 
         for (var gameObject : buttons) {
             gameObject.render(g);

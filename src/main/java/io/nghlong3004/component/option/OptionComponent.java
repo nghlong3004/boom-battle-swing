@@ -2,11 +2,14 @@ package io.nghlong3004.component.option;
 
 import io.nghlong3004.component.GameComponent;
 import io.nghlong3004.component.button.SpriteButton;
+import io.nghlong3004.constant.ImageConstant;
 import io.nghlong3004.context.GameContext;
+import io.nghlong3004.loader.ImageLoader;
 import io.nghlong3004.type.GameStateType;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 
 import static io.nghlong3004.constant.ButtonConstant.URM_BUTTON_SIZE;
 import static io.nghlong3004.constant.GameConstant.GAME_HEIGHT;
@@ -15,10 +18,18 @@ import static io.nghlong3004.constant.GameConstant.GAME_WIDTH;
 public class OptionComponent extends GameComponent {
 
     private SpriteButton homeButton;
+    private BufferedImage backgroundOption;
+    private final GameComponent audioComponent;
 
-    public OptionComponent(GameContext context) {
+    public OptionComponent(GameContext context, GameComponent audioComponent) {
         super(context);
+        loadBackground();
         createSpritesButton();
+        this.audioComponent = audioComponent;
+    }
+
+    private void loadBackground() {
+        backgroundOption = ImageLoader.loadImage(ImageConstant.OPTION_BACKGROUND);
     }
 
     private void createSpritesButton() {
@@ -32,6 +43,7 @@ public class OptionComponent extends GameComponent {
         if (homeButton.isMouseOver(e)) {
             homeButton.setMousePressed(true);
         }
+        audioComponent.mousePressed(e);
     }
 
     @Override
@@ -42,6 +54,7 @@ public class OptionComponent extends GameComponent {
             }
         }
         homeButton.reset();
+        audioComponent.mouseReleased(e);
     }
 
     @Override
@@ -50,22 +63,28 @@ public class OptionComponent extends GameComponent {
         if (homeButton.isMouseOver(e)) {
             homeButton.setMouseOver(true);
         }
+        audioComponent.mouseMoved(e);
     }
 
     @Override
     public void update() {
         homeButton.update();
+        audioComponent.update();
     }
 
 
     @Override
     public void render(Graphics g) {
+        if (backgroundOption != null) {
+            g.drawImage(backgroundOption, 0, 0, GAME_WIDTH, GAME_HEIGHT, null);
+        }
         homeButton.render(g);
+        audioComponent.render(g);
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-
+        audioComponent.mouseDragged(e);
     }
 
     @Override

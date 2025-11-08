@@ -1,10 +1,10 @@
 package io.nghlong3004.context.state;
 
+import io.nghlong3004.component.GameComponent;
 import io.nghlong3004.component.play.*;
 import io.nghlong3004.constant.AudioConstant;
 import io.nghlong3004.context.GameContext;
 import io.nghlong3004.type.PlayType;
-import lombok.Setter;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -16,21 +16,48 @@ public class PlayingState implements GameState {
 
     private final GameContext gameContext;
     private final Map<PlayType, PlayComponent> gameComponentMap;
-    @Setter
     private PlayType type;
+    private PlayType previousType;
 
-    public PlayingState(GameContext gameContext) {
+    public PlayingState(GameContext gameContext, GameComponent audioComponent) {
         this.gameContext = gameContext;
         this.gameComponentMap = new EnumMap<>(PlayType.class);
-        loadGameComponentMap();
+        loadGameComponentMap(audioComponent);
     }
 
-    private void loadGameComponentMap() {
+    private void loadGameComponentMap(GameComponent audioComponent) {
         this.gameComponentMap.put(PlayType.WIN, new GameWinComponent(gameContext));
         this.gameComponentMap.put(PlayType.OVER, new GameOverComponent(gameContext));
-        this.gameComponentMap.put(PlayType.PAUSED, new GamePausedComponent(gameContext));
+        this.gameComponentMap.put(PlayType.PAUSED, new GamePausedComponent(gameContext, audioComponent));
         this.gameComponentMap.put(PlayType.PLAYING, new GamePlayComponent(gameContext));
         this.type = PlayType.PLAYING;
+        this.previousType = PlayType.PLAYING;
+    }
+
+    public void setType(PlayType newType) {
+        if (this.type != newType) {
+            this.previousType = this.type;
+            this.type = newType;
+
+            if (newType == PlayType.OVER && previousType != PlayType.OVER) {
+                gameContext.getAudio()
+                           .playSong(AudioConstant.LOSE);
+                if (gameComponentMap.get(PlayType.OVER) instanceof GameOverComponent) {
+                    ((GameOverComponent) gameComponentMap.get(PlayType.OVER)).resetAnimation();
+                }
+            }
+            else if (newType == PlayType.WIN && previousType != PlayType.WIN) {
+                gameContext.getAudio()
+                           .playSong(AudioConstant.VICTORY);
+                if (gameComponentMap.get(PlayType.WIN) instanceof GameWinComponent) {
+                    ((GameWinComponent) gameComponentMap.get(PlayType.WIN)).resetAnimation();
+                }
+            }
+        }
+    }
+
+    public PlayType getType() {
+        return type;
     }
 
     @Override
@@ -45,6 +72,7 @@ public class PlayingState implements GameState {
     @Override
     public void off() {
         this.type = PlayType.PLAYING;
+        this.previousType = PlayType.PLAYING;
         gameContext.getAudio()
                    .stopSong();
     }
@@ -57,18 +85,17 @@ public class PlayingState implements GameState {
 
     @Override
     public void render(Graphics g) {
-        // Nếu đang ở Game Over hoặc Win, render playing phía dưới trước
         if (type == PlayType.OVER || type == PlayType.WIN) {
-            gameComponentMap.get(PlayType.PLAYING).render(g);
-            
-            // Vẽ overlay mờ lên trên
+            gameComponentMap.get(PlayType.PLAYING)
+                            .render(g);
+
             Graphics2D g2d = (Graphics2D) g;
-            g2d.setColor(new Color(0, 0, 0, 180)); // Màu đen mờ 70%
+            g2d.setColor(new Color(0, 0, 0, 180));
             g2d.fillRect(0, 0, g.getClipBounds().width, g.getClipBounds().height);
         }
-        
-        // Render component hiện tại
-        gameComponentMap.get(type).render(g);
+
+        gameComponentMap.get(type)
+                        .render(g);
     }
 
     @Override
@@ -116,6 +143,8 @@ public class PlayingState implements GameState {
 
     public void replay() {
         ((GamePlayComponent) gameComponentMap.get(PlayType.PLAYING)).play();
+        this.type = PlayType.PLAYING;
+        this.previousType = PlayType.PLAYING;
     }
 
     public PlayComponent getComponent(PlayType playType) {

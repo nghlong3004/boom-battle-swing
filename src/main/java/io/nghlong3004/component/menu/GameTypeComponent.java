@@ -79,8 +79,14 @@ public class GameTypeComponent extends GameComponent {
                 modeButton.startBlinking();
                 GameType selectedMode = modeButton.getGameMode();
                 context.setGameType(selectedMode);
-                ((MainMenuState) context.getGameState(GameStateType.MENU)).setType(MenuType.PLAYER_COUNT);
-                log.info("{} mode selected, proceeding to player count selection", selectedMode.name());
+                
+                if (selectedMode == GameType.ONLINE) {
+                    context.changeState(GameStateType.ONLINE);
+                    log.info("ONLINE mode selected, going to online lobby");
+                } else {
+                    ((MainMenuState) context.getGameState(GameStateType.MENU)).setType(MenuType.PLAYER_COUNT);
+                    log.info("{} mode selected, proceeding to player count selection", selectedMode.name());
+                }
             }
         }
         reset();

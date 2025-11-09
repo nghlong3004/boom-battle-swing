@@ -8,6 +8,7 @@ import io.nghlong3004.manager.GameManager;
 import io.nghlong3004.manager.ManagerFactory;
 import io.nghlong3004.type.GameStateType;
 import io.nghlong3004.type.PlayType;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
@@ -18,11 +19,10 @@ import java.util.List;
 
 @Slf4j
 public class GamePlayComponent extends PlayComponent {
-
+    @Getter
     private final GameManager gameManager;
     private final Bomber[] bombers;
     private final Map<Integer, BomberKeyAction> lookup;
-    private static final int MAX_CHARACTERS = 4;
 
     public GamePlayComponent(GameContext context) {
         super(context);
@@ -39,8 +39,8 @@ public class GamePlayComponent extends PlayComponent {
     }
 
     private List<Bomber> getPlayers() {
-        return new ArrayList<Bomber>(Arrays.asList(this.bombers)
-                                           .subList(0, context.getNumberBomber()));
+        return new ArrayList<>(Arrays.asList(this.bombers)
+                                     .subList(0, context.getNumberBomber()));
     }
 
     private void loadBombers() {
@@ -64,14 +64,19 @@ public class GamePlayComponent extends PlayComponent {
             return;
         }
 
-        PlayingState playingState = (PlayingState) context.getGameState(GameStateType.PLAYING);
-
         if (!gameManager.isAnyPlayerAlive()) {
+            PlayingState playingState = (PlayingState) context.getGameState(GameStateType.PLAYING);
+            gameManager.getAgentManager()
+                       .stop();
             playingState.setType(PlayType.OVER);
+            log.info("Player lose!");
             return;
         }
 
         if (!gameManager.isAnyAgentAlive()) {
+            PlayingState playingState = (PlayingState) context.getGameState(GameStateType.PLAYING);
+            gameManager.getAgentManager()
+                       .stop();
             playingState.setType(PlayType.WIN);
             log.info("All agents defeated! Player wins!");
         }

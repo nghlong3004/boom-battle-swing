@@ -4,5 +4,6 @@ public enum GameStateType {
     PLAYING,
     MENU,
     OPTION,
+    ONLINE,
     QUIT;
 }

@@ -29,7 +29,7 @@ public class AgentManager extends BomberManager {
     private final PathFinder pathFinder;
     private final BomberManager bomberManager;
 
-    private ScheduledExecutorService aiExec;
+    private ScheduledExecutorService scheduledExecutorService;
     private final AtomicBoolean running = new AtomicBoolean(false);
 
     private volatile int tickMillis = 30;
@@ -48,27 +48,22 @@ public class AgentManager extends BomberManager {
             setCollisionChecker(bomberManager.getCollisionChecker());
         }
         if (running.compareAndSet(false, true)) {
-            aiExec = Executors.newSingleThreadScheduledExecutor(r -> {
-                Thread t = new Thread(r, "AI-Tick");
-                t.setDaemon(true);
-                return t;
-            });
-            aiExec.scheduleAtFixedRate(this::tick, 0, tickMillis, TimeUnit.MILLISECONDS);
+            if (scheduledExecutorService == null || scheduledExecutorService.isShutdown()) {
+                scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+            }
+            scheduledExecutorService.scheduleAtFixedRate(this::tick, 0, tickMillis, TimeUnit.MILLISECONDS);
             log.info("AgentManager started with tick={}ms", tickMillis);
         }
     }
 
+    public void pause() {
+        running.set(!running.get());
+    }
+
     public void stop() {
         if (running.compareAndSet(true, false)) {
-            if (aiExec != null) {
-                aiExec.shutdownNow();
-                try {
-                    aiExec.awaitTermination(1, TimeUnit.SECONDS);
-                } catch (InterruptedException e) {
-                    Thread.currentThread()
-                          .interrupt();
-                }
-                aiExec = null;
+            if (scheduledExecutorService != null) {
+                scheduledExecutorService.shutdown();
             }
             log.info("AgentManager stopped");
         }
@@ -362,13 +357,12 @@ public class AgentManager extends BomberManager {
                     continue;
                 }
 
-
                 if (agent.getBox()
                          .intersects(player.getBox())) {
 
                     if (!player.isDying()) {
                         player.startDying();
-                        log.info("Bomber bị bot {} bắt được và bắt đầu chết tại vị trí ({}, {})", agent.hashCode(),
+                        log.info("Agent name: {} killer bomber at position ({}, {})", agent.hashCode(),
                                  player.getBox().x, player.getBox().y);
                     }
                 }

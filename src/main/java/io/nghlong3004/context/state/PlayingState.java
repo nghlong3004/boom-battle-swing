@@ -5,6 +5,7 @@ import io.nghlong3004.component.play.*;
 import io.nghlong3004.constant.AudioConstant;
 import io.nghlong3004.context.GameContext;
 import io.nghlong3004.type.PlayType;
+import lombok.Getter;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -16,6 +17,7 @@ public class PlayingState implements GameState {
 
     private final GameContext gameContext;
     private final Map<PlayType, PlayComponent> gameComponentMap;
+    @Getter
     private PlayType type;
     private PlayType previousType;
 
@@ -39,14 +41,14 @@ public class PlayingState implements GameState {
             this.previousType = this.type;
             this.type = newType;
 
-            if (newType == PlayType.OVER && previousType != PlayType.OVER) {
+            if (newType == PlayType.OVER) {
                 gameContext.getAudio()
                            .playSong(AudioConstant.LOSE);
                 if (gameComponentMap.get(PlayType.OVER) instanceof GameOverComponent) {
                     ((GameOverComponent) gameComponentMap.get(PlayType.OVER)).resetAnimation();
                 }
             }
-            else if (newType == PlayType.WIN && previousType != PlayType.WIN) {
+            else if (newType == PlayType.WIN) {
                 gameContext.getAudio()
                            .playSong(AudioConstant.VICTORY);
                 if (gameComponentMap.get(PlayType.WIN) instanceof GameWinComponent) {
@@ -54,10 +56,6 @@ public class PlayingState implements GameState {
                 }
             }
         }
-    }
-
-    public PlayType getType() {
-        return type;
     }
 
     @Override
@@ -104,6 +102,7 @@ public class PlayingState implements GameState {
                         .keyPressed(e);
         if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_ESCAPE) {
             type = PlayType.PAUSED;
+            unpause();
         }
     }
 
@@ -149,5 +148,11 @@ public class PlayingState implements GameState {
 
     public PlayComponent getComponent(PlayType playType) {
         return gameComponentMap.get(playType);
+    }
+
+    public void unpause() {
+        ((GamePlayComponent) gameComponentMap.get(PlayType.PLAYING)).getGameManager()
+                                                                    .getAgentManager()
+                                                                    .pause();
     }
 }

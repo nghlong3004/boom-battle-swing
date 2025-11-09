@@ -56,6 +56,29 @@ public class Configuration {
         return Float.parseFloat(getPropertyValue("game.scale"));
     }
 
+    public String getServerUrl(int serverNumber) {
+        String key = "server." + serverNumber + ".url";
+        String url = getPropertyValue(key);
+        if (url.isEmpty()) {
+            log.warn("Server URL not configured for server {}", serverNumber);
+            return "ws://localhost:808" + (serverNumber - 1);
+        }
+        return url;
+    }
+
+    public int getServerCount() {
+        int count = 0;
+        for (int i = 1; i <= 10; i++) {
+            String url = properties.getProperty("server." + i + ".url");
+            if (url != null && !url.isBlank()) {
+                count++;
+            } else {
+                break;
+            }
+        }
+        return count > 0 ? count : 3;
+    }
+
     private String getPropertyValue(String key) {
         String value = properties.getProperty(key);
         if (value == null || value.isBlank()) {

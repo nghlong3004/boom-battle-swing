@@ -70,7 +70,9 @@ public class SpriteComponent extends GameComponent {
         }
         else if (unpauseButton.isMouseOver(e)) {
             if (unpauseButton.isMousePressed()) {
-                ((PlayingState) context.getGameState(GameStateType.PLAYING)).setType(PlayType.PLAYING);
+                PlayingState playingState = ((PlayingState) context.getGameState(GameStateType.PLAYING));
+                playingState.setType(PlayType.PLAYING);
+                playingState.unpause();
             }
         }
         else if (replayButton.isMouseOver(e)) {

@@ -24,6 +24,7 @@ public class GameManager {
     private final ExplosionManager explosionManager;
     @Getter
     private final ItemManager itemManager;
+    @Getter
     private final AgentManager agentManager;
     private final GameRender gameRender;
     @Getter

@@ -17,7 +17,8 @@ import java.io.IOException;
 import java.util.List;
 
 import static io.nghlong3004.constant.ButtonConstant.URM_BUTTON_SIZE;
-import static io.nghlong3004.constant.GameConstant.*;
+import static io.nghlong3004.constant.GameConstant.GAME_WIDTH;
+import static io.nghlong3004.constant.GameConstant.SCALE;
 
 @Slf4j
 public class GameOverComponent extends PlayComponent {
@@ -84,7 +85,7 @@ public class GameOverComponent extends PlayComponent {
         if (homeButton.isMouseOver(e)) {
             if (homeButton.isMousePressed()) {
                 PlayingState playingState = (PlayingState) context.getGameState(GameStateType.PLAYING);
-                if (playingState instanceof PlayingState) {
+                if (playingState != null) {
                     ((GamePlayComponent) playingState.getComponent(PlayType.PLAYING)).exit();
                 }
                 context.changeState(GameStateType.MENU);
@@ -93,10 +94,10 @@ public class GameOverComponent extends PlayComponent {
         else if (replayButton.isMouseOver(e)) {
             if (replayButton.isMousePressed()) {
                 PlayingState playingState = (PlayingState) context.getGameState(GameStateType.PLAYING);
-                if (playingState instanceof PlayingState) {
+                if (playingState != null) {
                     ((GamePlayComponent) playingState.getComponent(PlayType.PLAYING)).play();
+                    playingState.setType(PlayType.PLAYING);
                 }
-                playingState.setType(PlayType.PLAYING);
                 resetAnimation();
                 log.info("Game reset from Game Over, restarting...");
             }
@@ -154,8 +155,6 @@ public class GameOverComponent extends PlayComponent {
 
     @Override
     public void render(Graphics g) {
-
-
         Graphics2D g2d = (Graphics2D) g;
 
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -164,10 +163,10 @@ public class GameOverComponent extends PlayComponent {
         if (loseImage != null) {
             int originalWidth = loseImage.getWidth();
             int originalHeight = loseImage.getHeight();
-            
+
             int scaledWidth = (int) (originalWidth * SCALE * imageScale);
             int scaledHeight = (int) (originalHeight * SCALE * imageScale);
-            
+
             int imageX = (GAME_WIDTH - scaledWidth) / 2;
             int imageY = (int) (150 * SCALE);
 
@@ -179,12 +178,12 @@ public class GameOverComponent extends PlayComponent {
                 AlphaComposite shadowComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, imageAlpha * 0.4f);
                 g2d.setComposite(shadowComposite);
                 g2d.drawImage(loseImage, imageX + 5, imageY + 5, scaledWidth, scaledHeight, null);
-                
+
                 g2d.setComposite(alphaComposite);
             }
 
             g2d.drawImage(loseImage, imageX, imageY, scaledWidth, scaledHeight, null);
-            
+
             g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
         }
 

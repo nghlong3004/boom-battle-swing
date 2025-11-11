@@ -9,5 +9,7 @@ public class MapConstant {
 
     public static final String IMAGE_PATH_TEMPLATE = "/images/map/%s/%s.png";
 
+    public static final String MAP_PATH_TEMPLATE = "/images/map/%s_avatar.jpg";
+
     public static final String FILE_PATH_TEMPLATE = "/map_data/%s.txt";
 }

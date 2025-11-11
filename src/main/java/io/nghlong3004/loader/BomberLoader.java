@@ -1,6 +1,6 @@
 package io.nghlong3004.loader;
 
-import io.nghlong3004.type.SkinType;
+import io.nghlong3004.model.type.SkinType;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.image.BufferedImage;

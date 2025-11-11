@@ -73,6 +73,9 @@ public class ImageConstant {
     public static final String EXPLOSION_RIGHT_1 = "/images/boom/explosion_right_1.png";
     public static final String EXPLOSION_RIGHT_2 = "/images/boom/explosion_right_2.png";
 
+    public static final String ARROW_LEFT = "/images/buttons/arrow_left.png";
+    public static final String ARROW_RIGHT = "/images/buttons/arrow_right.png";
+
     public static final String ITEM_BOMB = "/images/items/item_bomb.png";
     public static final String ITEM_BOMB_SIZE = "/images/items/item_bombsize.png";
     public static final String ITEM_SHOE = "/images/items/item_shoe.png";

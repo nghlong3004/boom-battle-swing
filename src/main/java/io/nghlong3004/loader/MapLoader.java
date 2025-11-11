@@ -1,8 +1,8 @@
 package io.nghlong3004.loader;
 
 import io.nghlong3004.constant.MapConstant;
-import io.nghlong3004.type.MapType;
-import io.nghlong3004.type.TileType;
+import io.nghlong3004.model.type.MapType;
+import io.nghlong3004.model.type.TileType;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.image.BufferedImage;

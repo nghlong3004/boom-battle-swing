@@ -1,6 +1,6 @@
 package io.nghlong3004.ai.algorithm;
 
-import io.nghlong3004.map.MapData;
+import io.nghlong3004.model.MapData;
 
 import java.awt.*;
 import java.util.ArrayList;

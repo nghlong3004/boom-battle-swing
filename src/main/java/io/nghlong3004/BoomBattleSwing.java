@@ -1,7 +1,7 @@
 package io.nghlong3004;
 
 import io.nghlong3004.game.GameFactory;
-import io.nghlong3004.game.GameWindow;
+import io.nghlong3004.game.main.GameWindow;
 
 import javax.swing.*;
 

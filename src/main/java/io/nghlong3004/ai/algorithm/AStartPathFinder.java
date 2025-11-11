@@ -1,6 +1,6 @@
 package io.nghlong3004.ai.algorithm;
 
-import io.nghlong3004.manager.MapManager;
+import io.nghlong3004.game.manager.MapManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

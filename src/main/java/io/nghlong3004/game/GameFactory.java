@@ -1,6 +1,10 @@
 package io.nghlong3004.game;
 
-import io.nghlong3004.context.GameContext;
+import io.nghlong3004.game.context.GameContext;
+import io.nghlong3004.game.main.GameFrame;
+import io.nghlong3004.game.main.GameLoop;
+import io.nghlong3004.game.main.GamePanel;
+import io.nghlong3004.game.main.GameWindow;
 
 public class GameFactory {
 

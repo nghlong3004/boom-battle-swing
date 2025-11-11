@@ -1,11 +1,11 @@
 package io.nghlong3004.util;
 
-import io.nghlong3004.entity.Bomb;
-import io.nghlong3004.entity.Bomber;
-import io.nghlong3004.manager.BombManager;
-import io.nghlong3004.manager.BomberManager;
-import io.nghlong3004.manager.MapManager;
-import io.nghlong3004.type.TileType;
+import io.nghlong3004.game.manager.BombManager;
+import io.nghlong3004.game.manager.BomberManager;
+import io.nghlong3004.game.manager.MapManager;
+import io.nghlong3004.model.entities.Bomb;
+import io.nghlong3004.model.entities.Bomber;
+import io.nghlong3004.model.type.TileType;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 

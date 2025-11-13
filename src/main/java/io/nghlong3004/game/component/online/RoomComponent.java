@@ -33,7 +33,7 @@ public class RoomComponent extends GameComponent {
     private final Rectangle chatInputBox;
     private final Rectangle sendButton;
     private final Rectangle chatScrollArea;
-    private final Rectangle playerPanelArea;
+    private final Rectangle bomberPanelArea;
     private final Rectangle mapPreviewArea;
     private final Rectangle skinPreviewArea;
     private final Rectangle mapLeftButton;
@@ -68,10 +68,10 @@ public class RoomComponent extends GameComponent {
 
         int rightX = sideMargin + leftWidth + colGap;
 
-        playerPanelArea = new Rectangle(sideMargin, topMargin, leftWidth, usableHeight);
+        bomberPanelArea = new Rectangle(sideMargin, topMargin, leftWidth, usableHeight);
         int mapPreviewHeight = (int) (usableHeight * 0.3);
         int sectionGap = (int) (12 * SCALE);
-        int chatInputHeight = (int) (44 * SCALE);
+        int chatInputHeight = (int) (25 * SCALE);
         int chatScrollHeight = Math.max(0, usableHeight - mapPreviewHeight - sectionGap - chatInputHeight - sectionGap);
 
         int innerGap = (int) (12 * SCALE);
@@ -88,13 +88,12 @@ public class RoomComponent extends GameComponent {
         sendButton = new Rectangle(chatInputBox.x + chatInputBox.width + inputGap, chatInputBox.y, sendBtnWidth,
                                    chatInputHeight);
 
-        int buttonWidth = (int) (120 * SCALE);
+        int buttonWidth = (int) (100 * SCALE);
         int buttonHeight = (int) (30 * SCALE);
         int controlY = usableHeight + topMargin + 10;
 
-        leaveButton = new Rectangle(sideMargin, controlY, (int) (140 * SCALE), buttonHeight);
-        readyButton = new Rectangle(GAME_WIDTH - sideMargin - (buttonWidth * 2 + inputGap), controlY, buttonWidth,
-                                    buttonHeight);
+        leaveButton = new Rectangle(sideMargin, controlY, buttonWidth, buttonHeight);
+        readyButton = new Rectangle(rightX, controlY, buttonWidth, buttonHeight);
         startButton = new Rectangle(GAME_WIDTH - sideMargin - buttonWidth, controlY, buttonWidth, buttonHeight);
 
         int arrowSize = (int) (12 * SCALE);
@@ -132,13 +131,12 @@ public class RoomComponent extends GameComponent {
         }
 
         renderRoomInfo(g2d, room);
-        renderPlayerSlots(g2d, room);
+        renderBomberSlots(g2d, room);
         renderChatArea(g2d);
         renderSkinPreview(g2d, room);
         renderMapPreview(g2d, room);
         renderChatInput(g2d);
 
-        boolean isHost = isLocalHost(room);
         boolean isReady = isLocalReady(room);
         boolean allReady = true;
         for (var bomberInfo : room.getBomberInfos()) {
@@ -147,11 +145,16 @@ public class RoomComponent extends GameComponent {
                 break;
             }
         }
-        boolean startDisabled = !isHost || room.getBomberInfos()
-                                               .isEmpty() || !allReady;
+        boolean startDisabled = !allReady;
 
-        renderButton(g2d, readyButton, isReady ? "Unready" : "Ready", new Color(46, 204, 113), isHost);
-        renderButton(g2d, startButton, "Start", new Color(52, 152, 219), startDisabled);
+        if (networkManager.getCurrentRoom()
+                          .getOwner()
+                          .equals(networkManager.getBomberId())) {
+            renderButton(g2d, startButton, "Start", new Color(52, 152, 219), startDisabled);
+        }
+        else {
+            renderButton(g2d, readyButton, isReady ? "Unready" : "Ready", new Color(46, 204, 113), false);
+        }
         renderButton(g2d, leaveButton, "Leave", new Color(231, 76, 60), false);
     }
 
@@ -165,10 +168,10 @@ public class RoomComponent extends GameComponent {
     }
 
     private void renderRoomInfo(Graphics2D g2d, Room room) {
-        g2d.setFont(new Font("Arial", Font.BOLD, (int) (36 * SCALE)));
+        g2d.setFont(new Font("Arial", Font.BOLD, (int) (20 * SCALE)));
         g2d.setColor(new Color(100, 200, 255));
         g2d.drawString(room.getName(), 50, 70);
-        String info = String.format("Map: %s  •  Players: %d/%d", room.getMap()
+        String info = String.format("Map: %s  |  Bombers: %d/%d", room.getMap()
                                                                       .getName(), room.getBomberInfos()
                                                                                       .size(), room.getMaxBomber());
         g2d.drawString(info, 50, 105);
@@ -177,11 +180,11 @@ public class RoomComponent extends GameComponent {
     private final Map<String, BufferedImage> avatarCache = new HashMap<>();
     private final Map<String, BufferedImage> mapPreviewCache = new HashMap<>();
 
-    private void renderPlayerSlots(Graphics2D g2d, Room room) {
-        int panelX = playerPanelArea.x;
-        int panelY = playerPanelArea.y;
-        int panelWidth = playerPanelArea.width;
-        int panelHeight = playerPanelArea.height;
+    private void renderBomberSlots(Graphics2D g2d, Room room) {
+        int panelX = bomberPanelArea.x;
+        int panelY = bomberPanelArea.y;
+        int panelWidth = bomberPanelArea.width;
+        int panelHeight = bomberPanelArea.height;
 
         g2d.setColor(new Color(30, 35, 45));
         g2d.fillRoundRect(panelX, panelY, panelWidth, panelHeight, 15, 15);
@@ -190,7 +193,7 @@ public class RoomComponent extends GameComponent {
         g2d.setStroke(new BasicStroke(3));
         g2d.drawRoundRect(panelX, panelY, panelWidth, panelHeight, 15, 15);
 
-        g2d.setFont(new Font("Arial", Font.BOLD, (int) (26 * SCALE)));
+        g2d.setFont(new Font("Arial", Font.BOLD, (int) (20 * SCALE)));
         g2d.setColor(new Color(100, 200, 255));
         g2d.drawString("Room Members", panelX + 20, panelY + 40);
 
@@ -235,18 +238,18 @@ public class RoomComponent extends GameComponent {
                     g2d.drawImage(avatar, ax, ay, avatarW, avatarH, null);
                 }
 
-                g2d.setFont(new Font("Arial", Font.BOLD, (int) (22 * SCALE)));
+                g2d.setFont(new Font("Arial", Font.BOLD, (int) (14 * SCALE)));
                 g2d.setColor(bomberInfo.getId()
                                        .equals(networkManager.getBomberId()) ? new Color(255, 215, 0) : Color.WHITE);
                 String name = bomberInfo.getName();
                 g2d.drawString(name, x + avatarW + 30, y + 35);
 
-                g2d.setFont(new Font("Arial", Font.PLAIN, (int) (18 * SCALE)));
+                g2d.setFont(new Font("Arial", Font.PLAIN, (int) (14 * SCALE)));
                 g2d.setColor(new Color(180, 180, 200));
                 g2d.drawString("Skin: " + bomberInfo.getSkin()
                                                     .name(), x + avatarW + 30, y + 60);
 
-                g2d.setFont(new Font("Arial", Font.BOLD, (int) (16 * SCALE)));
+                g2d.setFont(new Font("Arial", Font.BOLD, (int) (13 * SCALE)));
                 if (bomberInfo.isReady()) {
                     g2d.setColor(new Color(46, 204, 113));
                     g2d.drawString("Ready", x + avatarW + 30, y + 85);
@@ -350,7 +353,7 @@ public class RoomComponent extends GameComponent {
         g2d.setStroke(new BasicStroke(3));
         g2d.drawRoundRect(chatX, chatY, chatWidth, chatHeight, 15, 15);
 
-        g2d.setFont(new Font("Arial", Font.BOLD, (int) (26 * SCALE)));
+        g2d.setFont(new Font("Arial", Font.BOLD, (int) (16 * SCALE)));
         g2d.setColor(new Color(100, 200, 255));
         g2d.drawString("Chat", chatX + 20, chatY + 40);
 
@@ -373,7 +376,7 @@ public class RoomComponent extends GameComponent {
                 continue;
             }
 
-            g2d.setFont(new Font("Arial", Font.BOLD, (int) (18 * SCALE)));
+            g2d.setFont(new Font("Arial", Font.BOLD, (int) (12 * SCALE)));
             String sender = msg.getOwner();
             if (sender.equals("System")) {
                 g2d.setColor(new Color(100, 200, 255));
@@ -386,7 +389,7 @@ public class RoomComponent extends GameComponent {
             }
             g2d.drawString(sender + ":", chatX + 20, y);
 
-            g2d.setFont(new Font("Arial", Font.PLAIN, (int) (18 * SCALE)));
+            g2d.setFont(new Font("Arial", Font.PLAIN, (int) (12 * SCALE)));
             g2d.setColor(Color.WHITE);
             int nameWidth = g2d.getFontMetrics()
                                .stringWidth(sender + ": ");
@@ -419,7 +422,7 @@ public class RoomComponent extends GameComponent {
             scrollChat(notchPixels);
         }
         else {
-            if (p.x > playerPanelArea.x + playerPanelArea.width) {
+            if (p.x > bomberPanelArea.x + bomberPanelArea.width) {
                 scrollChat(notchPixels);
             }
         }
@@ -433,11 +436,11 @@ public class RoomComponent extends GameComponent {
         g2d.setStroke(new BasicStroke(3));
         g2d.drawRoundRect(chatInputBox.x, chatInputBox.y, chatInputBox.width, chatInputBox.height, 12, 12);
 
-        g2d.setFont(new Font("Arial", Font.PLAIN, (int) (22 * SCALE)));
+        g2d.setFont(new Font("Arial", Font.PLAIN, (int) (12 * SCALE)));
         String displayText = chatInput.isEmpty() ? "Type a message..." : chatInput;
         g2d.setColor(chatInput.isEmpty() ? Color.GRAY : Color.WHITE);
         g2d.drawString(displayText + (chatInputActive && !chatInput.isEmpty() ? "|" : ""), chatInputBox.x + 15,
-                       chatInputBox.y + 33);
+                       chatInputBox.y + 23);
 
         renderButton(g2d, sendButton, "Send", new Color(52, 152, 219), chatInput.isEmpty());
     }
@@ -452,7 +455,7 @@ public class RoomComponent extends GameComponent {
         g2d.setStroke(new BasicStroke(3));
         g2d.drawRoundRect(button.x, button.y, button.width, button.height, 12, 12);
 
-        g2d.setFont(new Font("Arial", Font.BOLD, (int) (24 * SCALE)));
+        g2d.setFont(new Font("Arial", Font.BOLD, (int) (13 * SCALE)));
         g2d.setColor(disabled ? Color.GRAY : Color.WHITE);
         int textWidth = g2d.getFontMetrics()
                            .stringWidth(text);
@@ -469,7 +472,7 @@ public class RoomComponent extends GameComponent {
             return;
         }
 
-        playerPanelArea.contains(e.getPoint());
+        bomberPanelArea.contains(e.getPoint());
 
         Room room = networkManager.getCurrentRoom();
         if (room != null) {

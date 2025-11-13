@@ -15,4 +15,11 @@ public enum MapType {
         return this.name()
                    .toLowerCase();
     }
+
+    public String getName() {
+        return this.name()
+                   .substring(0, this.name()
+                                     .indexOf("_"))
+                   .toUpperCase();
+    }
 }

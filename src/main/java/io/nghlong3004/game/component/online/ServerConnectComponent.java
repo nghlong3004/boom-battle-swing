@@ -72,10 +72,10 @@ public class ServerConnectComponent extends GameComponent {
 
     private void initializeComponents() {
         int centerX = GAME_WIDTH / 2;
-        int buttonWidth = (int) (200 * SCALE);
-        int buttonHeight = (int) (60 * SCALE);
-        int inputWidth = (int) (500 * SCALE);
-        int inputHeight = (int) (55 * SCALE);
+        int buttonWidth = (int) (120 * SCALE);
+        int buttonHeight = (int) (30 * SCALE);
+        int inputWidth = (int) (400 * SCALE);
+        int inputHeight = (int) (30 * SCALE);
 
         int serverSelectorY = (int) (200 * SCALE);
         serverSelectorBox = new Rectangle(centerX - inputWidth / 2, serverSelectorY, inputWidth, inputHeight);
@@ -99,9 +99,9 @@ public class ServerConnectComponent extends GameComponent {
     public void update() {
         if (connecting) {
             if (networkManager.isConnected()) {
-                networkManager.requestLobbyList();
+                networkManager.requestRoomList();
                 OnlineState onlineState = (OnlineState) context.getGameState(GameStateType.ONLINE);
-                onlineState.setType(OnlineType.LOBBY_LIST);
+                onlineState.setType(OnlineType.ROOM_LIST);
                 connecting = false;
                 connectThread = null;
             }
@@ -148,10 +148,9 @@ public class ServerConnectComponent extends GameComponent {
             g2d.setColor(new Color(231, 76, 60));
             int errorWidth = g2d.getFontMetrics()
                                 .stringWidth(errorMessage);
-            g2d.fillRoundRect(GAME_WIDTH / 2 - errorWidth / 2 - 20, nameInputBox.y + nameInputBox.height + 20,
-                              errorWidth + 40, 50, 10, 10);
+            g2d.fillRoundRect(GAME_WIDTH - errorWidth - 10 >>> 1, GAME_HEIGHT >>> 1, errorWidth + 40, 50, 10, 10);
             g2d.setColor(Color.WHITE);
-            g2d.drawString(errorMessage, GAME_WIDTH / 2 - errorWidth / 2, nameInputBox.y + nameInputBox.height + 50);
+            g2d.drawString(errorMessage, GAME_WIDTH - errorWidth >>> 1, GAME_HEIGHT >>> 1);
         }
 
         if (connecting) {
@@ -204,12 +203,6 @@ public class ServerConnectComponent extends GameComponent {
             String text = "Server " + (i + 1);
             g2d.drawString(text, item.x + 15, item.y + item.height / 2 + 8);
         }
-    }
-
-    private void renderLabel(Graphics2D g2d, String text, int x, int y) {
-        g2d.setFont(new Font("Arial", Font.BOLD, (int) (22 * SCALE)));
-        g2d.setColor(Color.WHITE);
-        g2d.drawString(text, x, y);
     }
 
     private void renderInputBox(Graphics2D g2d, Rectangle box, String text, boolean active, boolean placeholder) {
@@ -314,9 +307,8 @@ public class ServerConnectComponent extends GameComponent {
         final String serverUrl = configuration.getServerUrl(selectedServerIndex + 1);
 
         cancelConnect = false;
-        Thread t = getThread(serverUrl);
-        connectThread = t;
-        t.start();
+        connectThread = getThread(serverUrl);
+        connectThread.start();
     }
 
     private Thread getThread(String serverUrl) {
@@ -330,7 +322,7 @@ public class ServerConnectComponent extends GameComponent {
                     return;
                 }
                 if (!networkManager.isConnected()) {
-                    showTransientError("Could not connect to server", 5000);
+                    showTransientError("Could not connect to server", 500);
                     connecting = false;
                     connectThread = null;
                 }

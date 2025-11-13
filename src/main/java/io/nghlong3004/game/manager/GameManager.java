@@ -60,7 +60,7 @@ public class GameManager {
             agents.add(agent);
         }
         agentManager.setAgents(agents);
-        agentManager.setTickMillis(15);
+        agentManager.setTickMillis(7);
     }
 
     public void reset() {

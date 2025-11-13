@@ -4,10 +4,11 @@ import io.nghlong3004.game.component.GameComponent;
 import io.nghlong3004.game.context.GameContext;
 import io.nghlong3004.game.context.state.OnlineState;
 import io.nghlong3004.game.manager.NetworkManager;
+import io.nghlong3004.model.Room;
 import io.nghlong3004.model.type.GameStateType;
+import io.nghlong3004.model.type.MapType;
 import io.nghlong3004.model.type.OnlineType;
-import io.nghlong3004.websocket.model.Lobby;
-import io.nghlong3004.websocket.model.PlayerInfo;
+import io.nghlong3004.model.type.SkinType;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -16,23 +17,23 @@ import java.util.List;
 
 import static io.nghlong3004.constant.GameConstant.*;
 
-public class LobbyListComponent extends GameComponent {
+public class RoomListComponent extends GameComponent {
 
     private final NetworkManager networkManager;
-    private final CreateLobbyDialog createLobbyDialog;
-    private final List<Rectangle> lobbyButtons;
+    private final CreateRoomDialog createRoomDialog;
+    private final List<Rectangle> roomButtons;
     private final Rectangle createButton;
     private final Rectangle refreshButton;
     private final Rectangle backButton;
-    private int hoveredLobbyIndex = -1;
+    private int hoveredroomIndex = -1;
     private static final boolean OFFLINE_TEST_MODE = false;
     private static final int OFFLINE_MOCK_PLAYERS = 3;
 
-    public LobbyListComponent(GameContext context) {
+    public RoomListComponent(GameContext context) {
         super(context);
         this.networkManager = NetworkManager.getInstance();
-        this.createLobbyDialog = new CreateLobbyDialog();
-        this.lobbyButtons = new ArrayList<>();
+        this.createRoomDialog = new CreateRoomDialog();
+        this.roomButtons = new ArrayList<>();
 
         int buttonWidth = (int) (140 * SCALE);
         int buttonHeight = (int) (50 * SCALE);
@@ -49,12 +50,16 @@ public class LobbyListComponent extends GameComponent {
     @Override
     public void update() {
         networkManager.update();
-        updateLobbyButtons();
+        if (networkManager.getCurrentRoom() != null) {
+            OnlineState onlineState = (OnlineState) context.getGameState(GameStateType.ONLINE);
+            onlineState.setType(OnlineType.ROOM);
+        }
+        updateRoomButtons();
     }
 
-    private void updateLobbyButtons() {
-        lobbyButtons.clear();
-        List<Lobby> lobbies = networkManager.getAvailableLobbies();
+    private void updateRoomButtons() {
+        roomButtons.clear();
+        var rooms = networkManager.getAvailableRooms();
 
         int listMarginX = (int) (80 * SCALE);
         int listTop = (int) (140 * SCALE);
@@ -66,13 +71,13 @@ public class LobbyListComponent extends GameComponent {
         int listWidth = GAME_WIDTH - listMarginX * 2;
         int listX = (GAME_WIDTH - listWidth) / 2;
 
-        int n = lobbies.size();
+        int n = rooms.size();
         int totalHeight = n > 0 ? n * itemHeight + (n - 1) * itemSpacing : 0;
         int startY = listTop + Math.max(0, (areaHeight - totalHeight) / 2);
 
         for (int i = 0; i < n; i++) {
             Rectangle button = new Rectangle(listX, startY + i * (itemHeight + itemSpacing), listWidth, itemHeight);
-            lobbyButtons.add(button);
+            roomButtons.add(button);
         }
     }
 
@@ -87,33 +92,33 @@ public class LobbyListComponent extends GameComponent {
 
         g2d.setFont(new Font("Arial", Font.BOLD, (int) (48 * SCALE)));
         g2d.setColor(new Color(100, 200, 255));
-        String title = "Game Lobbies";
+        String title = "Game rooms";
         int titleWidth = g2d.getFontMetrics()
                             .stringWidth(title);
         g2d.drawString(title, GAME_WIDTH / 2 - titleWidth / 2, 80);
 
-        List<Lobby> lobbies = networkManager.getAvailableLobbies();
-        for (int i = 0; i < lobbies.size() && i < lobbyButtons.size(); i++) {
-            renderLobbyButton(g2d, lobbyButtons.get(i), lobbies.get(i), i == hoveredLobbyIndex);
+        var rooms = networkManager.getAvailableRooms();
+        for (int i = 0; i < rooms.size() && i < roomButtons.size(); i++) {
+            renderroomButton(g2d, roomButtons.get(i), rooms.get(i), i == hoveredroomIndex);
         }
 
-        if (lobbies.isEmpty()) {
+        if (rooms.isEmpty()) {
             g2d.setFont(new Font("Arial", Font.ITALIC, (int) (28 * SCALE)));
             g2d.setColor(Color.GRAY);
-            String noLobbies = "No lobbies available. Create one to start!";
+            String norooms = "No rooms available. Create one to start!";
             int width = g2d.getFontMetrics()
-                           .stringWidth(noLobbies);
-            g2d.drawString(noLobbies, GAME_WIDTH / 2 - width / 2, GAME_HEIGHT / 2);
+                           .stringWidth(norooms);
+            g2d.drawString(norooms, GAME_WIDTH / 2 - width / 2, GAME_HEIGHT / 2);
         }
 
         renderButton(g2d, createButton, "Create", new Color(46, 204, 113));
         renderButton(g2d, refreshButton, "Refresh", new Color(52, 152, 219));
         renderButton(g2d, backButton, "Back", new Color(231, 76, 60));
 
-        createLobbyDialog.render(g2d);
+        createRoomDialog.render(g2d);
     }
 
-    private void renderLobbyButton(Graphics2D g2d, Rectangle rect, Lobby lobby, boolean hovered) {
+    private void renderroomButton(Graphics2D g2d, Rectangle rect, Room room, boolean hovered) {
         Color bgColor = hovered ? new Color(45, 52, 65) : new Color(30, 35, 45);
         g2d.setColor(bgColor);
         g2d.fillRoundRect(rect.x, rect.y, rect.width, rect.height, 15, 15);
@@ -125,13 +130,13 @@ public class LobbyListComponent extends GameComponent {
 
         g2d.setFont(new Font("Arial", Font.BOLD, (int) (28 * SCALE)));
         g2d.setColor(new Color(100, 200, 255));
-        g2d.drawString(lobby.getLobbyName(), rect.x + 20, rect.y + 35);
+        g2d.drawString(room.getName(), rect.x + 20, rect.y + 35);
 
         g2d.setFont(new Font("Arial", Font.PLAIN, (int) (20 * SCALE)));
         g2d.setColor(new Color(180, 180, 200));
-        String info = String.format("Players: %d/%d | Map: %s", lobby.getPlayers()
-                                                                     .size(), lobby.getMaxPlayers(),
-                                    lobby.getMapType());
+        String info = String.format("Players: %d/%d | Map: %s", room.getBomberInfos()
+                                                                    .size(), room.getMaxBomber(), room.getMap()
+                                                                                                      .getName());
         g2d.drawString(info, rect.x + 20, rect.y + 60);
     }
 
@@ -152,21 +157,21 @@ public class LobbyListComponent extends GameComponent {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if (createLobbyDialog.isVisible()) {
-            if (createLobbyDialog.isCreateClicked(e)) {
-                createNewLobby();
+        if (createRoomDialog.isVisible()) {
+            if (createRoomDialog.isCreateClicked(e)) {
+                createNewRoom();
             }
-            createLobbyDialog.handleMousePressed(e);
+            createRoomDialog.handleMousePressed(e);
             return;
         }
 
         if (createButton.contains(e.getPoint())) {
-            createLobbyDialog.show();
+            createRoomDialog.show();
             return;
         }
 
         if (refreshButton.contains(e.getPoint())) {
-            networkManager.requestLobbyList();
+            networkManager.requestRoomList();
         }
 
         if (backButton.contains(e.getPoint())) {
@@ -174,100 +179,63 @@ public class LobbyListComponent extends GameComponent {
             context.changeState(GameStateType.MENU);
         }
 
-        List<Lobby> lobbies = networkManager.getAvailableLobbies();
-        for (int i = 0; i < lobbyButtons.size() && i < lobbies.size(); i++) {
-            if (lobbyButtons.get(i)
-                            .contains(e.getPoint())) {
-                Lobby lobby = lobbies.get(i);
+        List<Room> rooms = networkManager.getAvailableRooms();
+        for (int i = 0; i < roomButtons.size() && i < rooms.size(); i++) {
+            if (roomButtons.get(i)
+                           .contains(e.getPoint())) {
+                Room room = rooms.get(i);
 
                 if (networkManager.isConnected()) {
-                    networkManager.joinLobby(lobby.getLobbyId());
+                    networkManager.joinRoom(room.getId());
                 }
-                else {
-                    Lobby currentLobby = new Lobby(lobby.getLobbyId(), lobby.getLobbyName(), lobby.getHostId(),
-                                                   lobby.getMaxPlayers());
-                    currentLobby.setMapType(lobby.getMapType());
-                    currentLobby.getPlayers()
-                                .addAll(lobby.getPlayers());
-                    currentLobby.getPlayers()
-                                .add(new PlayerInfo("you", "You", "boz", false, false));
-                    networkManager.setCurrentLobby(currentLobby);
-
-                    boolean exists = false;
-                    for (PlayerInfo p : lobby.getPlayers()) {
-                        if ("you".equalsIgnoreCase(p.getPlayerId()) || "you".equalsIgnoreCase(p.getPlayerName())) {
-                            exists = true;
-                            break;
-                        }
-                    }
-                    if (!exists && lobby.getPlayers()
-                                        .size() < lobby.getMaxPlayers()) {
-                        lobby.getPlayers()
-                             .add(new PlayerInfo("you", "You", "boz", false, false));
-                    }
-                }
-
-                OnlineState onlineState = (OnlineState) context.getGameState(GameStateType.ONLINE);
-                onlineState.setType(OnlineType.LOBBY_ROOM);
                 break;
             }
         }
     }
 
-    private void createNewLobby() {
-        String lobbyName = createLobbyDialog.getLobbyName();
-        String mapType = createLobbyDialog.getSelectedMap();
-        String skinType = createLobbyDialog.getSelectedSkin();
-        int maxPlayers = 4;
+    private void createNewRoom() {
+        String roomName = createRoomDialog.getRoomName();
+        MapType mapType = createRoomDialog.getSelectedMap();
+        SkinType skinType = createRoomDialog.getSelectedSkin();
 
         if (networkManager.isConnected()) {
-            networkManager.createLobby(lobbyName, maxPlayers, mapType);
-        }
-        else {
-            Lobby newLobby = new Lobby("lobby_" + System.currentTimeMillis(), lobbyName, "you", maxPlayers);
-            newLobby.setMapType(mapType);
-            newLobby.getPlayers()
-                    .add(new PlayerInfo("you", "You", skinType, true, true));
-
-            networkManager.getAvailableLobbies()
-                          .add(newLobby);
-            networkManager.setCurrentLobby(newLobby);
+            networkManager.createRoom(roomName, 4, mapType, skinType);
         }
 
-        createLobbyDialog.hide();
+        createRoomDialog.hide();
 
         OnlineState onlineState = (OnlineState) context.getGameState(GameStateType.ONLINE);
-        onlineState.setType(OnlineType.LOBBY_ROOM);
+        onlineState.setType(OnlineType.ROOM);
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        if (createLobbyDialog.isVisible()) {
-            createLobbyDialog.handleMouseMoved(e);
+        if (createRoomDialog.isVisible()) {
+            createRoomDialog.handleMouseMoved(e);
             return;
         }
 
-        hoveredLobbyIndex = -1;
-        List<Lobby> lobbies = networkManager.getAvailableLobbies();
-        for (int i = 0; i < lobbyButtons.size() && i < lobbies.size(); i++) {
-            if (lobbyButtons.get(i)
-                            .contains(e.getPoint())) {
-                hoveredLobbyIndex = i;
+        hoveredroomIndex = -1;
+        List<Room> rooms = networkManager.getAvailableRooms();
+        for (int i = 0; i < roomButtons.size() && i < rooms.size(); i++) {
+            if (roomButtons.get(i)
+                           .contains(e.getPoint())) {
+                hoveredroomIndex = i;
                 break;
             }
         }
     }
 
     public boolean isDialogInputActive() {
-        return createLobbyDialog.isVisible() && createLobbyDialog.isNameInputActive();
+        return createRoomDialog.isVisible() && createRoomDialog.isNameInputActive();
     }
 
     public void addCharToDialog(char c) {
-        createLobbyDialog.addCharToName(c);
+        createRoomDialog.addCharToName(c);
     }
 
     public void removeCharFromDialog() {
-        createLobbyDialog.removeCharFromName();
+        createRoomDialog.removeCharFromName();
     }
 
     @Override

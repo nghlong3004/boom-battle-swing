@@ -1,26 +1,28 @@
 package io.nghlong3004.websocket;
 
 import com.google.gson.Gson;
-import io.nghlong3004.websocket.model.NetworkMessage;
+import io.nghlong3004.model.NetworkMessage;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Slf4j
-public class WebSocketClient extends org.java_websocket.client.WebSocketClient {
+public class BomberWebSocketClient extends WebSocketClient {
 
+    @Getter
     private final Gson gson;
     private final ConcurrentLinkedQueue<NetworkMessage> messageQueue;
     private boolean connected;
     @Getter
     @Setter
-    private String playerId;
+    private String bomberId;
 
-    public WebSocketClient(URI serverUri) {
+    public BomberWebSocketClient(URI serverUri) {
         super(serverUri);
         this.gson = new Gson();
         this.messageQueue = new ConcurrentLinkedQueue<>();
@@ -58,8 +60,6 @@ public class WebSocketClient extends org.java_websocket.client.WebSocketClient {
 
     public void sendMessage(NetworkMessage message) {
         if (connected && isOpen()) {
-            message.setPlayerId(playerId);
-            message.setTimestamp(System.currentTimeMillis());
             String json = gson.toJson(message);
             send(json);
             log.debug("Sent message: {}", message.getType());

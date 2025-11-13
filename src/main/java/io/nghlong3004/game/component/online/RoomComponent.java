@@ -7,21 +7,24 @@ import io.nghlong3004.game.context.GameContext;
 import io.nghlong3004.game.context.state.OnlineState;
 import io.nghlong3004.game.manager.NetworkManager;
 import io.nghlong3004.loader.ImageLoader;
-import io.nghlong3004.model.type.*;
-import io.nghlong3004.websocket.model.ChatMessage;
-import io.nghlong3004.websocket.model.Lobby;
-import io.nghlong3004.websocket.model.PlayerInfo;
+import io.nghlong3004.model.BomberInfo;
+import io.nghlong3004.model.ChatMessage;
+import io.nghlong3004.model.Room;
+import io.nghlong3004.model.type.GameStateType;
+import io.nghlong3004.model.type.MapType;
+import io.nghlong3004.model.type.OnlineType;
+import io.nghlong3004.model.type.SkinType;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static io.nghlong3004.constant.GameConstant.*;
 
-public class LobbyRoomComponent extends GameComponent {
+public class RoomComponent extends GameComponent {
 
     private final NetworkManager networkManager;
     private final Rectangle startButton;
@@ -30,7 +33,7 @@ public class LobbyRoomComponent extends GameComponent {
     private final Rectangle chatInputBox;
     private final Rectangle sendButton;
     private final Rectangle chatScrollArea;
-    private final Rectangle playerPanelArea;
+    private final Rectangle bomberPanelArea;
     private final Rectangle mapPreviewArea;
     private final Rectangle skinPreviewArea;
     private final Rectangle mapLeftButton;
@@ -48,7 +51,7 @@ public class LobbyRoomComponent extends GameComponent {
     private Point lastDragPoint = null;
     private boolean isDraggingChat = false;
 
-    public LobbyRoomComponent(GameContext context) {
+    public RoomComponent(GameContext context) {
         super(context);
         this.networkManager = NetworkManager.getInstance();
         this.arrowLeft = ImageLoader.loadImage(ImageConstant.ARROW_LEFT);
@@ -65,10 +68,10 @@ public class LobbyRoomComponent extends GameComponent {
 
         int rightX = sideMargin + leftWidth + colGap;
 
-        playerPanelArea = new Rectangle(sideMargin, topMargin, leftWidth, usableHeight);
+        bomberPanelArea = new Rectangle(sideMargin, topMargin, leftWidth, usableHeight);
         int mapPreviewHeight = (int) (usableHeight * 0.3);
         int sectionGap = (int) (12 * SCALE);
-        int chatInputHeight = (int) (44 * SCALE);
+        int chatInputHeight = (int) (25 * SCALE);
         int chatScrollHeight = Math.max(0, usableHeight - mapPreviewHeight - sectionGap - chatInputHeight - sectionGap);
 
         int innerGap = (int) (12 * SCALE);
@@ -85,13 +88,12 @@ public class LobbyRoomComponent extends GameComponent {
         sendButton = new Rectangle(chatInputBox.x + chatInputBox.width + inputGap, chatInputBox.y, sendBtnWidth,
                                    chatInputHeight);
 
-        int buttonWidth = (int) (120 * SCALE);
+        int buttonWidth = (int) (100 * SCALE);
         int buttonHeight = (int) (30 * SCALE);
         int controlY = usableHeight + topMargin + 10;
 
-        leaveButton = new Rectangle(sideMargin, controlY, (int) (140 * SCALE), buttonHeight);
-        readyButton = new Rectangle(GAME_WIDTH - sideMargin - (buttonWidth * 2 + inputGap), controlY, buttonWidth,
-                                    buttonHeight);
+        leaveButton = new Rectangle(sideMargin, controlY, buttonWidth, buttonHeight);
+        readyButton = new Rectangle(rightX, controlY, buttonWidth, buttonHeight);
         startButton = new Rectangle(GAME_WIDTH - sideMargin - buttonWidth, controlY, buttonWidth, buttonHeight);
 
         int arrowSize = (int) (12 * SCALE);
@@ -110,7 +112,7 @@ public class LobbyRoomComponent extends GameComponent {
 
     @Override
     public void update() {
-        // Network updates centralized in OnlineState.update() now.
+
     }
 
     @Override
@@ -122,63 +124,67 @@ public class LobbyRoomComponent extends GameComponent {
         g2d.setColor(new Color(20, 25, 35));
         g2d.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
-        Lobby lobby = networkManager.getCurrentLobby();
-        if (lobby == null) {
-            renderNoLobby(g2d);
+        Room room = networkManager.getCurrentRoom();
+        if (room == null) {
+            renderNoRoom(g2d);
             return;
         }
 
-        renderLobbyInfo(g2d, lobby);
-        renderPlayerSlots(g2d, lobby);
+        renderRoomInfo(g2d, room);
+        renderBomberSlots(g2d, room);
         renderChatArea(g2d);
-        renderSkinPreview(g2d, lobby);
-        renderMapPreview(g2d, lobby);
+        renderSkinPreview(g2d, room);
+        renderMapPreview(g2d, room);
         renderChatInput(g2d);
 
-        boolean isHost = isLocalHost(lobby);
-        boolean isReady = isLocalReady(lobby);
+        boolean isReady = isLocalReady(room);
         boolean allReady = true;
-        for (PlayerInfo p : lobby.getPlayers()) {
-            if (!p.isReady()) {
+        for (var bomberInfo : room.getBomberInfos()) {
+            if (!bomberInfo.isReady()) {
                 allReady = false;
                 break;
             }
         }
-        boolean startDisabled = !isHost || lobby.getPlayers()
-                                                .isEmpty() || !allReady;
+        boolean startDisabled = !allReady;
 
-        renderButton(g2d, readyButton, isReady ? "Unready" : "Ready", new Color(46, 204, 113), isHost);
-        renderButton(g2d, startButton, "Start", new Color(52, 152, 219), startDisabled);
+        if (networkManager.getCurrentRoom()
+                          .getOwner()
+                          .equals(networkManager.getBomberId())) {
+            renderButton(g2d, startButton, "Start", new Color(52, 152, 219), startDisabled);
+        }
+        else {
+            renderButton(g2d, readyButton, isReady ? "Unready" : "Ready", new Color(46, 204, 113), false);
+        }
         renderButton(g2d, leaveButton, "Leave", new Color(231, 76, 60), false);
     }
 
-    private void renderNoLobby(Graphics2D g2d) {
+    private void renderNoRoom(Graphics2D g2d) {
         g2d.setFont(new Font("Arial", Font.BOLD, (int) (32 * SCALE)));
         g2d.setColor(Color.RED);
-        String msg = "Not in a lobby";
+        String msg = "Not in a Room";
         int width = g2d.getFontMetrics()
                        .stringWidth(msg);
         g2d.drawString(msg, GAME_WIDTH / 2 - width / 2, GAME_HEIGHT / 2);
     }
 
-    private void renderLobbyInfo(Graphics2D g2d, Lobby lobby) {
-        g2d.setFont(new Font("Arial", Font.BOLD, (int) (36 * SCALE)));
+    private void renderRoomInfo(Graphics2D g2d, Room room) {
+        g2d.setFont(new Font("Arial", Font.BOLD, (int) (20 * SCALE)));
         g2d.setColor(new Color(100, 200, 255));
-        g2d.drawString(lobby.getLobbyName(), 50, 70);
-        String info = String.format("Map: %s  •  Players: %d/%d", lobby.getNameMap(), lobby.getPlayers()
-                                                                                           .size(),
-                                    lobby.getMaxPlayers());
+        g2d.drawString(room.getName(), 50, 70);
+        String info = String.format("Map: %s  |  Bombers: %d/%d", room.getMap()
+                                                                      .getName(), room.getBomberInfos()
+                                                                                      .size(), room.getMaxBomber());
         g2d.drawString(info, 50, 105);
     }
 
     private final Map<String, BufferedImage> avatarCache = new HashMap<>();
     private final Map<String, BufferedImage> mapPreviewCache = new HashMap<>();
 
-    private void renderPlayerSlots(Graphics2D g2d, Lobby lobby) {
-        int panelX = playerPanelArea.x;
-        int panelY = playerPanelArea.y;
-        int panelWidth = playerPanelArea.width;
-        int panelHeight = playerPanelArea.height;
+    private void renderBomberSlots(Graphics2D g2d, Room room) {
+        int panelX = bomberPanelArea.x;
+        int panelY = bomberPanelArea.y;
+        int panelWidth = bomberPanelArea.width;
+        int panelHeight = bomberPanelArea.height;
 
         g2d.setColor(new Color(30, 35, 45));
         g2d.fillRoundRect(panelX, panelY, panelWidth, panelHeight, 15, 15);
@@ -187,7 +193,7 @@ public class LobbyRoomComponent extends GameComponent {
         g2d.setStroke(new BasicStroke(3));
         g2d.drawRoundRect(panelX, panelY, panelWidth, panelHeight, 15, 15);
 
-        g2d.setFont(new Font("Arial", Font.BOLD, (int) (26 * SCALE)));
+        g2d.setFont(new Font("Arial", Font.BOLD, (int) (20 * SCALE)));
         g2d.setColor(new Color(100, 200, 255));
         g2d.drawString("Room Members", panelX + 20, panelY + 40);
 
@@ -202,7 +208,7 @@ public class LobbyRoomComponent extends GameComponent {
         int slotW = Math.max((int) (140 * SCALE), gridW / cols);
         int slotH = Math.max((int) (110 * SCALE), gridH / rows);
 
-        List<PlayerInfo> players = lobby.getPlayers();
+        var bomberInfos = room.getBomberInfos();
 
         skinLeftButton = null;
         skinRightButton = null;
@@ -219,10 +225,11 @@ public class LobbyRoomComponent extends GameComponent {
             g2d.setStroke(new BasicStroke(2));
             g2d.drawRoundRect(x, y, slotW, slotH, 12, 12);
 
-            if (i < players.size()) {
-                PlayerInfo p = players.get(i);
+            if (i < bomberInfos.size()) {
+                var bomberInfo = bomberInfos.get(i);
 
-                BufferedImage avatar = getAvatar(p.getSkinType());
+                BufferedImage avatar = getAvatar(bomberInfo.getSkin()
+                                                           .getAssetKey());
                 int avatarW = Math.min((int) (80 * SCALE), slotW / 3);
                 int avatarH = Math.min((int) (110 * SCALE), slotH - 20);
                 int ax = x + 15;
@@ -231,17 +238,19 @@ public class LobbyRoomComponent extends GameComponent {
                     g2d.drawImage(avatar, ax, ay, avatarW, avatarH, null);
                 }
 
-                g2d.setFont(new Font("Arial", Font.BOLD, (int) (22 * SCALE)));
-                g2d.setColor(p.isHost() ? new Color(255, 215, 0) : Color.WHITE);
-                String name = p.getPlayerName();
+                g2d.setFont(new Font("Arial", Font.BOLD, (int) (14 * SCALE)));
+                g2d.setColor(bomberInfo.getId()
+                                       .equals(networkManager.getBomberId()) ? new Color(255, 215, 0) : Color.WHITE);
+                String name = bomberInfo.getName();
                 g2d.drawString(name, x + avatarW + 30, y + 35);
 
-                g2d.setFont(new Font("Arial", Font.PLAIN, (int) (18 * SCALE)));
+                g2d.setFont(new Font("Arial", Font.PLAIN, (int) (14 * SCALE)));
                 g2d.setColor(new Color(180, 180, 200));
-                g2d.drawString("Skin: " + p.getSkinType(), x + avatarW + 30, y + 60);
+                g2d.drawString("Skin: " + bomberInfo.getSkin()
+                                                    .name(), x + avatarW + 30, y + 60);
 
-                g2d.setFont(new Font("Arial", Font.BOLD, (int) (16 * SCALE)));
-                if (p.isReady()) {
+                g2d.setFont(new Font("Arial", Font.BOLD, (int) (13 * SCALE)));
+                if (bomberInfo.isReady()) {
                     g2d.setColor(new Color(46, 204, 113));
                     g2d.drawString("Ready", x + avatarW + 30, y + 85);
                 }
@@ -275,20 +284,21 @@ public class LobbyRoomComponent extends GameComponent {
                 ImageConstant.BOMBER_AVATAR_TEMPLATE.formatted(k)));
     }
 
-    private void renderMapPreview(Graphics2D g2d, Lobby lobby) {
+    private void renderMapPreview(Graphics2D g2d, Room room) {
         g2d.setColor(new Color(30, 35, 45));
         g2d.fillRoundRect(mapPreviewArea.x, mapPreviewArea.y, mapPreviewArea.width, mapPreviewArea.height, 15, 15);
         g2d.setColor(new Color(100, 200, 255));
         g2d.setStroke(new BasicStroke(3));
         g2d.drawRoundRect(mapPreviewArea.x, mapPreviewArea.y, mapPreviewArea.width, mapPreviewArea.height, 15, 15);
 
-        BufferedImage mapImg = getMapPreview(lobby.getMapType());
+        BufferedImage mapImg = getMapPreview(room.getMap()
+                                                 .getAssetKey());
         if (mapImg != null) {
             g2d.drawImage(mapImg, mapPreviewArea.x + 5, mapPreviewArea.y + 5, mapPreviewArea.width - 10,
                           mapPreviewArea.height - 10, null);
         }
 
-        boolean isHost = isLocalHost(lobby);
+        boolean isHost = isLocalHost(room);
         if (isHost) {
             renderArrowButton(g2d, mapLeftButton, true);
             renderArrowButton(g2d, mapRightButton, false);
@@ -299,19 +309,20 @@ public class LobbyRoomComponent extends GameComponent {
         if (mapKey == null || mapKey.isBlank()) {
             return null;
         }
-        return mapPreviewCache.computeIfAbsent(mapKey,
-                                               k -> ImageLoader.loadImage(MapConstant.MAP_PATH_TEMPLATE.formatted(k)));
+        return mapPreviewCache.computeIfAbsent(mapKey, k -> ImageLoader.loadImage(
+                MapConstant.MAP_PATH_TEMPLATE.formatted(k.toLowerCase())));
     }
 
-    private void renderSkinPreview(Graphics2D g2d, Lobby lobby) {
+    private void renderSkinPreview(Graphics2D g2d, Room room) {
         g2d.setColor(new Color(30, 35, 45));
         g2d.fillRoundRect(skinPreviewArea.x, skinPreviewArea.y, skinPreviewArea.width, skinPreviewArea.height, 15, 15);
         g2d.setColor(new Color(100, 200, 255));
         g2d.setStroke(new BasicStroke(3));
         g2d.drawRoundRect(skinPreviewArea.x, skinPreviewArea.y, skinPreviewArea.width, skinPreviewArea.height, 15, 15);
 
-        PlayerInfo me = getLocalPlayer(lobby);
-        BufferedImage avatar = me != null ? getAvatar(me.getSkinType()) : null;
+        var me = getLocalPlayer(room);
+        BufferedImage avatar = me != null ? getAvatar(me.getSkin()
+                                                        .getAssetKey()) : null;
         if (avatar != null) {
             int padding = 10;
             int availW = skinPreviewArea.width - padding * 2;
@@ -342,14 +353,15 @@ public class LobbyRoomComponent extends GameComponent {
         g2d.setStroke(new BasicStroke(3));
         g2d.drawRoundRect(chatX, chatY, chatWidth, chatHeight, 15, 15);
 
-        g2d.setFont(new Font("Arial", Font.BOLD, (int) (26 * SCALE)));
+        g2d.setFont(new Font("Arial", Font.BOLD, (int) (16 * SCALE)));
         g2d.setColor(new Color(100, 200, 255));
         g2d.drawString("Chat", chatX + 20, chatY + 40);
 
         Shape oldClip = g2d.getClip();
         g2d.setClip(chatX + 10, chatY + 55, chatWidth - 20, chatHeight - 65);
 
-        List<ChatMessage> messages = networkManager.getChatMessages();
+        var messages = networkManager.getCurrentRoom()
+                                     .getChatMessages();
         int lineHeight = 28;
         int contentHeight = messages.size() * lineHeight;
         maxChatScroll = Math.max(0, contentHeight - (chatHeight - 65));
@@ -364,12 +376,12 @@ public class LobbyRoomComponent extends GameComponent {
                 continue;
             }
 
-            g2d.setFont(new Font("Arial", Font.BOLD, (int) (18 * SCALE)));
-            String sender = msg.getPlayerName();
+            g2d.setFont(new Font("Arial", Font.BOLD, (int) (12 * SCALE)));
+            String sender = msg.getOwner();
             if (sender.equals("System")) {
                 g2d.setColor(new Color(100, 200, 255));
             }
-            else if (sender.equals("You")) {
+            else if (sender.equals(networkManager.getBomberName())) {
                 g2d.setColor(new Color(46, 204, 113));
             }
             else {
@@ -377,11 +389,11 @@ public class LobbyRoomComponent extends GameComponent {
             }
             g2d.drawString(sender + ":", chatX + 20, y);
 
-            g2d.setFont(new Font("Arial", Font.PLAIN, (int) (18 * SCALE)));
+            g2d.setFont(new Font("Arial", Font.PLAIN, (int) (12 * SCALE)));
             g2d.setColor(Color.WHITE);
             int nameWidth = g2d.getFontMetrics()
                                .stringWidth(sender + ": ");
-            g2d.drawString(msg.getMessage(), chatX + 20 + nameWidth, y);
+            g2d.drawString(msg.getContent(), chatX + 20 + nameWidth, y);
         }
 
         g2d.setClip(oldClip);
@@ -410,7 +422,7 @@ public class LobbyRoomComponent extends GameComponent {
             scrollChat(notchPixels);
         }
         else {
-            if (p.x > playerPanelArea.x + playerPanelArea.width) {
+            if (p.x > bomberPanelArea.x + bomberPanelArea.width) {
                 scrollChat(notchPixels);
             }
         }
@@ -424,11 +436,11 @@ public class LobbyRoomComponent extends GameComponent {
         g2d.setStroke(new BasicStroke(3));
         g2d.drawRoundRect(chatInputBox.x, chatInputBox.y, chatInputBox.width, chatInputBox.height, 12, 12);
 
-        g2d.setFont(new Font("Arial", Font.PLAIN, (int) (22 * SCALE)));
+        g2d.setFont(new Font("Arial", Font.PLAIN, (int) (12 * SCALE)));
         String displayText = chatInput.isEmpty() ? "Type a message..." : chatInput;
         g2d.setColor(chatInput.isEmpty() ? Color.GRAY : Color.WHITE);
         g2d.drawString(displayText + (chatInputActive && !chatInput.isEmpty() ? "|" : ""), chatInputBox.x + 15,
-                       chatInputBox.y + 33);
+                       chatInputBox.y + 23);
 
         renderButton(g2d, sendButton, "Send", new Color(52, 152, 219), chatInput.isEmpty());
     }
@@ -443,7 +455,7 @@ public class LobbyRoomComponent extends GameComponent {
         g2d.setStroke(new BasicStroke(3));
         g2d.drawRoundRect(button.x, button.y, button.width, button.height, 12, 12);
 
-        g2d.setFont(new Font("Arial", Font.BOLD, (int) (24 * SCALE)));
+        g2d.setFont(new Font("Arial", Font.BOLD, (int) (13 * SCALE)));
         g2d.setColor(disabled ? Color.GRAY : Color.WHITE);
         int textWidth = g2d.getFontMetrics()
                            .stringWidth(text);
@@ -460,118 +472,55 @@ public class LobbyRoomComponent extends GameComponent {
             return;
         }
 
-        playerPanelArea.contains(e.getPoint());
+        bomberPanelArea.contains(e.getPoint());
 
-        Lobby lobby = networkManager.getCurrentLobby();
-        if (lobby != null) {
+        Room room = networkManager.getCurrentRoom();
+        if (room != null) {
             if (readyButton.contains(e.getPoint())) {
-                PlayerInfo me = getLocalPlayer(lobby);
-                if (me != null && !me.isHost()) {
+                var me = getLocalPlayer(room);
+                if (me != null && me.getId()
+                                    .equals(networkManager.getBomberId())) {
                     boolean newReady = !me.isReady();
                     if (networkManager.isConnected()) {
                         networkManager.toggleReady(newReady);
-                    }
-                    else {
-                        me.setReady(newReady);
                     }
                 }
             }
 
             if (startButton.contains(e.getPoint())) {
                 boolean allReady = true;
-                for (PlayerInfo p : lobby.getPlayers()) {
-                    if (!p.isReady()) {
+                for (var bomberInfo : room.getBomberInfos()) {
+                    if (!bomberInfo.isReady()) {
                         allReady = false;
                         break;
                     }
                 }
-                if (isLocalHost(lobby) && lobby.getPlayers()
-                                               .size() >= 1 && allReady) {
-                    if (!networkManager.isConnected()) {
-                        int missing = Math.max(0, 4 - lobby.getPlayers()
-                                                           .size());
-                        if (missing > 0) {
-                            SkinType[] skins = SkinType.values();
-                            int base = (int) (System.currentTimeMillis() % skins.length);
-                            for (int i = 0; i < missing; i++) {
-                                String pid = "bot_" + System.currentTimeMillis() + "_" + i;
-                                String pname = "Bot" + (i + 1);
-                                String skin = skins[(base + i) % skins.length].getAssetKey();
-                                lobby.getPlayers()
-                                     .add(new PlayerInfo(pid, pname, skin, true, false));
-                            }
-                            if (networkManager.getAvailableLobbies() != null) {
-                                for (Lobby l : networkManager.getAvailableLobbies()) {
-                                    if (l.getLobbyId() != null && l.getLobbyId()
-                                                                   .equals(lobby.getLobbyId())) {
-                                        int need = Math.max(0, 4 - l.getPlayers()
-                                                                    .size());
-                                        for (int i = 0; i < need; i++) {
-                                            String pid = "bot_" + System.currentTimeMillis() + "_l_" + i;
-                                            String pname = "Bot" + (i + 1);
-                                            String skin = skins[(base + i) % skins.length].getAssetKey();
-                                            l.getPlayers()
-                                             .add(new PlayerInfo(pid, pname, skin, true, false));
-                                        }
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        MapType selectedMap = MapType.DESERT_MODE;
-                        for (MapType mt : MapType.values()) {
-                            if (mt.getAssetKey()
-                                  .equalsIgnoreCase(lobby.getMapType())) {
-                                selectedMap = mt;
-                                break;
-                            }
-                        }
-                        PlayerInfo me = getLocalPlayer(lobby);
-                        SkinType mySkin = SkinType.BOZ;
-                        if (me != null) {
-                            for (SkinType s : SkinType.values()) {
-                                if (s.getAssetKey()
-                                     .equalsIgnoreCase(me.getSkinType())) {
-                                    mySkin = s;
-                                    break;
-                                }
-                            }
-                        }
-                        context.setMapType(selectedMap);
-                        context.setGameType(GameType.OFFLINE);
-                        context.setPlayerCount(PlayerCountType.ONE_PLAYER);
-                        context.setNumberBomber(1);
-                        SkinType[] skinsArr = context.getSkinType();
-                        if (skinsArr == null || skinsArr.length < 2) {
-                            skinsArr = new SkinType[2];
-                        }
-                        skinsArr[0] = mySkin;
-                        context.setSkinType(skinsArr);
-                        context.changeState(GameStateType.PLAYING);
-                    }
+                if (isLocalHost(room) && !room.getBomberInfos()
+                                              .isEmpty() && allReady) {
+                    // note
                     networkManager.startGame();
                 }
             }
 
             if (leaveButton.contains(e.getPoint())) {
-                networkManager.leaveLobby();
+                networkManager.leaveRoom();
                 OnlineState onlineState = (OnlineState) context.getGameState(GameStateType.ONLINE);
-                onlineState.setType(OnlineType.LOBBY_LIST);
+                onlineState.setType(OnlineType.ROOM_LIST);
             }
 
             if (sendButton.contains(e.getPoint()) && !chatInput.isEmpty()) {
                 sendChatMessage();
             }
 
-            if (isLocalHost(lobby)) {
+            if (isLocalHost(room)) {
                 if (mapLeftButton.contains(e.getPoint())) {
-                    cycleMap(lobby, -1);
+                    cycleMap(room, -1);
                 }
                 else if (mapRightButton.contains(e.getPoint())) {
-                    cycleMap(lobby, 1);
+                    cycleMap(room, 1);
                 }
             }
-            PlayerInfo me = getLocalPlayer(lobby);
+            var me = getLocalPlayer(room);
             if (me != null && skinLeftButton != null && skinRightButton != null) {
                 if (skinLeftButton.contains(e.getPoint())) {
                     cycleSkin(me, -1);
@@ -639,30 +588,30 @@ public class LobbyRoomComponent extends GameComponent {
         return chatInputActive;
     }
 
-    private PlayerInfo getLocalPlayer(Lobby lobby) {
-        String playerId = networkManager.getPlayerId();
-        String playerName = networkManager.getPlayerName();
-        PlayerInfo me = null;
-        if (playerId != null) {
-            for (PlayerInfo p : lobby.getPlayers()) {
-                if (playerId.equals(p.getPlayerId())) {
-                    me = p;
+    private BomberInfo getLocalPlayer(Room room) {
+        String bomberId = networkManager.getBomberId();
+        String bomberName = networkManager.getBomberName();
+        BomberInfo me = null;
+        if (bomberId != null) {
+            for (var bomberInfo : room.getBomberInfos()) {
+                if (bomberId.equals(bomberInfo.getId())) {
+                    me = bomberInfo;
                     break;
                 }
             }
         }
-        if (me == null && playerName != null) {
-            for (PlayerInfo p : lobby.getPlayers()) {
-                if (playerName.equals(p.getPlayerName())) {
-                    me = p;
+        if (me == null && bomberName != null) {
+            for (var bomberInfo : room.getBomberInfos()) {
+                if (bomberName.equals(bomberInfo.getName())) {
+                    me = bomberInfo;
                     break;
                 }
             }
         }
         if (me == null) {
-            for (PlayerInfo p : lobby.getPlayers()) {
-                if ("You".equalsIgnoreCase(p.getPlayerName()) || "you".equalsIgnoreCase(p.getPlayerId())) {
-                    me = p;
+            for (var bomberInfo : room.getBomberInfos()) {
+                if ("You".equalsIgnoreCase(bomberInfo.getName())) {
+                    me = bomberInfo;
                     break;
                 }
             }
@@ -670,53 +619,37 @@ public class LobbyRoomComponent extends GameComponent {
         return me;
     }
 
-    private boolean isLocalHost(Lobby lobby) {
-        PlayerInfo me = getLocalPlayer(lobby);
-        return me != null && me.isHost();
+    private boolean isLocalHost(Room room) {
+        var me = getLocalPlayer(room);
+        return me != null && me.getId()
+                               .equals(networkManager.getBomberId());
     }
 
-    private boolean isLocalReady(Lobby lobby) {
-        PlayerInfo me = getLocalPlayer(lobby);
+    private boolean isLocalReady(Room room) {
+        var me = getLocalPlayer(room);
         return me != null && me.isReady();
     }
 
-    private void cycleMap(Lobby lobby, int dir) {
-        MapType[] values = MapType.values();
-        int idx = 0;
-        for (int i = 0; i < values.length; i++) {
-            if (values[i].getAssetKey()
-                         .equalsIgnoreCase(lobby.getMapType())) {
-                idx = i;
-                break;
-            }
-        }
-        int next = (idx + dir + values.length) % values.length;
-        String nextKey = values[next].getAssetKey();
-        if (networkManager.isConnected()) {
-            networkManager.changeMap(nextKey);
-        }
-        else {
-            lobby.setMapType(nextKey);
-        }
+    private void cycleMap(Room room, int dir) {
+        cycle(room.getMap(), dir, MapType.values(), networkManager::changeMap);
     }
 
-    private void cycleSkin(PlayerInfo me, int dir) {
-        SkinType[] values = SkinType.values();
+    private void cycleSkin(BomberInfo me, int dir) {
+        cycle(me.getSkin(), dir, SkinType.values(), networkManager::changeSkin);
+    }
+
+    private <E extends Enum<E>> void cycle(E current, int dir, E[] values, Consumer<E> action) {
         int idx = 0;
         for (int i = 0; i < values.length; i++) {
-            if (values[i].getAssetKey()
-                         .equalsIgnoreCase(me.getSkinType())) {
+            if (values[i] == current) {
                 idx = i;
                 break;
             }
         }
+
         int next = (idx + dir + values.length) % values.length;
-        String nextKey = values[next].getAssetKey();
         if (networkManager.isConnected()) {
-            networkManager.changeSkin(nextKey);
-        }
-        else {
-            me.setSkinType(nextKey);
+            action.accept(values[next]);
         }
     }
 

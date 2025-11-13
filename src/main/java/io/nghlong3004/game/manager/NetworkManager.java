@@ -1,8 +1,16 @@
 package io.nghlong3004.game.manager;
 
+import io.nghlong3004.model.BomberInfo;
+import io.nghlong3004.model.NetworkMessage;
+import io.nghlong3004.model.Room;
+import io.nghlong3004.model.request.ChatMessageRequest;
+import io.nghlong3004.model.request.CreateRoomRequest;
+import io.nghlong3004.model.request.JoinRoomRequest;
+import io.nghlong3004.model.type.MapType;
 import io.nghlong3004.model.type.MessageType;
-import io.nghlong3004.websocket.WebSocketClient;
-import io.nghlong3004.websocket.model.*;
+import io.nghlong3004.model.type.SkinType;
+import io.nghlong3004.websocket.BomberWebSocketClient;
+import io.nghlong3004.websocket.MessageHandler;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 @Slf4j
 public class NetworkManager {
@@ -18,35 +25,32 @@ public class NetworkManager {
     @Getter
     private static final NetworkManager instance = new NetworkManager();
 
-    private WebSocketClient client;
-    private String serverUrl;
     @Getter
-    private String playerId;
+    private BomberWebSocketClient client;
     @Getter
-    private String playerName;
+    private String bomberId;
+    @Getter
+    private String bomberName;
     @Setter
     @Getter
-    private Lobby currentLobby;
+    private Room currentRoom;
     @Getter
-    private List<Lobby> availableLobbies;
-    @Getter
-    private final List<ChatMessage> chatMessages;
+    @Setter
+    private List<Room> availableRooms;
 
-    @Setter
-    private Consumer<NetworkMessage> messageHandler;
+    private final MessageHandler messageHandler;
 
     private NetworkManager() {
-        this.availableLobbies = new ArrayList<>();
-        this.chatMessages = new ArrayList<>();
+        this.availableRooms = new ArrayList<>();
+        this.messageHandler = new MessageHandler(this);
     }
 
     public void connect(String serverUrl, String playerName) {
-        this.serverUrl = serverUrl;
-        this.playerName = playerName;
+        this.bomberName = playerName;
 
         try {
             URI serverUri = new URI(serverUrl);
-            client = new WebSocketClient(serverUri);
+            client = new BomberWebSocketClient(serverUri);
             client.connectBlocking();
             log.info("Connected to server: {}", serverUrl);
         } catch (Exception e) {
@@ -68,174 +72,63 @@ public class NetworkManager {
 
         while (client.hasMessages()) {
             NetworkMessage message = client.pollMessage();
-            handleMessage(message);
+            messageHandler.handle(message);
         }
     }
 
-    private void handleMessage(NetworkMessage message) {
-        log.debug("Handling message: {}", message.getType());
-
-        switch (message.getType()) {
-            case CONNECT:
-                handleConnect(message);
-                break;
-            case LOBBY_LIST:
-                handleLobbyList(message);
-                break;
-            case LOBBY_UPDATE:
-                handleLobbyUpdate(message);
-                break;
-            case CHAT_MESSAGE:
-                handleChatMessage(message);
-                break;
-            case START_GAME:
-                handleStartGame(message);
-                break;
-            case GAME_STATE_UPDATE:
-                handleGameStateUpdate(message);
-                break;
-            case ERROR:
-                handleError(message);
-                break;
-            default:
-                log.warn("Unhandled message type: {}", message.getType());
-        }
-
-        if (messageHandler != null) {
-            messageHandler.accept(message);
-        }
-    }
-
-    private void handleConnect(NetworkMessage message) {
-        this.playerId = (String) message.getData();
-        client.setPlayerId(playerId);
-        log.info("Player ID assigned: {}", playerId);
-    }
-
-    private void handleLobbyList(NetworkMessage message) {
-        List<Lobby> lobbies = (List<Lobby>) message.getData();
-        this.availableLobbies = lobbies;
-        if (this.availableLobbies == null) {
-            this.availableLobbies = new ArrayList<>();
-        }
-        log.info("Received {} lobbies", this.availableLobbies.size());
-    }
-
-    private void handleLobbyUpdate(NetworkMessage message) {
-        Lobby lobby = (Lobby) message.getData();
-        this.currentLobby = lobby;
-        log.info("Lobby updated: {}", lobby.getLobbyName());
-    }
-
-    private void handleChatMessage(NetworkMessage message) {
-        ChatMessage chatMessage = (ChatMessage) message.getData();
-        chatMessages.add(chatMessage);
-        log.debug("Chat message from {}: {}", chatMessage.getPlayerName(), chatMessage.getMessage());
-    }
-
-    private void handleStartGame(NetworkMessage message) {
-        log.info("Game starting!");
-    }
-
-    private void handleGameStateUpdate(NetworkMessage message) {
-        log.debug("Game state updated");
-    }
-
-    private void handleError(NetworkMessage message) {
-        log.error("Server error: {}", message.getData());
-    }
-
-    public void createLobby(String lobbyName, int maxPlayers, String mapType) {
-        NetworkMessage message = new NetworkMessage(MessageType.CREATE_LOBBY,
-                                                    new Object[]{lobbyName, maxPlayers, mapType, playerId});
+    public void createRoom(String roomName, int maxBombers, MapType mapType, SkinType skinType) {
+        var createRoomResponse = new CreateRoomRequest(bomberId, bomberName, roomName, maxBombers, mapType, skinType);
+        var message = new NetworkMessage(MessageType.CREATE_ROOM, client.getGson()
+                                                                        .toJson(createRoomResponse));
         if (client != null && client.isConnected()) {
             client.sendMessage(message);
         }
         else {
-            log.debug("Client not connected; createLobby ignored (offline mode)");
+            log.debug("Client not connected; createRoom ignored (offline mode)");
         }
     }
 
-    public void joinLobby(String lobbyId) {
-        NetworkMessage message = new NetworkMessage(MessageType.JOIN_LOBBY, lobbyId);
+    public void joinRoom(String roomId) {
+        BomberInfo bomberInfo = new BomberInfo(bomberId, bomberName, SkinType.BOZ, false);
+        JoinRoomRequest joinRoomRequest = new JoinRoomRequest(roomId, bomberInfo);
+        var message = new NetworkMessage(MessageType.JOIN_ROOM, client.getGson()
+                                                                      .toJson(joinRoomRequest));
         if (client != null && client.isConnected()) {
             client.sendMessage(message);
         }
         else {
-            log.debug("Client not connected; joinLobby ignored (offline mode)");
+            log.debug("Client not connected; joinRoom ignored (offline mode)");
         }
     }
 
-    public void leaveLobby() {
-        NetworkMessage message = new NetworkMessage(MessageType.LEAVE_LOBBY, null);
+    public void leaveRoom() {
+        var message = new NetworkMessage(MessageType.LEAVE_ROOM, "%s leave room".formatted(bomberName));
         if (client != null && client.isConnected()) {
             client.sendMessage(message);
         }
         else {
-            log.debug("Client not connected; leaving lobby locally");
-            if (currentLobby != null) {
-                String lobbyId = currentLobby.getLobbyId();
-                Lobby listLobby = null;
-                for (Lobby l : availableLobbies) {
-                    if (l.getLobbyId() != null && l.getLobbyId()
-                                                   .equals(lobbyId)) {
-                        listLobby = l;
-                        break;
-                    }
-                }
-                if (listLobby != null) {
-                    PlayerInfo leaving = null;
-                    for (PlayerInfo p : listLobby.getPlayers()) {
-                        if ((playerId != null && playerId.equals(
-                                p.getPlayerId())) || (playerName != null && playerName.equals(
-                                p.getPlayerName())) || "you".equalsIgnoreCase(
-                                p.getPlayerId()) || "you".equalsIgnoreCase(p.getPlayerName())) {
-                            leaving = p;
-                            break;
-                        }
-                    }
-                    if (leaving != null) {
-                        boolean wasHost = leaving.isHost() || (listLobby.getHostId() != null && listLobby.getHostId()
-                                                                                                         .equals(leaving.getPlayerId()));
-                        listLobby.getPlayers()
-                                 .remove(leaving);
-                        if (listLobby.getPlayers()
-                                     .isEmpty()) {
-                            availableLobbies.remove(listLobby);
-                        }
-                        else if (wasHost) {
-                            PlayerInfo newHost = listLobby.getPlayers()
-                                                          .getFirst();
-                            listLobby.setHostId(newHost.getPlayerId());
-                            for (PlayerInfo p : listLobby.getPlayers()) {
-                                p.setHost(p == newHost);
-                            }
-                        }
-                    }
-                }
-            }
+            log.debug("Offline can't leave");
         }
-        currentLobby = null;
+        currentRoom = null;
     }
 
     public void sendChatMessage(String text) {
-        if (text == null || text.isBlank()) {
+        if (text == null || text.isBlank() || this.currentRoom == null) {
             return;
         }
-        String name = (playerName == null || playerName.isBlank()) ? "You" : playerName;
-        ChatMessage chatMessage = new ChatMessage(name, text);
+        var chatMessageRequest = new ChatMessageRequest(this.currentRoom.getId(), bomberName, text);
         if (client != null && client.isConnected()) {
-            NetworkMessage message = new NetworkMessage(MessageType.CHAT_MESSAGE, chatMessage);
+            var message = new NetworkMessage(MessageType.CHAT_MESSAGE, client.getGson()
+                                                                             .toJson(chatMessageRequest));
             client.sendMessage(message);
         }
         else {
-            chatMessages.add(chatMessage);
-            log.debug("Offline chat message: {}: {}", name, text);
+            log.debug("Offline");
         }
     }
 
-    public void sendGameAction(GameAction action) {
-        NetworkMessage message = new NetworkMessage(MessageType.PLAYER_MOVE, action);
+    public void sendGameAction() {
+        var message = new NetworkMessage(MessageType.PLAYER_MOVE, null);
         if (client != null && client.isConnected()) {
             client.sendMessage(message);
         }
@@ -245,7 +138,7 @@ public class NetworkManager {
     }
 
     public void startGame() {
-        NetworkMessage message = new NetworkMessage(MessageType.START_GAME, null);
+        var message = new NetworkMessage(MessageType.START_GAME, null);
         if (client != null && client.isConnected()) {
             client.sendMessage(message);
         }
@@ -255,64 +148,36 @@ public class NetworkManager {
     }
 
     public void toggleReady(boolean ready) {
-        NetworkMessage message = new NetworkMessage(MessageType.UPDATE_READY, ready);
+        var message = new NetworkMessage(MessageType.UPDATE_READY, client.getGson()
+                                                                         .toJson(ready));
         if (client != null && client.isConnected()) {
             client.sendMessage(message);
-        }
-        else {
-            if (currentLobby != null) {
-                for (PlayerInfo p : currentLobby.getPlayers()) {
-                    if ((playerId != null && playerId.equals(
-                            p.getPlayerId())) || (playerName != null && playerName.equals(
-                            p.getPlayerName())) || "you".equalsIgnoreCase(p.getPlayerId()) || "You".equalsIgnoreCase(
-                            p.getPlayerName())) {
-                        p.setReady(ready);
-                        break;
-                    }
-                }
-            }
         }
     }
 
-    public void changeSkin(String skinKey) {
-        NetworkMessage message = new NetworkMessage(MessageType.UPDATE_SKIN, skinKey);
+    public void changeSkin(SkinType skinType) {
+        var message = new NetworkMessage(MessageType.UPDATE_SKIN, client.getGson()
+                                                                        .toJson(skinType));
         if (client != null && client.isConnected()) {
             client.sendMessage(message);
-        }
-        else {
-            if (currentLobby != null) {
-                for (PlayerInfo p : currentLobby.getPlayers()) {
-                    if ((playerId != null && playerId.equals(
-                            p.getPlayerId())) || (playerName != null && playerName.equals(
-                            p.getPlayerName())) || "you".equalsIgnoreCase(p.getPlayerId()) || "You".equalsIgnoreCase(
-                            p.getPlayerName())) {
-                        p.setSkinType(skinKey);
-                        break;
-                    }
-                }
-            }
         }
     }
 
-    public void changeMap(String mapKey) {
-        NetworkMessage message = new NetworkMessage(MessageType.UPDATE_MAP, mapKey);
+    public void changeMap(MapType mapType) {
+        var message = new NetworkMessage(MessageType.UPDATE_MAP, client.getGson()
+                                                                       .toJson(mapType));
         if (client != null && client.isConnected()) {
             client.sendMessage(message);
-        }
-        else {
-            if (currentLobby != null) {
-                currentLobby.setMapType(mapKey);
-            }
         }
     }
 
-    public void requestLobbyList() {
-        NetworkMessage message = new NetworkMessage(MessageType.LOBBY_LIST, null);
+    public void requestRoomList() {
+        var message = new NetworkMessage(MessageType.ROOM_LIST, null);
         if (client != null && client.isConnected()) {
             client.sendMessage(message);
         }
         else {
-            log.debug("Client not connected; requestLobbyList ignored (offline mode)");
+            log.debug("Client not connected; requestRoomList ignored");
         }
     }
 
@@ -320,7 +185,8 @@ public class NetworkManager {
         return client != null && client.isConnected();
     }
 
-    public void clearChatMessages() {
-        chatMessages.clear();
+    public void setBomberId(String bomberId) {
+        this.bomberId = bomberId;
+        client.setBomberId(bomberId);
     }
 }

@@ -379,20 +379,19 @@ public class RoomComponent extends GameComponent {
             g2d.setFont(new Font("Arial", Font.BOLD, (int) (12 * SCALE)));
             String sender = msg.getOwner();
             if (sender.equals("System")) {
-                g2d.setColor(new Color(100, 200, 255));
+                g2d.setColor(Color.DARK_GRAY);
             }
             else if (sender.equals(networkManager.getBomberName())) {
-                g2d.setColor(new Color(46, 204, 113));
-            }
-            else {
                 g2d.setColor(new Color(255, 215, 0));
             }
+            else {
+                g2d.setColor(Color.WHITE);
+            }
             g2d.drawString(sender + ":", chatX + 20, y);
-
-            g2d.setFont(new Font("Arial", Font.PLAIN, (int) (12 * SCALE)));
-            g2d.setColor(Color.WHITE);
             int nameWidth = g2d.getFontMetrics()
                                .stringWidth(sender + ": ");
+            g2d.setFont(new Font("Arial", Font.PLAIN, (int) (12 * SCALE)));
+            g2d.setColor(Color.WHITE);
             g2d.drawString(msg.getContent(), chatX + 20 + nameWidth, y);
         }
 

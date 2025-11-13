@@ -78,7 +78,7 @@ public class CreateRoomDialog {
 
         this.skinButtons = new Rectangle[this.availableSkins.length];
         int skinButtonWidth = (int) (dialogWidth / (this.availableSkins.length + 1));
-        int skinButtonHeight = (int) (60 * SCALE);
+        int skinButtonHeight = (int) (80 * SCALE);
         int skinStartX = dialogX + (skinButtonWidth / (this.availableSkins.length + 1));
         int skinY = mapY + mapButtonHeight * 3 / 2;
         this.skinImages = new BufferedImage[this.availableSkins.length];

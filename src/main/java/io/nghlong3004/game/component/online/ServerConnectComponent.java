@@ -16,15 +16,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.nghlong3004.constant.GameConstant.*;
-import static io.nghlong3004.constant.ImageConstant.BUTTON;
-import static io.nghlong3004.constant.ImageConstant.BUTTON_TOUCH;
+import static io.nghlong3004.constant.ImageConstant.*;
 
 public class ServerConnectComponent extends GameComponent {
 
     private final NetworkManager networkManager;
     private final Configuration configuration;
     private int selectedServerIndex;
-    private String playerName;
+    private String bomberName;
     private volatile boolean connecting;
     private volatile long connectStartTime;
     private volatile String errorMessage;
@@ -34,6 +33,7 @@ public class ServerConnectComponent extends GameComponent {
 
     private BufferedImage buttonImage;
     private BufferedImage buttonTouchImage;
+    private BufferedImage background;
 
     private Rectangle connectButton;
     private Rectangle backButton;
@@ -51,7 +51,7 @@ public class ServerConnectComponent extends GameComponent {
         super(context);
         this.networkManager = NetworkManager.getInstance();
         this.configuration = Configuration.getInstance();
-        this.playerName = "";
+        this.bomberName = "";
         this.connecting = false;
         this.connectStartTime = 0L;
         this.errorExpireAt = 0L;
@@ -68,6 +68,7 @@ public class ServerConnectComponent extends GameComponent {
     private void loadImages() {
         buttonImage = ImageLoader.loadImage(BUTTON);
         buttonTouchImage = ImageLoader.loadImage(BUTTON_TOUCH);
+        background = ImageLoader.loadImage(ONLINE_BACKGROUND);
     }
 
     private void initializeComponents() {
@@ -115,40 +116,23 @@ public class ServerConnectComponent extends GameComponent {
     @Override
     public void render(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        g2d.setColor(new Color(20, 25, 35));
-        g2d.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-
-        g2d.setFont(new Font("Arial", Font.BOLD, (int) (48 * SCALE)));
-        g2d.setColor(new Color(100, 200, 255));
-        String title = "Boom Battle Online";
-        int titleWidth = g2d.getFontMetrics()
-                            .stringWidth(title);
-        g2d.drawString(title, GAME_WIDTH / 2 - titleWidth / 2, (int) (100 * SCALE));
-
-        g2d.setFont(new Font("Arial", Font.PLAIN, (int) (20 * SCALE)));
-        g2d.setColor(Color.LIGHT_GRAY);
-        String subtitle = "Select a server and enter your name";
-        int subtitleWidth = g2d.getFontMetrics()
-                               .stringWidth(subtitle);
-        g2d.drawString(subtitle, GAME_WIDTH / 2 - subtitleWidth / 2, (int) (150 * SCALE));
-
+        g.drawImage(background, 0, 0, GAME_WIDTH, GAME_HEIGHT, null);
         renderServerSelector(g2d);
 
-        renderInputBox(g2d, nameInputBox, playerName.isEmpty() ? "Enter your name" : playerName, nameInputActive,
-                       playerName.isEmpty());
+        renderInputBox(g2d, nameInputBox, bomberName.isEmpty() ? "Enter your name" : bomberName, nameInputActive,
+                       bomberName.isEmpty());
 
         renderImageButton(g2d, connectButton, "Connect", connectHovered, connecting);
         renderImageButton(g2d, backButton, "Back", backHovered, connecting);
 
         if (errorMessage != null) {
             g2d.setFont(new Font("Arial", Font.BOLD, (int) (20 * SCALE)));
-            g2d.setColor(new Color(231, 76, 60));
+            g2d.setColor(Color.decode("#7C8483"));
             int errorWidth = g2d.getFontMetrics()
                                 .stringWidth(errorMessage);
-            g2d.fillRoundRect(GAME_WIDTH - errorWidth - 10 >>> 1, GAME_HEIGHT >>> 1, errorWidth + 40, 50, 10, 10);
+            g2d.fillRoundRect(GAME_WIDTH - errorWidth - 10 >>> 1, (int) (GAME_HEIGHT - 40 * SCALE) / 2, errorWidth + 5,
+                              50, 10, 10);
             g2d.setColor(Color.WHITE);
             g2d.drawString(errorMessage, GAME_WIDTH - errorWidth >>> 1, GAME_HEIGHT >>> 1);
         }
@@ -287,15 +271,15 @@ public class ServerConnectComponent extends GameComponent {
     }
 
     private void tryConnect() {
-        if (playerName.trim()
+        if (bomberName.trim()
                       .isEmpty()) {
             errorMessage = "Please enter your name!";
             return;
         }
 
-        if (playerName.trim()
+        if (bomberName.trim()
                       .length() < 2) {
-            errorMessage = "Player name must be at least 2 characters!";
+            errorMessage = "Name must be at least 2 characters!";
             return;
         }
 
@@ -314,7 +298,7 @@ public class ServerConnectComponent extends GameComponent {
     private Thread getThread(String serverUrl) {
         Thread t = new Thread(() -> {
             try {
-                networkManager.connect(serverUrl, playerName.trim());
+                networkManager.connect(serverUrl, bomberName.trim());
                 if (cancelConnect) {
                     if (networkManager.isConnected()) {
                         networkManager.disconnect();
@@ -322,7 +306,7 @@ public class ServerConnectComponent extends GameComponent {
                     return;
                 }
                 if (!networkManager.isConnected()) {
-                    showTransientError("Could not connect to server", 500);
+                    showTransientError("Could not connect to server");
                     connecting = false;
                     connectThread = null;
                 }
@@ -334,9 +318,9 @@ public class ServerConnectComponent extends GameComponent {
         return t;
     }
 
-    private void showTransientError(String msg, long durationMs) {
+    private void showTransientError(String msg) {
         errorMessage = msg;
-        errorExpireAt = System.currentTimeMillis() + Math.max(0, durationMs);
+        errorExpireAt = System.currentTimeMillis() + 400;
     }
 
     public void cancelConnecting() {
@@ -354,7 +338,6 @@ public class ServerConnectComponent extends GameComponent {
         if (networkManager.isConnected()) {
             networkManager.disconnect();
         }
-        showTransientError("Connection cancelled", 3000);
     }
 
     private void renderConnectingAnimation(Graphics2D g2d) {
@@ -367,7 +350,7 @@ public class ServerConnectComponent extends GameComponent {
         g2d.setColor(new Color(100, 200, 255));
         int textWidth = g2d.getFontMetrics()
                            .stringWidth(sb.toString());
-        int y = connectButton.y + connectButton.height + (int) (40 * SCALE);
+        int y = GAME_HEIGHT >>> 1;
         g2d.drawString(sb.toString(), GAME_WIDTH / 2 - textWidth / 2, y);
 
         int spinnerSize = (int) (40 * SCALE);
@@ -380,14 +363,17 @@ public class ServerConnectComponent extends GameComponent {
     }
 
     public void addCharToName(char c) {
-        if (nameInputActive && playerName.length() < 20) {
-            playerName += c;
+        if (nameInputActive && bomberName.length() < 14) {
+            bomberName += c;
+        }
+        else if (nameInputActive) {
+            showTransientError("Name must be less than 14 characters!");
         }
     }
 
     public void removeCharFromName() {
-        if (nameInputActive && !playerName.isEmpty()) {
-            playerName = playerName.substring(0, playerName.length() - 1);
+        if (nameInputActive && !bomberName.isEmpty()) {
+            bomberName = bomberName.substring(0, bomberName.length() - 1);
         }
     }
 

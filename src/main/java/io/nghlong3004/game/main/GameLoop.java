@@ -76,7 +76,6 @@ public class GameLoop implements Runnable {
 
     private void displayFPSandUPS() {
         if (secondDelta >= 1.0) {
-            log.debug("FPS: {}, UPS: {}", frameCount, updateCount);
             --secondDelta;
             frameCount = 0;
             updateCount = 0;

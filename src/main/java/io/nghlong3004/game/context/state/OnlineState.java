@@ -1,14 +1,14 @@
 package io.nghlong3004.game.context.state;
 
 import io.nghlong3004.game.component.GameComponent;
-import io.nghlong3004.game.component.online.LobbyListComponent;
-import io.nghlong3004.game.component.online.LobbyRoomComponent;
+import io.nghlong3004.game.component.online.RoomComponent;
+import io.nghlong3004.game.component.online.RoomListComponent;
 import io.nghlong3004.game.component.online.ServerConnectComponent;
 import io.nghlong3004.game.context.GameContext;
 import io.nghlong3004.game.manager.NetworkManager;
-import io.nghlong3004.model.type.*;
-import io.nghlong3004.websocket.model.Lobby;
-import io.nghlong3004.websocket.model.PlayerInfo;
+import io.nghlong3004.model.BomberInfo;
+import io.nghlong3004.model.Room;
+import io.nghlong3004.model.type.OnlineType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -31,57 +31,16 @@ public class OnlineState implements GameState {
         this.componentMap = new EnumMap<>(OnlineType.class);
         loadComponents();
         this.type = OnlineType.SERVER_CONNECT;
-        NetworkManager.getInstance()
-                      .setMessageHandler(msg -> {
-                          if (msg.getType() == MessageType.START_GAME) {
-                              LobbyRoomComponent lobbyRoom = (LobbyRoomComponent) componentMap.get(
-                                      OnlineType.LOBBY_ROOM);
-                              NetworkManager nm = NetworkManager.getInstance();
-                              Lobby lobby = nm.getCurrentLobby();
-                              if (lobby != null) {
-                                  MapType selectedMap = MapType.DESERT_MODE;
-                                  for (MapType mt : MapType.values()) {
-                                      if (mt.getAssetKey()
-                                            .equalsIgnoreCase(lobby.getMapType())) {
-                                          selectedMap = mt;
-                                          break;
-                                      }
-                                  }
-                                  context.setMapType(selectedMap);
-                                  context.setGameType(GameType.ONLINE);
-                                  context.setPlayerCount(PlayerCountType.ONE_PLAYER);
-                                  context.setNumberBomber(1);
-                                  SkinType[] skinsArr = context.getSkinType();
-                                  if (skinsArr == null || skinsArr.length < 2) {
-                                      skinsArr = new SkinType[2];
-                                  }
-                                  PlayerInfo me = lobbyRoom != null ? getLocal(nm, lobby) : null;
-                                  SkinType mySkin = SkinType.BOZ;
-                                  if (me != null) {
-                                      for (SkinType s : SkinType.values()) {
-                                          if (s.getAssetKey()
-                                               .equalsIgnoreCase(me.getSkinType())) {
-                                              mySkin = s;
-                                              break;
-                                          }
-                                      }
-                                  }
-                                  skinsArr[0] = mySkin;
-                                  context.setSkinType(skinsArr);
-                                  context.changeState(GameStateType.PLAYING);
-                              }
-                          }
-                      });
     }
 
-    private PlayerInfo getLocal(NetworkManager nm, Lobby lobby) {
-        String playerId = nm.getPlayerId();
-        String playerName = nm.getPlayerName();
-        for (PlayerInfo p : lobby.getPlayers()) {
-            if ((playerId != null && playerId.equals(p.getPlayerId())) || (playerName != null && playerName.equals(
-                    p.getPlayerName())) || "you".equalsIgnoreCase(p.getPlayerId()) || "you".equalsIgnoreCase(
-                    p.getPlayerName())) {
-                return p;
+    private BomberInfo getLocal(NetworkManager nm, Room lobby) {
+        String playerId = nm.getBomberId();
+        String playerName = nm.getBomberName();
+        for (var bomberInfo : lobby.getBomberInfos()) {
+            if ((playerId != null && playerId.equals(bomberInfo.getId())) || (playerName != null && playerName.equals(
+                    bomberInfo.getName())) || "you".equalsIgnoreCase(bomberInfo.getId()) || "you".equalsIgnoreCase(
+                    bomberInfo.getName())) {
+                return bomberInfo;
             }
         }
         return null;
@@ -89,13 +48,12 @@ public class OnlineState implements GameState {
 
     private void loadComponents() {
         componentMap.put(OnlineType.SERVER_CONNECT, new ServerConnectComponent(context));
-        componentMap.put(OnlineType.LOBBY_LIST, new LobbyListComponent(context));
-        componentMap.put(OnlineType.LOBBY_ROOM, new LobbyRoomComponent(context));
+        componentMap.put(OnlineType.ROOM_LIST, new RoomListComponent(context));
+        componentMap.put(OnlineType.ROOM, new RoomComponent(context));
     }
 
     @Override
     public void update() {
-        // Centralize network message pumping here so components stay UI-focused
         NetworkManager.getInstance()
                       .update();
         GameComponent component = componentMap.get(type);
@@ -165,8 +123,8 @@ public class OnlineState implements GameState {
                 }
             }
         }
-        else if (type == OnlineType.LOBBY_LIST) {
-            LobbyListComponent lobbyList = (LobbyListComponent) componentMap.get(OnlineType.LOBBY_LIST);
+        else if (type == OnlineType.ROOM_LIST) {
+            RoomListComponent lobbyList = (RoomListComponent) componentMap.get(OnlineType.ROOM_LIST);
             if (lobbyList.isDialogInputActive()) {
                 if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
                     lobbyList.removeCharFromDialog();
@@ -176,8 +134,8 @@ public class OnlineState implements GameState {
                 }
             }
         }
-        else if (type == OnlineType.LOBBY_ROOM) {
-            LobbyRoomComponent lobbyRoom = (LobbyRoomComponent) componentMap.get(OnlineType.LOBBY_ROOM);
+        else if (type == OnlineType.ROOM) {
+            RoomComponent lobbyRoom = (RoomComponent) componentMap.get(OnlineType.ROOM);
             if (lobbyRoom.isChatActive()) {
                 if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
                     lobbyRoom.removeCharFromChat();
@@ -207,8 +165,8 @@ public class OnlineState implements GameState {
     }
 
     public void handleMouseWheel(int amount, Point p) {
-        if (type == OnlineType.LOBBY_ROOM) {
-            LobbyRoomComponent lobbyRoom = (LobbyRoomComponent) componentMap.get(OnlineType.LOBBY_ROOM);
+        if (type == OnlineType.ROOM) {
+            RoomComponent lobbyRoom = (RoomComponent) componentMap.get(OnlineType.ROOM);
             if (lobbyRoom != null) {
                 lobbyRoom.handleWheel(amount, p);
             }

@@ -129,7 +129,7 @@ public class GameContext implements GameLogic, KeyboardAdapter, MouseAdapter, Mo
             GameState gs = getGameState(GameStateType.ONLINE);
             if (gs instanceof OnlineState onlineState) {
                 int rotation = e.getWheelRotation();
-                if (onlineState.getType() == OnlineType.LOBBY_ROOM) {
+                if (onlineState.getType() == OnlineType.ROOM) {
                     int amount = rotation * 25;
                     onlineState.handleMouseWheel(amount, e.getPoint());
                 }

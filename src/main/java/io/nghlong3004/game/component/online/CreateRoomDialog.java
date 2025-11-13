@@ -10,20 +10,19 @@ import lombok.Getter;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
 
 import static io.nghlong3004.constant.GameConstant.*;
 import static io.nghlong3004.constant.ImageConstant.BUTTON;
 import static io.nghlong3004.constant.ImageConstant.BUTTON_TOUCH;
 
-public class CreateLobbyDialog {
+public class CreateRoomDialog {
 
-    private final String[] availableMaps;
+    private final MapType[] availableMaps;
 
-    private final String[] availableSkins;
+    private final SkinType[] availableSkins;
 
     private final Rectangle dialogBox;
-    private final Rectangle lobbyNameInputBox;
+    private final Rectangle roomNameInputBox;
     private final Rectangle createButton;
     private final Rectangle cancelButton;
     private final Rectangle[] mapButtons;
@@ -31,7 +30,8 @@ public class CreateLobbyDialog {
     private final BufferedImage[] mapImages;
     private final BufferedImage[] skinImages;
 
-    private String lobbyName = "";
+    @Getter
+    private String roomName = "";
     private int selectedMapIndex = 0;
     private int selectedSkinIndex = 0;
     private boolean nameInputActive = false;
@@ -46,13 +46,9 @@ public class CreateLobbyDialog {
     private java.awt.image.BufferedImage buttonImage;
     private java.awt.image.BufferedImage buttonTouchImage;
 
-    public CreateLobbyDialog() {
-        this.availableMaps = Arrays.stream(MapType.values())
-                                   .map(MapType::getAssetKey)
-                                   .toArray(String[]::new);
-        this.availableSkins = Arrays.stream(SkinType.values())
-                                    .map(SkinType::getAssetKey)
-                                    .toArray(String[]::new);
+    public CreateRoomDialog() {
+        this.availableMaps = MapType.values();
+        this.availableSkins = SkinType.values();
         int dialogWidth = (int) (GAME_WIDTH * 0.6);
         int dialogHeight = (int) (GAME_HEIGHT * 0.8);
         int dialogX = (GAME_WIDTH - dialogWidth) / 2;
@@ -64,7 +60,7 @@ public class CreateLobbyDialog {
         int inputHeight = (int) (30 * SCALE);
         int inputX = GAME_WIDTH - inputWidth >>> 1;
         int inputY = dialogY + 30;
-        this.lobbyNameInputBox = new Rectangle(inputX, inputY, inputWidth, inputHeight);
+        this.roomNameInputBox = new Rectangle(inputX, inputY, inputWidth, inputHeight);
 
         this.mapButtons = new Rectangle[this.availableMaps.length];
         int mapButtonWidth = (int) (dialogWidth / (this.availableMaps.length + 1));
@@ -76,7 +72,8 @@ public class CreateLobbyDialog {
             this.mapButtons[i] = new Rectangle(
                     mapStartX + i * (mapButtonWidth + mapButtonWidth / (this.availableMaps.length + 1)), mapY,
                     mapButtonWidth, mapButtonHeight);
-            this.mapImages[i] = ImageLoader.loadImage(MapConstant.MAP_PATH_TEMPLATE.formatted(this.availableMaps[i]));
+            this.mapImages[i] = ImageLoader.loadImage(
+                    MapConstant.MAP_PATH_TEMPLATE.formatted(this.availableMaps[i].getAssetKey()));
         }
 
         this.skinButtons = new Rectangle[this.availableSkins.length];
@@ -90,7 +87,7 @@ public class CreateLobbyDialog {
                     skinStartX + i * (skinButtonWidth + (skinButtonWidth / (this.availableSkins.length + 1))), skinY,
                     skinButtonWidth, skinButtonHeight);
             this.skinImages[i] = ImageLoader.loadImage(
-                    ImageConstant.BOMBER_AVATAR_TEMPLATE.formatted(availableSkins[i]));
+                    ImageConstant.BOMBER_AVATAR_TEMPLATE.formatted(availableSkins[i].getAssetKey()));
         }
 
         int buttonWidth = (int) (120 * SCALE);
@@ -110,7 +107,7 @@ public class CreateLobbyDialog {
 
     public void show() {
         visible = true;
-        lobbyName = "";
+        roomName = "";
         selectedMapIndex = 0;
         selectedSkinIndex = 0;
         nameInputActive = false;
@@ -143,25 +140,25 @@ public class CreateLobbyDialog {
 
         renderImageButton(g2d, cancelButton, "Cancel", cancelHovered, false);
 
-        renderImageButton(g2d, createButton, "Create", createHovered, lobbyName.trim()
-                                                                               .isEmpty());
+        renderImageButton(g2d, createButton, "Create", createHovered, roomName.trim()
+                                                                              .isEmpty());
     }
 
     private void renderInputBox(Graphics2D g2d) {
         g2d.setColor(nameInputActive ? new Color(45, 52, 65) : new Color(35, 40, 50));
-        g2d.fillRoundRect(lobbyNameInputBox.x, lobbyNameInputBox.y, lobbyNameInputBox.width, lobbyNameInputBox.height,
-                          12, 12);
+        g2d.fillRoundRect(roomNameInputBox.x, roomNameInputBox.y, roomNameInputBox.width, roomNameInputBox.height, 12,
+                          12);
 
         g2d.setColor(nameInputActive ? new Color(100, 200, 255) : new Color(80, 90, 100));
         g2d.setStroke(new BasicStroke(3));
-        g2d.drawRoundRect(lobbyNameInputBox.x, lobbyNameInputBox.y, lobbyNameInputBox.width, lobbyNameInputBox.height,
-                          12, 12);
+        g2d.drawRoundRect(roomNameInputBox.x, roomNameInputBox.y, roomNameInputBox.width, roomNameInputBox.height, 12,
+                          12);
 
         g2d.setFont(new Font("Arial", Font.PLAIN, (int) (24 * SCALE)));
-        String displayText = lobbyName.isEmpty() ? "Enter lobby name..." : lobbyName;
-        g2d.setColor(lobbyName.isEmpty() ? Color.GRAY : Color.WHITE);
-        g2d.drawString(displayText + (nameInputActive && !lobbyName.isEmpty() ? "|" : ""), lobbyNameInputBox.x + 15,
-                       lobbyNameInputBox.y + 33);
+        String displayText = roomName.isEmpty() ? "Enter room name..." : roomName;
+        g2d.setColor(roomName.isEmpty() ? Color.GRAY : Color.WHITE);
+        g2d.drawString(displayText + (nameInputActive && !roomName.isEmpty() ? "|" : ""), roomNameInputBox.x + 15,
+                       roomNameInputBox.y + 33);
     }
 
     private void renderMapButtons(Graphics2D g2d) {
@@ -190,8 +187,7 @@ public class CreateLobbyDialog {
             g2d.drawImage(mapImages[i], btn.x + 3, btn.y + 3, btn.width - 3, btn.height - 3, null);
             g2d.setFont(new Font("Arial", Font.BOLD, (int) (13 * SCALE)));
             g2d.setColor(Color.WHITE);
-            String text = availableMaps[i].substring(0, availableMaps[i].indexOf("_"))
-                                          .toUpperCase();
+            String text = availableMaps[i].getName();
             int textWidth = g2d.getFontMetrics()
                                .stringWidth(text);
             g2d.drawString(text, btn.x + btn.width / 2 - textWidth / 2, btn.y + btn.height + 20);
@@ -241,7 +237,7 @@ public class CreateLobbyDialog {
             return;
         }
 
-        nameInputActive = lobbyNameInputBox.contains(e.getPoint());
+        nameInputActive = roomNameInputBox.contains(e.getPoint());
 
         for (int i = 0; i < mapButtons.length; i++) {
             if (mapButtons[i].contains(e.getPoint())) {
@@ -257,8 +253,8 @@ public class CreateLobbyDialog {
             }
         }
 
-        if (createButton.contains(e.getPoint()) && !lobbyName.trim()
-                                                             .isEmpty()) {
+        if (createButton.contains(e.getPoint()) && !roomName.trim()
+                                                            .isEmpty()) {
             return;
         }
 
@@ -296,8 +292,8 @@ public class CreateLobbyDialog {
     }
 
     public boolean isCreateClicked(MouseEvent e) {
-        return visible && createButton.contains(e.getPoint()) && !lobbyName.trim()
-                                                                           .isEmpty();
+        return visible && createButton.contains(e.getPoint()) && !roomName.trim()
+                                                                          .isEmpty();
     }
 
     public boolean isNameInputActive() {
@@ -305,26 +301,22 @@ public class CreateLobbyDialog {
     }
 
     public void addCharToName(char c) {
-        if (nameInputActive && lobbyName.length() < 30) {
-            lobbyName += c;
+        if (nameInputActive && roomName.length() < 30) {
+            roomName += c;
         }
     }
 
     public void removeCharFromName() {
-        if (nameInputActive && !lobbyName.isEmpty()) {
-            lobbyName = lobbyName.substring(0, lobbyName.length() - 1);
+        if (nameInputActive && !roomName.isEmpty()) {
+            roomName = roomName.substring(0, roomName.length() - 1);
         }
     }
 
-    public String getLobbyName() {
-        return lobbyName.trim();
-    }
-
-    public String getSelectedMap() {
+    public MapType getSelectedMap() {
         return availableMaps[selectedMapIndex];
     }
 
-    public String getSelectedSkin() {
+    public SkinType getSelectedSkin() {
         return availableSkins[selectedSkinIndex];
     }
 }

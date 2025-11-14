@@ -18,8 +18,8 @@ import io.nghlong3004.model.type.SkinType;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.List;
 import java.util.function.Consumer;
 
 import static io.nghlong3004.constant.GameConstant.*;
@@ -50,6 +50,7 @@ public class RoomComponent extends GameComponent {
     private int maxChatScroll = 0;
     private Point lastDragPoint = null;
     private boolean isDraggingChat = false;
+    private int lastMessageCount = 0;
 
     public RoomComponent(GameContext context) {
         super(context);
@@ -145,11 +146,13 @@ public class RoomComponent extends GameComponent {
                 break;
             }
         }
-        boolean startDisabled = !allReady;
 
         if (networkManager.getCurrentRoom()
                           .getOwner()
                           .equals(networkManager.getBomberId())) {
+            boolean startDisabled = !allReady && !(networkManager.getCurrentRoom()
+                                                                 .getBomberInfos()
+                                                                 .size() > 1);
             renderButton(g2d, startButton, "Start", new Color(52, 152, 219), startDisabled);
         }
         else {
@@ -297,12 +300,8 @@ public class RoomComponent extends GameComponent {
             g2d.drawImage(mapImg, mapPreviewArea.x + 5, mapPreviewArea.y + 5, mapPreviewArea.width - 10,
                           mapPreviewArea.height - 10, null);
         }
-
-        boolean isHost = isLocalHost(room);
-        if (isHost) {
-            renderArrowButton(g2d, mapLeftButton, true);
-            renderArrowButton(g2d, mapRightButton, false);
-        }
+        renderArrowButton(g2d, mapLeftButton, true);
+        renderArrowButton(g2d, mapRightButton, false);
     }
 
     private BufferedImage getMapPreview(String mapKey) {
@@ -320,7 +319,7 @@ public class RoomComponent extends GameComponent {
         g2d.setStroke(new BasicStroke(3));
         g2d.drawRoundRect(skinPreviewArea.x, skinPreviewArea.y, skinPreviewArea.width, skinPreviewArea.height, 15, 15);
 
-        var me = getLocalPlayer(room);
+        var me = getLocalBomber(room);
         BufferedImage avatar = me != null ? getAvatar(me.getSkin()
                                                         .getAssetKey()) : null;
         if (avatar != null) {
@@ -362,43 +361,226 @@ public class RoomComponent extends GameComponent {
 
         var messages = networkManager.getCurrentRoom()
                                      .getChatMessages();
-        int lineHeight = 28;
-        int contentHeight = messages.size() * lineHeight;
-        maxChatScroll = Math.max(0, contentHeight - (chatHeight - 65));
+
+        if (messages.size() > lastMessageCount) {
+            lastMessageCount = messages.size();
+            chatScrollOffset = Integer.MAX_VALUE;
+        }
+
+        int currentY = chatY + 65 - chatScrollOffset;
+        int totalHeight = 0;
+        for (ChatMessage msg : messages) {
+            int bubbleHeight = calculateMessageHeight(g2d, msg, chatWidth);
+            totalHeight += bubbleHeight + (int) (8 * SCALE);
+        }
+
+        maxChatScroll = Math.max(0, totalHeight - (chatHeight - 65));
         chatScrollOffset = Math.max(0, Math.min(chatScrollOffset, maxChatScroll));
 
-        int messageY = chatY + 75 - chatScrollOffset;
-        for (int i = 0; i < messages.size(); i++) {
-            ChatMessage msg = messages.get(i);
-            int y = messageY + i * lineHeight;
+        currentY = chatY + 65 - chatScrollOffset;
 
-            if (y + lineHeight < chatY + 55 || y > chatY + chatHeight) {
+        for (ChatMessage msg : messages) {
+            String sender = msg.getOwner();
+            String content = msg.getContent();
+
+            int bubbleHeight = calculateMessageHeight(g2d, msg, chatWidth);
+
+            if (currentY + bubbleHeight < chatY + 55) {
+                currentY += bubbleHeight + (int) (8 * SCALE);
                 continue;
             }
-
-            g2d.setFont(new Font("Arial", Font.BOLD, (int) (12 * SCALE)));
-            String sender = msg.getOwner();
-            if (sender.equals("System")) {
-                g2d.setColor(Color.DARK_GRAY);
+            if (currentY > chatY + chatHeight) {
+                break;
             }
-            else if (sender.equals(networkManager.getBomberName())) {
-                g2d.setColor(new Color(255, 215, 0));
+
+            if (sender.equals("System")) {
+                renderSystemMessage(g2d, content, chatX, currentY, chatWidth);
             }
             else {
-                g2d.setColor(Color.WHITE);
+                Room room = networkManager.getCurrentRoom();
+                boolean isOwnMessage = false;
+
+                if (room != null) {
+                    BomberInfo localPlayer = getLocalBomber(room);
+                    if (localPlayer != null && sender.equals(localPlayer.getName())) {
+                        isOwnMessage = true;
+                    }
+                }
+
+                if (isOwnMessage) {
+                    renderOwnMessage(g2d, content, chatX, currentY, chatWidth);
+                }
+                else {
+                    Room currentRoom = networkManager.getCurrentRoom();
+                    if (currentRoom != null) {
+                        for (var bomberInfo : currentRoom.getBomberInfos()) {
+                            if (bomberInfo.getName()
+                                          .equals(sender)) {
+                                break;
+                            }
+                        }
+                    }
+                    renderOtherMessage(g2d, sender, content, chatX, currentY, chatWidth);
+                }
             }
-            g2d.drawString(sender + ":", chatX + 20, y);
-            int nameWidth = g2d.getFontMetrics()
-                               .stringWidth(sender + ": ");
-            g2d.setFont(new Font("Arial", Font.PLAIN, (int) (12 * SCALE)));
-            g2d.setColor(Color.WHITE);
-            g2d.drawString(msg.getContent(), chatX + 20 + nameWidth, y);
+
+            currentY += bubbleHeight + (int) (8 * SCALE);
         }
 
         g2d.setClip(oldClip);
 
         if (maxChatScroll > 0) {
             renderScrollbar(g2d, chatX + chatWidth - 10, chatY + 55, chatHeight - 65, chatScrollOffset, maxChatScroll);
+        }
+    }
+
+    private int calculateMessageHeight(Graphics2D g2d, ChatMessage msg, int chatWidth) {
+        g2d.setFont(new Font("Arial", Font.PLAIN, (int) (11 * SCALE)));
+        FontMetrics fm = g2d.getFontMetrics();
+
+        int maxBubbleWidth = (int) (chatWidth * 0.55);
+        int padding = (int) (8 * SCALE);
+
+        String content = msg.getContent();
+        var lines = wrapText(content, fm, maxBubbleWidth - padding * 2);
+
+        int lineHeight = fm.getHeight();
+        int textHeight = lines.size() * lineHeight;
+
+        if (!msg.getOwner()
+                .equals("System") && !msg.getOwner()
+                                         .equals(networkManager.getBomberName())) {
+            textHeight += (int) (14 * SCALE);
+        }
+
+        return textHeight + padding * 2;
+    }
+
+    private List<String> wrapText(String text, FontMetrics fm, int maxWidth) {
+        var lines = new ArrayList<String>();
+        String[] words = text.split(" ");
+        StringBuilder currentLine = new StringBuilder();
+
+        for (String word : words) {
+            String testLine = currentLine.isEmpty() ? word : currentLine + " " + word;
+            if (fm.stringWidth(testLine) <= maxWidth) {
+                currentLine = new StringBuilder(testLine);
+            }
+            else {
+                if (!currentLine.isEmpty()) {
+                    lines.add(currentLine.toString());
+                    currentLine = new StringBuilder(word);
+                }
+                else {
+                    lines.add(word);
+                }
+            }
+        }
+
+        if (!currentLine.isEmpty()) {
+            lines.add(currentLine.toString());
+        }
+
+        return lines.isEmpty() ? Collections.singletonList(text) : lines;
+    }
+
+    private void renderSystemMessage(Graphics2D g2d, String content, int chatX, int y, int chatWidth) {
+        g2d.setFont(new Font("Arial", Font.ITALIC, (int) (10 * SCALE)));
+        FontMetrics fm = g2d.getFontMetrics();
+
+        int padding = (int) (8 * SCALE);
+        int maxBubbleWidth = (int) (chatWidth * 0.7);
+
+        var lines = wrapText(content, fm, maxBubbleWidth - padding * 2);
+
+        int bubbleWidth = 0;
+        for (String line : lines) {
+            bubbleWidth = Math.max(bubbleWidth, fm.stringWidth(line));
+        }
+        bubbleWidth += padding * 2;
+
+        int lineHeight = fm.getHeight();
+        int bubbleHeight = lines.size() * lineHeight + padding;
+        int bubbleX = chatX + (chatWidth - bubbleWidth) / 2;
+
+        g2d.setColor(new Color(60, 65, 75, 120));
+        g2d.fillRoundRect(bubbleX, y, bubbleWidth, bubbleHeight, 12, 12);
+
+        g2d.setColor(new Color(150, 150, 160));
+        int textY = y + padding / 2 + fm.getAscent();
+        for (String line : lines) {
+            int lineWidth = fm.stringWidth(line);
+            g2d.drawString(line, bubbleX + (bubbleWidth - lineWidth) / 2, textY);
+            textY += lineHeight;
+        }
+    }
+
+    private void renderOwnMessage(Graphics2D g2d, String content, int chatX, int y, int chatWidth) {
+        g2d.setFont(new Font("Arial", Font.PLAIN, (int) (11 * SCALE)));
+        FontMetrics fm = g2d.getFontMetrics();
+
+        int maxBubbleWidth = (int) (chatWidth * 0.55);
+        int padding = (int) (8 * SCALE);
+        int margin = (int) (15 * SCALE);
+
+        var lines = wrapText(content, fm, maxBubbleWidth - padding * 2);
+
+        int bubbleWidth = 0;
+        for (String line : lines) {
+            bubbleWidth = Math.max(bubbleWidth, fm.stringWidth(line));
+        }
+        bubbleWidth += padding * 2;
+
+        int lineHeight = fm.getHeight();
+        int bubbleHeight = lines.size() * lineHeight + padding * 2;
+        int bubbleX = chatX + chatWidth - bubbleWidth - margin;
+
+        g2d.setColor(new Color(0, 132, 255));
+        g2d.fillRoundRect(bubbleX, y, bubbleWidth, bubbleHeight, 16, 16);
+
+        g2d.setColor(Color.WHITE);
+        int textY = y + padding + fm.getAscent();
+        for (String line : lines) {
+            g2d.drawString(line, bubbleX + padding, textY);
+            textY += lineHeight;
+        }
+    }
+
+    private void renderOtherMessage(Graphics2D g2d, String sender, String content, int chatX, int y, int chatWidth) {
+        int padding = (int) (8 * SCALE);
+        int margin = (int) (15 * SCALE);
+
+        int bubbleX = chatX + margin;
+        int maxBubbleWidth = (int) (chatWidth * 0.55);
+
+        g2d.setFont(new Font("Arial", Font.BOLD, (int) (9 * SCALE)));
+        g2d.setColor(new Color(180, 180, 190));
+        g2d.drawString(sender, bubbleX, y + 10);
+
+        g2d.setFont(new Font("Arial", Font.PLAIN, (int) (11 * SCALE)));
+        FontMetrics fm = g2d.getFontMetrics();
+
+        var lines = wrapText(content, fm, maxBubbleWidth - padding * 2);
+
+        int bubbleWidth = 0;
+        for (String line : lines) {
+            bubbleWidth = Math.max(bubbleWidth, fm.stringWidth(line));
+        }
+        bubbleWidth += padding * 2;
+
+        int lineHeight = fm.getHeight();
+        int nameSpace = (int) (14 * SCALE);
+        int bubbleHeight = lines.size() * lineHeight + padding * 2;
+        int bubbleY = y + nameSpace;
+
+        g2d.setColor(new Color(60, 65, 75));
+        g2d.fillRoundRect(bubbleX, bubbleY, bubbleWidth, bubbleHeight, 16, 16);
+
+        g2d.setColor(Color.WHITE);
+        int textY = bubbleY + padding + fm.getAscent();
+        for (String line : lines) {
+            g2d.drawString(line, bubbleX + padding, textY);
+            textY += lineHeight;
         }
     }
 
@@ -476,7 +658,7 @@ public class RoomComponent extends GameComponent {
         Room room = networkManager.getCurrentRoom();
         if (room != null) {
             if (readyButton.contains(e.getPoint())) {
-                var me = getLocalPlayer(room);
+                var me = getLocalBomber(room);
                 if (me != null && me.getId()
                                     .equals(networkManager.getBomberId())) {
                     boolean newReady = !me.isReady();
@@ -494,9 +676,9 @@ public class RoomComponent extends GameComponent {
                         break;
                     }
                 }
-                if (isLocalHost(room) && !room.getBomberInfos()
-                                              .isEmpty() && allReady) {
-                    // note
+                if (networkManager.getCurrentRoom()
+                                  .getBomberInfos()
+                                  .size() > 1 && allReady) {
                     networkManager.startGame();
                 }
             }
@@ -511,15 +693,13 @@ public class RoomComponent extends GameComponent {
                 sendChatMessage();
             }
 
-            if (isLocalHost(room)) {
-                if (mapLeftButton.contains(e.getPoint())) {
-                    cycleMap(room, -1);
-                }
-                else if (mapRightButton.contains(e.getPoint())) {
-                    cycleMap(room, 1);
-                }
+            if (mapLeftButton.contains(e.getPoint())) {
+                cycleMap(room, -1);
             }
-            var me = getLocalPlayer(room);
+            else if (mapRightButton.contains(e.getPoint())) {
+                cycleMap(room, 1);
+            }
+            var me = getLocalBomber(room);
             if (me != null && skinLeftButton != null && skinRightButton != null) {
                 if (skinLeftButton.contains(e.getPoint())) {
                     cycleSkin(me, -1);
@@ -587,7 +767,7 @@ public class RoomComponent extends GameComponent {
         return chatInputActive;
     }
 
-    private BomberInfo getLocalPlayer(Room room) {
+    private BomberInfo getLocalBomber(Room room) {
         String bomberId = networkManager.getBomberId();
         String bomberName = networkManager.getBomberName();
         BomberInfo me = null;
@@ -599,33 +779,11 @@ public class RoomComponent extends GameComponent {
                 }
             }
         }
-        if (me == null && bomberName != null) {
-            for (var bomberInfo : room.getBomberInfos()) {
-                if (bomberName.equals(bomberInfo.getName())) {
-                    me = bomberInfo;
-                    break;
-                }
-            }
-        }
-        if (me == null) {
-            for (var bomberInfo : room.getBomberInfos()) {
-                if ("You".equalsIgnoreCase(bomberInfo.getName())) {
-                    me = bomberInfo;
-                    break;
-                }
-            }
-        }
         return me;
     }
 
-    private boolean isLocalHost(Room room) {
-        var me = getLocalPlayer(room);
-        return me != null && me.getId()
-                               .equals(networkManager.getBomberId());
-    }
-
     private boolean isLocalReady(Room room) {
-        var me = getLocalPlayer(room);
+        var me = getLocalBomber(room);
         return me != null && me.isReady();
     }
 

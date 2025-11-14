@@ -88,7 +88,7 @@ public class MapTypeComponent extends GameComponent {
                 context.setMapType(selectedMode);
                 log.info("Selected map: {}", selectedMode.getAssetKey());
                 ((MainMenuState) context.getGameState(GameStateType.MENU)).setType(MenuType.MENU);
-                context.changeState(GameStateType.PLAYING);
+                context.changeState(GameStateType.OFFLINE);
                 break;
             }
         }

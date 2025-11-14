@@ -1,9 +1,9 @@
 package io.nghlong3004.model.type;
 
 public enum GameStateType {
-    PLAYING,
+    OFFLINE,
+    ONLINE,
     MENU,
     OPTION,
-    ONLINE,
     QUIT;
 }

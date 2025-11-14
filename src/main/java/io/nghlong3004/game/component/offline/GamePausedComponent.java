@@ -1,4 +1,4 @@
-package io.nghlong3004.game.component.play;
+package io.nghlong3004.game.component.offline;
 
 import io.nghlong3004.constant.GameConstant;
 import io.nghlong3004.constant.ImageConstant;
@@ -73,7 +73,7 @@ public class GamePausedComponent extends PlayComponent {
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            ((PlayingState) context.getGameState(GameStateType.PLAYING)).setType(PlayType.PLAYING);
+            ((PlayingState) context.getGameState(GameStateType.OFFLINE)).setType(PlayType.PLAYING);
         }
     }
 

@@ -2,7 +2,7 @@ package io.nghlong3004.game.component;
 
 import io.nghlong3004.game.component.button.GameButton;
 import io.nghlong3004.game.component.button.SpriteButton;
-import io.nghlong3004.game.component.play.GamePlayComponent;
+import io.nghlong3004.game.component.offline.GamePlayComponent;
 import io.nghlong3004.game.context.GameContext;
 import io.nghlong3004.game.context.state.PlayingState;
 import io.nghlong3004.model.type.GameStateType;
@@ -60,7 +60,7 @@ public class SpriteComponent extends GameComponent {
     public void mouseReleased(MouseEvent e) {
         if (homeButton.isMouseOver(e)) {
             if (homeButton.isMousePressed()) {
-                PlayingState playingState = (PlayingState) context.getGameState(GameStateType.PLAYING);
+                PlayingState playingState = (PlayingState) context.getGameState(GameStateType.OFFLINE);
                 if (playingState.getComponent(PlayType.PLAYING) instanceof GamePlayComponent) {
                     ((GamePlayComponent) playingState.getComponent(PlayType.PLAYING)).exit();
                 }
@@ -70,14 +70,14 @@ public class SpriteComponent extends GameComponent {
         }
         else if (unpauseButton.isMouseOver(e)) {
             if (unpauseButton.isMousePressed()) {
-                PlayingState playingState = ((PlayingState) context.getGameState(GameStateType.PLAYING));
+                PlayingState playingState = ((PlayingState) context.getGameState(GameStateType.OFFLINE));
                 playingState.setType(PlayType.PLAYING);
                 playingState.unpause();
             }
         }
         else if (replayButton.isMouseOver(e)) {
             if (replayButton.isMousePressed()) {
-                PlayingState playingState = (PlayingState) context.getGameState(GameStateType.PLAYING);
+                PlayingState playingState = (PlayingState) context.getGameState(GameStateType.OFFLINE);
                 playingState.replay();
                 playingState.setType(PlayType.PLAYING);
             }

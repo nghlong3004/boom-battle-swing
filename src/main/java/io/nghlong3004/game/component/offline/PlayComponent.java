@@ -1,4 +1,4 @@
-package io.nghlong3004.game.component.play;
+package io.nghlong3004.game.component.offline;
 
 import io.nghlong3004.game.component.GameComponent;
 import io.nghlong3004.game.context.GameContext;

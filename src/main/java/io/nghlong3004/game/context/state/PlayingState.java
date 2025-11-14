@@ -2,7 +2,7 @@ package io.nghlong3004.game.context.state;
 
 import io.nghlong3004.constant.AudioConstant;
 import io.nghlong3004.game.component.GameComponent;
-import io.nghlong3004.game.component.play.*;
+import io.nghlong3004.game.component.offline.*;
 import io.nghlong3004.game.context.GameContext;
 import io.nghlong3004.model.type.PlayType;
 import lombok.Getter;

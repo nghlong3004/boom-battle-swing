@@ -1,4 +1,4 @@
-package io.nghlong3004.game.component.play;
+package io.nghlong3004.game.component.offline;
 
 import io.nghlong3004.game.context.GameContext;
 import io.nghlong3004.game.context.state.PlayingState;
@@ -65,7 +65,7 @@ public class GamePlayComponent extends PlayComponent {
         }
 
         if (!gameManager.isAnyPlayerAlive()) {
-            PlayingState playingState = (PlayingState) context.getGameState(GameStateType.PLAYING);
+            PlayingState playingState = (PlayingState) context.getGameState(GameStateType.OFFLINE);
             gameManager.getAgentManager()
                        .stop();
             playingState.setType(PlayType.OVER);
@@ -74,7 +74,7 @@ public class GamePlayComponent extends PlayComponent {
         }
 
         if (!gameManager.isAnyAgentAlive()) {
-            PlayingState playingState = (PlayingState) context.getGameState(GameStateType.PLAYING);
+            PlayingState playingState = (PlayingState) context.getGameState(GameStateType.OFFLINE);
             gameManager.getAgentManager()
                        .stop();
             playingState.setType(PlayType.WIN);

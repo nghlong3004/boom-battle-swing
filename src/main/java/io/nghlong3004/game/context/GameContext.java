@@ -72,7 +72,7 @@ public class GameContext implements GameLogic, KeyboardAdapter, MouseAdapter, Mo
     private void loadStates() {
         GameComponent audioComponent = new AudioComponent(this);
         stateMap.put(GameStateType.MENU, new MainMenuState(this));
-        stateMap.put(GameStateType.PLAYING, new PlayingState(this, audioComponent));
+        stateMap.put(GameStateType.OFFLINE, new PlayingState(this, audioComponent));
         stateMap.put(GameStateType.OPTION, new OptionState(this, audioComponent));
         stateMap.put(GameStateType.ONLINE, new OnlineState(this));
         stateMap.put(GameStateType.QUIT, new QuitState(this));

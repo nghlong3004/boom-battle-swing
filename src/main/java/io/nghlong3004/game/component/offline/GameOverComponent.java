@@ -1,4 +1,4 @@
-package io.nghlong3004.game.component.play;
+package io.nghlong3004.game.component.offline;
 
 import io.nghlong3004.game.component.button.GameButton;
 import io.nghlong3004.game.component.button.SpriteButton;
@@ -84,7 +84,7 @@ public class GameOverComponent extends PlayComponent {
     public void mouseReleased(MouseEvent e) {
         if (homeButton.isMouseOver(e)) {
             if (homeButton.isMousePressed()) {
-                PlayingState playingState = (PlayingState) context.getGameState(GameStateType.PLAYING);
+                PlayingState playingState = (PlayingState) context.getGameState(GameStateType.OFFLINE);
                 if (playingState != null) {
                     ((GamePlayComponent) playingState.getComponent(PlayType.PLAYING)).exit();
                 }
@@ -93,7 +93,7 @@ public class GameOverComponent extends PlayComponent {
         }
         else if (replayButton.isMouseOver(e)) {
             if (replayButton.isMousePressed()) {
-                PlayingState playingState = (PlayingState) context.getGameState(GameStateType.PLAYING);
+                PlayingState playingState = (PlayingState) context.getGameState(GameStateType.OFFLINE);
                 if (playingState != null) {
                     ((GamePlayComponent) playingState.getComponent(PlayType.PLAYING)).play();
                     playingState.setType(PlayType.PLAYING);

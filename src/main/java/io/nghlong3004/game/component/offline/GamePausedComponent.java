@@ -76,13 +76,4 @@ public class GamePausedComponent extends PlayComponent {
             ((PlayingState) context.getGameState(GameStateType.OFFLINE)).setType(PlayType.PLAYING);
         }
     }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-    }
 }

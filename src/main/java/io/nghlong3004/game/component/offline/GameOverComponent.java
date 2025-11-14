@@ -4,21 +4,20 @@ import io.nghlong3004.game.component.button.GameButton;
 import io.nghlong3004.game.component.button.SpriteButton;
 import io.nghlong3004.game.context.GameContext;
 import io.nghlong3004.game.context.state.PlayingState;
+import io.nghlong3004.loader.ImageLoader;
 import io.nghlong3004.model.type.GameStateType;
 import io.nghlong3004.model.type.PlayType;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.List;
 
 import static io.nghlong3004.constant.ButtonConstant.URM_BUTTON_SIZE;
 import static io.nghlong3004.constant.GameConstant.GAME_WIDTH;
 import static io.nghlong3004.constant.GameConstant.SCALE;
+import static io.nghlong3004.constant.ImageConstant.GAME_OVER;
 
 @Slf4j
 public class GameOverComponent extends PlayComponent {
@@ -41,12 +40,7 @@ public class GameOverComponent extends PlayComponent {
     }
 
     private void loadImages() {
-        try {
-            loseImage = ImageIO.read(getClass().getResourceAsStream("/images/component/lose.png"));
-        } catch (IOException e) {
-            e.printStackTrace();
-            log.error("Failed to load lose image");
-        }
+        loseImage = ImageLoader.loadImage(GAME_OVER);
     }
 
     public void resetAnimation() {
@@ -64,11 +58,6 @@ public class GameOverComponent extends PlayComponent {
 
         homeButton = new SpriteButton(startX, spriteY, URM_BUTTON_SIZE, URM_BUTTON_SIZE, 2);
         replayButton = new SpriteButton(startX + buttonSpacing, spriteY, URM_BUTTON_SIZE, URM_BUTTON_SIZE, 1);
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-
     }
 
     @Override
@@ -190,19 +179,5 @@ public class GameOverComponent extends PlayComponent {
         for (var gameObject : buttons) {
             gameObject.render(g);
         }
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-
     }
 }

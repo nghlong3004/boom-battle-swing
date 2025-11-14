@@ -43,11 +43,6 @@ public class SpriteComponent extends GameComponent {
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
-
-    }
-
-    @Override
     public void mousePressed(MouseEvent e) {
         for (var gameButton : buttons) {
             if (gameButton.isMouseOver(e)) {
@@ -114,10 +109,4 @@ public class SpriteComponent extends GameComponent {
             gameObject.render(g);
         }
     }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-
-    }
-
 }

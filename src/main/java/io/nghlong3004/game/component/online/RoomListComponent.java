@@ -237,16 +237,4 @@ public class RoomListComponent extends GameComponent {
     public void removeCharFromDialog() {
         createRoomDialog.removeCharFromName();
     }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-    }
 }

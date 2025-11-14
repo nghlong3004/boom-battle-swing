@@ -32,18 +32,17 @@ public class GameManager {
     private List<Bomber> bombers;
     private List<Bomber> agents;
 
-    public void play(MapType type, List<Bomber> bombers) {
+    public void play(MapType type, List<Bomber> bombers, boolean isOnline) {
         mapManager.setType(type);
         mapManager.loadMap();
-        setSpawnBombers(bombers);
+        setSpawnBombers(bombers, isOnline);
         this.bombers = bombers;
         bomberManager.addAll(bombers);
         gameTimer.reset();
         gameTimer.start();
-        agentManager.start();
     }
 
-    private void setSpawnBombers(List<Bomber> bombers) {
+    private void setSpawnBombers(List<Bomber> bombers, boolean isOnline) {
         var points = mapManager.getSpawns(6);
         for (int i = 0; i < bombers.size(); ++i) {
             bombers.get(i)
@@ -53,14 +52,17 @@ public class GameManager {
             bombers.get(i)
                    .reset();
         }
-        agents = new ArrayList<Bomber>();
-        for (int i = bombers.size(); i < points.size(); ++i) {
-            Bomber agent = new Bomber(points.get(i).x, points.get(i).y, SkinType.BOZ);
-            agent.reset();
-            agents.add(agent);
+        if (!isOnline) {
+            agents = new ArrayList<>();
+            for (int i = bombers.size(); i < points.size(); ++i) {
+                Bomber agent = new Bomber(points.get(i).x, points.get(i).y, SkinType.BOZ);
+                agent.reset();
+                agents.add(agent);
+            }
+            agentManager.setAgents(agents);
+            agentManager.setTickMillis(7);
+            agentManager.start();
         }
-        agentManager.setAgents(agents);
-        agentManager.setTickMillis(7);
     }
 
     public void reset() {

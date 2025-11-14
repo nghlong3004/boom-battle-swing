@@ -13,29 +13,29 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import static io.nghlong3004.game.input.BomberKeyAction.LOOKUP;
+import static io.nghlong3004.game.input.BomberKeyAction.getIndexFromKeyCode;
 
 @Slf4j
 public class GamePlayComponent extends PlayComponent {
     @Getter
     private final GameManager gameManager;
     private final Bomber[] bombers;
-    private final Map<Integer, BomberKeyAction> lookup;
 
     public GamePlayComponent(GameContext context) {
         super(context);
         this.gameManager = ManagerFactory.createGameManager();
-        this.lookup = new HashMap<>();
-        initLookup();
         bombers = new Bomber[2];
     }
 
     public void play() {
         gameManager.reset();
         loadBombers();
-        gameManager.play(context.getMapType(), getPlayers());
+        gameManager.play(context.getMapType(), getPlayers(), false);
     }
 
     private List<Bomber> getPlayers() {
@@ -88,33 +88,8 @@ public class GamePlayComponent extends PlayComponent {
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseMoved(MouseEvent e) {
-
-    }
-
-    @Override
     public void keyPressed(KeyEvent e) {
-        var action = lookup.get(e.getKeyCode());
+        var action = LOOKUP.get(e.getKeyCode());
         int index = getIndexFromKeyEvent(action, e);
         if (index != -1) {
             action.onPress.accept(bombers[index]);
@@ -123,7 +98,7 @@ public class GamePlayComponent extends PlayComponent {
 
     @Override
     public void keyReleased(KeyEvent e) {
-        var action = lookup.get(e.getKeyCode());
+        var action = LOOKUP.get(e.getKeyCode());
         int index = getIndexFromKeyEvent(action, e);
         if (index != -1) {
             action.onRelease.accept(bombers[index]);
@@ -138,22 +113,5 @@ public class GamePlayComponent extends PlayComponent {
             }
         }
         return -1;
-    }
-
-    private int getIndexFromKeyCode(int[] keys, int keyCode) {
-        for (int i = 0; i < keys.length; ++i) {
-            if (keys[i] == keyCode) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    private void initLookup() {
-        for (var act : BomberKeyAction.values()) {
-            for (int k : act.keys) {
-                lookup.put(k, act);
-            }
-        }
     }
 }

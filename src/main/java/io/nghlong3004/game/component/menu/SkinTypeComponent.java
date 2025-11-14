@@ -144,12 +144,4 @@ public class SkinTypeComponent extends GameComponent {
             skinButton.reset();
         }
     }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-    }
 }

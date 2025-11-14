@@ -1,10 +1,14 @@
 package io.nghlong3004.game.input;
 
 import io.nghlong3004.model.entities.Bomber;
+import lombok.AllArgsConstructor;
 
 import java.awt.event.KeyEvent;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
+@AllArgsConstructor
 public enum BomberKeyAction {
     MOVE_LEFT(new int[]{KeyEvent.VK_A, KeyEvent.VK_LEFT}, (bomber) -> bomber.setLeft(true),
               (bomber) -> bomber.setLeft(false)),
@@ -25,9 +29,26 @@ public enum BomberKeyAction {
     public final Consumer<Bomber> onPress;
     public final Consumer<Bomber> onRelease;
 
-    BomberKeyAction(int[] keys, Consumer<Bomber> onPress, Consumer<Bomber> onRelease) {
-        this.keys = keys;
-        this.onPress = onPress;
-        this.onRelease = onRelease;
+    public static final Map<Integer, BomberKeyAction> LOOKUP = new HashMap<>();
+
+    static {
+        initLookup();
+    }
+
+    public static int getIndexFromKeyCode(int[] keys, int keyCode) {
+        for (int i = 0; i < keys.length; ++i) {
+            if (keys[i] == keyCode) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private static void initLookup() {
+        for (var act : values()) {
+            for (int k : act.keys) {
+                LOOKUP.put(k, act);
+            }
+        }
     }
 }

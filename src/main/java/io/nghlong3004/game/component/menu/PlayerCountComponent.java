@@ -113,12 +113,4 @@ public class PlayerCountComponent extends GameComponent {
             button.reset();
         }
     }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-    }
 }

@@ -135,14 +135,11 @@ public class AudioComponent extends GameComponent {
         int bgHeight = fontSize + padding;
         int arc = (int) (15 * SCALE);
 
-        // Cập nhật bounds cho click detection
         bounds.setBounds(bgX, bgY, bgWidth, bgHeight);
 
-        // Draw outer shadow
         g2d.setColor(new Color(0, 0, 0, pressed ? 80 : 120));
         g2d.fillRoundRect(bgX + (pressed ? 2 : 4), bgY + (pressed ? 2 : 4), bgWidth, bgHeight, arc, arc);
 
-        // Draw gradient background - thay đổi màu khi hover/pressed
         Color topColor, bottomColor;
         if (pressed) {
             topColor = new Color(35, 42, 44, 240);
@@ -161,46 +158,34 @@ public class AudioComponent extends GameComponent {
         g2d.setPaint(gradient);
         g2d.fillRoundRect(bgX, bgY, bgWidth, bgHeight, arc, arc);
 
-        // Draw border - thay đổi màu khi hover
         g2d.setStroke(new BasicStroke(2.5f * SCALE));
         Color borderColor = hover ? new Color(150, 220, 255, 220) : new Color(116, 185, 255, 180);
         g2d.setColor(borderColor);
         g2d.drawRoundRect(bgX, bgY, bgWidth, bgHeight, arc, arc);
 
-        // Draw inner highlight
         g2d.setColor(new Color(255, 255, 255, hover ? 50 : 30));
         g2d.fillRoundRect(bgX + 3, bgY + 3, bgWidth - 6, bgHeight / 2 - 3, arc - 3, arc - 3);
 
-        // Draw text shadow
         g2d.setColor(new Color(0, 0, 0, 200));
         g2d.drawString(text, textX + 2, textY + 2);
 
-        // Draw main text with gradient
         Color textTop = hover ? new Color(255, 255, 255) : new Color(240, 245, 250);
         Color textBottom = hover ? new Color(210, 240, 255) : new Color(190, 220, 245);
         GradientPaint textGradient = new GradientPaint(textX, textY - fontSize, textTop, textX, textY, textBottom);
         g2d.setPaint(textGradient);
         g2d.drawString(text, textX, textY);
 
-        // Draw strikethrough if muted
         if (muted) {
             g2d.setStroke(new BasicStroke(3.5f * SCALE, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
             int lineY = textY - fontSize / 3;
             int lineStartX = textX - padding / 2;
             int lineEndX = textX + textWidth + padding / 2;
 
-            // Shadow for strikethrough
             g2d.setColor(new Color(0, 0, 0, 200));
             g2d.drawLine(lineStartX + 2, lineY + 2, lineEndX + 2, lineY + 2);
 
-            // Main strikethrough line
             g2d.setColor(new Color(255, 60, 60, 230));
             g2d.drawLine(lineStartX, lineY, lineEndX, lineY);
         }
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-
     }
 }

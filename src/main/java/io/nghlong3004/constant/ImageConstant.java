@@ -13,6 +13,10 @@ public class ImageConstant {
     public static final String BUTTON_2P = "/images/buttons/2P.png";
     public static final String BUTTON_2P_TOUCH = "/images/buttons/2P_touch.png";
 
+    public static final String GAME_OVER = "/images/component/lose.png";
+
+    public static final String GAME_WIN = "/images/component/win.png";
+
     public static final String MENU_BACKGROUND = "/images/home/menu_background.png";
     public static final String ONLINE_BACKGROUND = "/images/home/online_background.jpg";
     public static final String BACKGROUND = "/images/home/boom-online-3.jpg";

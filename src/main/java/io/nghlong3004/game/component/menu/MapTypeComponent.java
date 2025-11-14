@@ -113,12 +113,4 @@ public class MapTypeComponent extends GameComponent {
             mapButton.reset();
         }
     }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-    }
 }

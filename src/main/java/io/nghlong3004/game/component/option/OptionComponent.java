@@ -86,9 +86,4 @@ public class OptionComponent extends GameComponent {
     public void mouseDragged(MouseEvent e) {
         audioComponent.mouseDragged(e);
     }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-
-    }
 }

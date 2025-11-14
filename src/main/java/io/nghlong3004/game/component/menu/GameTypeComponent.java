@@ -111,12 +111,4 @@ public class GameTypeComponent extends GameComponent {
             modeButton.reset();
         }
     }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-    }
 }

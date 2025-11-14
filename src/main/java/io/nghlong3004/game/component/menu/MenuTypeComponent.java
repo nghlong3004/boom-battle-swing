@@ -97,12 +97,4 @@ public class MenuTypeComponent extends GameComponent {
             menuButton.reset();
         }
     }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-    }
 }

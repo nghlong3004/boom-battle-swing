@@ -380,16 +380,4 @@ public class ServerConnectComponent extends GameComponent {
     public boolean isAnyInputActive() {
         return nameInputActive;
     }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-    }
 }

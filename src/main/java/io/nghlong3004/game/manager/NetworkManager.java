@@ -1,8 +1,11 @@
 package io.nghlong3004.game.manager;
 
+import io.nghlong3004.game.input.BomberKeyAction;
 import io.nghlong3004.model.BomberInfo;
 import io.nghlong3004.model.NetworkMessage;
 import io.nghlong3004.model.Room;
+import io.nghlong3004.model.entities.Bomber;
+import io.nghlong3004.model.request.BomberActionRequest;
 import io.nghlong3004.model.request.ChatMessageRequest;
 import io.nghlong3004.model.request.CreateRoomRequest;
 import io.nghlong3004.model.request.JoinRoomRequest;
@@ -19,12 +22,10 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.nghlong3004.game.input.BomberKeyAction.LOOKUP;
+
 @Slf4j
 public class NetworkManager {
-
-    @Getter
-    private static final NetworkManager instance = new NetworkManager();
-
     @Getter
     private BomberWebSocketClient client;
     @Getter
@@ -37,12 +38,18 @@ public class NetworkManager {
     @Getter
     @Setter
     private List<Room> availableRooms;
+    private List<Bomber> bombers;
+
+    @Getter
+    @Setter
+    private boolean isPlaying;
 
     private final MessageHandler messageHandler;
 
-    private NetworkManager() {
+    public NetworkManager() {
         this.availableRooms = new ArrayList<>();
         this.messageHandler = new MessageHandler(this);
+        this.isPlaying = false;
     }
 
     public void connect(String serverUrl, String playerName) {
@@ -56,6 +63,19 @@ public class NetworkManager {
         } catch (Exception e) {
             log.error("Failed to connect to server", e);
         }
+    }
+
+    public List<Bomber> getBombers() {
+        if (bombers == null) {
+            bombers = new ArrayList<>();
+        }
+        bombers.clear();
+        for (var bomberInfo : this.currentRoom.getBomberInfos()) {
+            var bomber = new Bomber(0, 0, bomberInfo.getSkin());
+            bomber.setBomberId(bomberInfo.getId());
+            bombers.add(bomber);
+        }
+        return this.bombers;
     }
 
     public void disconnect() {
@@ -127,8 +147,10 @@ public class NetworkManager {
         }
     }
 
-    public void sendGameAction() {
-        var message = new NetworkMessage(MessageType.PLAYER_MOVE, null);
+    public void sendGameAction(Integer keyCode, Boolean isReleased) {
+        var bomberActionRequest = new BomberActionRequest(bomberId, keyCode, isReleased);
+        var message = new NetworkMessage(MessageType.BOMBER_ACTION, client.getGson()
+                                                                          .toJson(bomberActionRequest));
         if (client != null && client.isConnected()) {
             client.sendMessage(message);
         }
@@ -188,5 +210,31 @@ public class NetworkManager {
     public void setBomberId(String bomberId) {
         this.bomberId = bomberId;
         client.setBomberId(bomberId);
+    }
+
+    public void keyAction(int keyCode, String bomberId, boolean isReleased) {
+        var action = LOOKUP.get(keyCode);
+        int index = getIndexByBomberId(action, bomberId);
+        if (index != -1) {
+            if (isReleased) {
+                action.onReleased.accept(bombers.get(index));
+            }
+            else {
+                action.onPressed.accept(bombers.get(index));
+            }
+        }
+    }
+
+    private int getIndexByBomberId(BomberKeyAction action, String bomberId) {
+        if (action != null && bombers != null) {
+            for (int i = 0; i < bombers.size(); ++i) {
+                if (bomberId.equals(bombers.get(i)
+                                           .getBomberId())) {
+                    return i;
+                }
+            }
+        }
+
+        return -1;
     }
 }

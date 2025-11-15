@@ -26,8 +26,8 @@ public enum BomberKeyAction {
 
 
     public final int[] keys;
-    public final Consumer<Bomber> onPress;
-    public final Consumer<Bomber> onRelease;
+    public final Consumer<Bomber> onPressed;
+    public final Consumer<Bomber> onReleased;
 
     public static final Map<Integer, BomberKeyAction> LOOKUP = new HashMap<>();
 

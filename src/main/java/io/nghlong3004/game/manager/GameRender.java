@@ -52,7 +52,9 @@ public class GameRender {
         explosionManager.render(g);
 
         renderWithDepthSorting(g, images, row, data, spaceX, spaceY, bomberManager.getBombers(), bomberManager);
-        renderWithDepthSorting(g, images, row, data, spaceX, spaceY, agentManager.getAgents(), agentManager);
+        if (agentManager.getAgents() != null) {
+            renderWithDepthSorting(g, images, row, data, spaceX, spaceY, agentManager.getAgents(), agentManager);
+        }
 
         gameTimer.render(g);
     }

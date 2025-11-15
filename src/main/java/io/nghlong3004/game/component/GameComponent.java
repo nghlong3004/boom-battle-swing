@@ -6,6 +6,7 @@ import io.nghlong3004.game.input.MouseMotionAdapter;
 import io.nghlong3004.game.main.GameLogic;
 import lombok.RequiredArgsConstructor;
 
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
 @RequiredArgsConstructor
@@ -27,4 +28,10 @@ public abstract class GameComponent implements GameLogic, MouseAdapter, MouseMot
     public void mouseMoved(MouseEvent e) {
     }
 
+    public void keyPressed(KeyEvent e) {
+    }
+
+
+    public void keyReleased(KeyEvent e) {
+    }
 }

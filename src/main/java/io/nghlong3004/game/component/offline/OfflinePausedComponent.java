@@ -5,22 +5,22 @@ import io.nghlong3004.constant.ImageConstant;
 import io.nghlong3004.game.component.GameComponent;
 import io.nghlong3004.game.component.SpriteComponent;
 import io.nghlong3004.game.context.GameContext;
-import io.nghlong3004.game.context.state.PlayingState;
+import io.nghlong3004.game.context.state.OfflineState;
 import io.nghlong3004.loader.ImageLoader;
 import io.nghlong3004.model.type.GameStateType;
-import io.nghlong3004.model.type.PlayType;
+import io.nghlong3004.model.type.OfflineType;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
-public class GamePausedComponent extends PlayComponent {
+public class OfflinePausedComponent extends GameComponent {
     private BufferedImage backgroundOption;
     private final GameComponent spriteComponent;
     private final GameComponent audioComponent;
 
-    public GamePausedComponent(GameContext stateContext, GameComponent audioComponent) {
+    public OfflinePausedComponent(GameContext stateContext, GameComponent audioComponent) {
         super(stateContext);
         loadBackground();
         this.spriteComponent = new SpriteComponent(stateContext);
@@ -73,7 +73,7 @@ public class GamePausedComponent extends PlayComponent {
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            ((PlayingState) context.getGameState(GameStateType.OFFLINE)).setType(PlayType.PLAYING);
+            ((OfflineState) context.getGameState(GameStateType.OFFLINE)).setType(OfflineType.PLAYING);
         }
     }
 }

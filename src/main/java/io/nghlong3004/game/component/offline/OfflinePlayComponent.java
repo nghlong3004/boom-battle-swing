@@ -1,13 +1,13 @@
 package io.nghlong3004.game.component.offline;
 
+import io.nghlong3004.game.component.GameComponent;
 import io.nghlong3004.game.context.GameContext;
-import io.nghlong3004.game.context.state.PlayingState;
+import io.nghlong3004.game.context.state.OfflineState;
 import io.nghlong3004.game.input.BomberKeyAction;
 import io.nghlong3004.game.manager.GameManager;
-import io.nghlong3004.game.manager.ManagerFactory;
 import io.nghlong3004.model.entities.Bomber;
 import io.nghlong3004.model.type.GameStateType;
-import io.nghlong3004.model.type.PlayType;
+import io.nghlong3004.model.type.OfflineType;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,19 +21,18 @@ import static io.nghlong3004.game.input.BomberKeyAction.LOOKUP;
 import static io.nghlong3004.game.input.BomberKeyAction.getIndexFromKeyCode;
 
 @Slf4j
-public class GamePlayComponent extends PlayComponent {
+public class OfflinePlayComponent extends GameComponent {
     @Getter
     private final GameManager gameManager;
     private final Bomber[] bombers;
 
-    public GamePlayComponent(GameContext context) {
+    public OfflinePlayComponent(GameContext context) {
         super(context);
-        this.gameManager = ManagerFactory.createGameManager();
+        this.gameManager = context.getGameManager();
         bombers = new Bomber[2];
     }
 
     public void play() {
-        gameManager.reset();
         loadBombers();
         gameManager.play(context.getMapType(), getPlayers(), false);
     }
@@ -50,7 +49,7 @@ public class GamePlayComponent extends PlayComponent {
     }
 
     public void exit() {
-        gameManager.reset();
+        gameManager.reset(false);
     }
 
 
@@ -65,19 +64,19 @@ public class GamePlayComponent extends PlayComponent {
         }
 
         if (!gameManager.isAnyPlayerAlive()) {
-            PlayingState playingState = (PlayingState) context.getGameState(GameStateType.OFFLINE);
+            OfflineState playingState = (OfflineState) context.getGameState(GameStateType.OFFLINE);
             gameManager.getAgentManager()
                        .stop();
-            playingState.setType(PlayType.OVER);
+            playingState.setType(OfflineType.OVER);
             log.info("Player lose!");
             return;
         }
 
         if (!gameManager.isAnyAgentAlive()) {
-            PlayingState playingState = (PlayingState) context.getGameState(GameStateType.OFFLINE);
+            OfflineState playingState = (OfflineState) context.getGameState(GameStateType.OFFLINE);
             gameManager.getAgentManager()
                        .stop();
-            playingState.setType(PlayType.WIN);
+            playingState.setType(OfflineType.WIN);
             log.info("All agents defeated! Player wins!");
         }
     }
@@ -92,7 +91,7 @@ public class GamePlayComponent extends PlayComponent {
         var action = LOOKUP.get(e.getKeyCode());
         int index = getIndexFromKeyEvent(action, e);
         if (index != -1) {
-            action.onPress.accept(bombers[index]);
+            action.onPressed.accept(bombers[index]);
         }
     }
 
@@ -101,7 +100,7 @@ public class GamePlayComponent extends PlayComponent {
         var action = LOOKUP.get(e.getKeyCode());
         int index = getIndexFromKeyEvent(action, e);
         if (index != -1) {
-            action.onRelease.accept(bombers[index]);
+            action.onReleased.accept(bombers[index]);
         }
     }
 

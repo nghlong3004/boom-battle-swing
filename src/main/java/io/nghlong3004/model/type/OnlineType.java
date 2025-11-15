@@ -4,5 +4,7 @@ public enum OnlineType {
     SERVER_CONNECT,
     ROOM_LIST,
     ROOM,
-    PLAYING
+    PLAYING,
+    OVER,
+    WIN,
 }

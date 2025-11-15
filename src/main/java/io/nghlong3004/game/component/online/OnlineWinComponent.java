@@ -1,12 +1,14 @@
-package io.nghlong3004.game.component.offline;
+package io.nghlong3004.game.component.online;
 
+import io.nghlong3004.game.component.GameComponent;
 import io.nghlong3004.game.component.button.GameButton;
 import io.nghlong3004.game.component.button.SpriteButton;
 import io.nghlong3004.game.context.GameContext;
-import io.nghlong3004.game.context.state.PlayingState;
+import io.nghlong3004.game.context.state.OnlineState;
+import io.nghlong3004.game.manager.NetworkManager;
 import io.nghlong3004.loader.ImageLoader;
 import io.nghlong3004.model.type.GameStateType;
-import io.nghlong3004.model.type.PlayType;
+import io.nghlong3004.model.type.OnlineType;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
@@ -20,7 +22,7 @@ import static io.nghlong3004.constant.GameConstant.SCALE;
 import static io.nghlong3004.constant.ImageConstant.GAME_WIN;
 
 @Slf4j
-public class GameWinComponent extends PlayComponent {
+public class OnlineWinComponent extends GameComponent {
     private SpriteButton replayButton;
     private SpriteButton homeButton;
 
@@ -33,11 +35,14 @@ public class GameWinComponent extends PlayComponent {
     private float starScale = 0f;
     private int starRotation = 0;
 
-    public GameWinComponent(GameContext context) {
+    private final NetworkManager networkManager;
+
+    public OnlineWinComponent(GameContext context) {
         super(context);
         loadImages();
         createSpritesButton();
         buttons = List.of(replayButton, homeButton);
+        networkManager = context.getNetworkManager();
     }
 
     private void loadImages() {
@@ -56,7 +61,7 @@ public class GameWinComponent extends PlayComponent {
         int buttonSpacing = (int) (URM_BUTTON_SIZE * 6 / 5);
         int totalWidth = URM_BUTTON_SIZE * 2 + buttonSpacing;
         int startX = (GAME_WIDTH - totalWidth + URM_BUTTON_SIZE) / 2;
-        int spriteY = (int) (380 * SCALE);
+        int spriteY = (int) (350 * SCALE);
 
         homeButton = new SpriteButton(startX, spriteY, URM_BUTTON_SIZE, URM_BUTTON_SIZE, 2);
         replayButton = new SpriteButton(startX + buttonSpacing, spriteY, URM_BUTTON_SIZE, URM_BUTTON_SIZE, 1);
@@ -75,13 +80,23 @@ public class GameWinComponent extends PlayComponent {
     public void mouseReleased(MouseEvent e) {
         if (homeButton.isMouseOver(e)) {
             if (homeButton.isMousePressed()) {
-                context.changeState(GameStateType.MENU);
+                var onlineState = (OnlineState) context.getGameState(GameStateType.ONLINE);
+                if (onlineState != null) {
+                    ((OnlinePlayComponent) onlineState.getComponent(OnlineType.PLAYING)).exit();
+                    networkManager.leaveRoom();
+                    onlineState.setType(OnlineType.ROOM_LIST);
+                }
             }
         }
         else if (replayButton.isMouseOver(e)) {
             if (replayButton.isMousePressed()) {
-                ((PlayingState) context.getGameState(GameStateType.OFFLINE)).setType(PlayType.PLAYING);
-
+                var onlineState = (OnlineState) context.getGameState(GameStateType.ONLINE);
+                if (onlineState != null) {
+                    ((OnlinePlayComponent) onlineState.getComponent(OnlineType.PLAYING)).exit();
+                    onlineState.setType(OnlineType.ROOM);
+                }
+                resetAnimation();
+                log.info("Game reset from Game Win, change to room");
             }
         }
 

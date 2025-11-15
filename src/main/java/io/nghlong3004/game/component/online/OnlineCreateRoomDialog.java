@@ -15,7 +15,7 @@ import static io.nghlong3004.constant.GameConstant.*;
 import static io.nghlong3004.constant.ImageConstant.BUTTON;
 import static io.nghlong3004.constant.ImageConstant.BUTTON_TOUCH;
 
-public class CreateRoomDialog {
+public class OnlineCreateRoomDialog {
 
     private final MapType[] availableMaps;
 
@@ -46,7 +46,7 @@ public class CreateRoomDialog {
     private java.awt.image.BufferedImage buttonImage;
     private java.awt.image.BufferedImage buttonTouchImage;
 
-    public CreateRoomDialog() {
+    public OnlineCreateRoomDialog() {
         this.availableMaps = MapType.values();
         this.availableSkins = SkinType.values();
         int dialogWidth = (int) (GAME_WIDTH * 0.6);

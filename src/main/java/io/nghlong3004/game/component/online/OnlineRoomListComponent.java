@@ -17,10 +17,10 @@ import java.util.List;
 
 import static io.nghlong3004.constant.GameConstant.*;
 
-public class RoomListComponent extends GameComponent {
+public class OnlineRoomListComponent extends GameComponent {
 
     private final NetworkManager networkManager;
-    private final CreateRoomDialog createRoomDialog;
+    private final OnlineCreateRoomDialog createRoomDialog;
     private final List<Rectangle> roomButtons;
     private final Rectangle createButton;
     private final Rectangle refreshButton;
@@ -29,10 +29,10 @@ public class RoomListComponent extends GameComponent {
     private static final boolean OFFLINE_TEST_MODE = false;
     private static final int OFFLINE_MOCK_PLAYERS = 3;
 
-    public RoomListComponent(GameContext context) {
+    public OnlineRoomListComponent(GameContext context) {
         super(context);
-        this.networkManager = NetworkManager.getInstance();
-        this.createRoomDialog = new CreateRoomDialog();
+        this.networkManager = context.getNetworkManager();
+        this.createRoomDialog = new OnlineCreateRoomDialog();
         this.roomButtons = new ArrayList<>();
 
         int buttonWidth = (int) (140 * SCALE);

@@ -2,9 +2,12 @@ package io.nghlong3004.game.context.state;
 
 import io.nghlong3004.constant.AudioConstant;
 import io.nghlong3004.game.component.GameComponent;
-import io.nghlong3004.game.component.offline.*;
+import io.nghlong3004.game.component.offline.OfflineOverComponent;
+import io.nghlong3004.game.component.offline.OfflinePausedComponent;
+import io.nghlong3004.game.component.offline.OfflinePlayComponent;
+import io.nghlong3004.game.component.offline.OfflineWinComponent;
 import io.nghlong3004.game.context.GameContext;
-import io.nghlong3004.model.type.PlayType;
+import io.nghlong3004.model.type.OfflineType;
 import lombok.Getter;
 
 import java.awt.*;
@@ -13,46 +16,46 @@ import java.awt.event.MouseEvent;
 import java.util.EnumMap;
 import java.util.Map;
 
-public class PlayingState implements GameState {
+public class OfflineState implements GameState {
 
     private final GameContext gameContext;
-    private final Map<PlayType, PlayComponent> gameComponentMap;
+    private final Map<OfflineType, GameComponent> gameComponentMap;
     @Getter
-    private PlayType type;
-    private PlayType previousType;
+    private OfflineType type;
+    private OfflineType previousType;
 
-    public PlayingState(GameContext gameContext, GameComponent audioComponent) {
+    public OfflineState(GameContext gameContext, GameComponent audioComponent) {
         this.gameContext = gameContext;
-        this.gameComponentMap = new EnumMap<>(PlayType.class);
+        this.gameComponentMap = new EnumMap<>(OfflineType.class);
         loadGameComponentMap(audioComponent);
     }
 
     private void loadGameComponentMap(GameComponent audioComponent) {
-        this.gameComponentMap.put(PlayType.WIN, new GameWinComponent(gameContext));
-        this.gameComponentMap.put(PlayType.OVER, new GameOverComponent(gameContext));
-        this.gameComponentMap.put(PlayType.PAUSED, new GamePausedComponent(gameContext, audioComponent));
-        this.gameComponentMap.put(PlayType.PLAYING, new GamePlayComponent(gameContext));
-        this.type = PlayType.PLAYING;
-        this.previousType = PlayType.PLAYING;
+        this.gameComponentMap.put(OfflineType.WIN, new OfflineWinComponent(gameContext));
+        this.gameComponentMap.put(OfflineType.OVER, new OfflineOverComponent(gameContext));
+        this.gameComponentMap.put(OfflineType.PAUSED, new OfflinePausedComponent(gameContext, audioComponent));
+        this.gameComponentMap.put(OfflineType.PLAYING, new OfflinePlayComponent(gameContext));
+        this.type = OfflineType.PLAYING;
+        this.previousType = OfflineType.PLAYING;
     }
 
-    public void setType(PlayType newType) {
+    public void setType(OfflineType newType) {
         if (this.type != newType) {
             this.previousType = this.type;
             this.type = newType;
 
-            if (newType == PlayType.OVER) {
+            if (newType == OfflineType.OVER) {
                 gameContext.getAudio()
                            .playSong(AudioConstant.LOSE);
-                if (gameComponentMap.get(PlayType.OVER) instanceof GameOverComponent) {
-                    ((GameOverComponent) gameComponentMap.get(PlayType.OVER)).resetAnimation();
+                if (gameComponentMap.get(OfflineType.OVER) instanceof OfflineOverComponent) {
+                    ((OfflineOverComponent) gameComponentMap.get(OfflineType.OVER)).resetAnimation();
                 }
             }
-            else if (newType == PlayType.WIN) {
+            else if (newType == OfflineType.WIN) {
                 gameContext.getAudio()
                            .playSong(AudioConstant.VICTORY);
-                if (gameComponentMap.get(PlayType.WIN) instanceof GameWinComponent) {
-                    ((GameWinComponent) gameComponentMap.get(PlayType.WIN)).resetAnimation();
+                if (gameComponentMap.get(OfflineType.WIN) instanceof OfflineWinComponent) {
+                    ((OfflineWinComponent) gameComponentMap.get(OfflineType.WIN)).resetAnimation();
                 }
             }
         }
@@ -64,13 +67,13 @@ public class PlayingState implements GameState {
                    .playSong(gameContext.getMapType().id);
         gameContext.getAudio()
                    .playEffect(AudioConstant.START);
-        ((GamePlayComponent) gameComponentMap.get(type)).play();
+        ((OfflinePlayComponent) gameComponentMap.get(type)).play();
     }
 
     @Override
     public void off() {
-        this.type = PlayType.PLAYING;
-        this.previousType = PlayType.PLAYING;
+        this.type = OfflineType.PLAYING;
+        this.previousType = OfflineType.PLAYING;
         gameContext.getAudio()
                    .stopSong();
     }
@@ -83,8 +86,8 @@ public class PlayingState implements GameState {
 
     @Override
     public void render(Graphics g) {
-        if (type == PlayType.OVER || type == PlayType.WIN) {
-            gameComponentMap.get(PlayType.PLAYING)
+        if (type == OfflineType.OVER || type == OfflineType.WIN) {
+            gameComponentMap.get(OfflineType.PLAYING)
                             .render(g);
 
             Graphics2D g2d = (Graphics2D) g;
@@ -101,7 +104,7 @@ public class PlayingState implements GameState {
         gameComponentMap.get(type)
                         .keyPressed(e);
         if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            type = PlayType.PAUSED;
+            type = OfflineType.PAUSED;
             unpause();
         }
     }
@@ -141,18 +144,18 @@ public class PlayingState implements GameState {
     }
 
     public void replay() {
-        ((GamePlayComponent) gameComponentMap.get(PlayType.PLAYING)).play();
-        this.type = PlayType.PLAYING;
-        this.previousType = PlayType.PLAYING;
+        ((OfflinePlayComponent) gameComponentMap.get(OfflineType.PLAYING)).play();
+        this.type = OfflineType.PLAYING;
+        this.previousType = OfflineType.PLAYING;
     }
 
-    public PlayComponent getComponent(PlayType playType) {
+    public GameComponent getComponent(OfflineType playType) {
         return gameComponentMap.get(playType);
     }
 
     public void unpause() {
-        ((GamePlayComponent) gameComponentMap.get(PlayType.PLAYING)).getGameManager()
-                                                                    .getAgentManager()
-                                                                    .pause();
+        ((OfflinePlayComponent) gameComponentMap.get(OfflineType.PLAYING)).getGameManager()
+                                                                          .getAgentManager()
+                                                                          .pause();
     }
 }

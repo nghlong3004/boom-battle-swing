@@ -49,7 +49,7 @@ public class ServerConnectComponent extends GameComponent {
 
     public ServerConnectComponent(GameContext context) {
         super(context);
-        this.networkManager = NetworkManager.getInstance();
+        this.networkManager = context.getNetworkManager();
         this.configuration = Configuration.getInstance();
         this.bomberName = "";
         this.connecting = false;

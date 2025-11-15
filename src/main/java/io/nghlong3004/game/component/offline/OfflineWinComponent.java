@@ -1,12 +1,13 @@
 package io.nghlong3004.game.component.offline;
 
+import io.nghlong3004.game.component.GameComponent;
 import io.nghlong3004.game.component.button.GameButton;
 import io.nghlong3004.game.component.button.SpriteButton;
 import io.nghlong3004.game.context.GameContext;
-import io.nghlong3004.game.context.state.PlayingState;
+import io.nghlong3004.game.context.state.OfflineState;
 import io.nghlong3004.loader.ImageLoader;
 import io.nghlong3004.model.type.GameStateType;
-import io.nghlong3004.model.type.PlayType;
+import io.nghlong3004.model.type.OfflineType;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
@@ -17,22 +18,23 @@ import java.util.List;
 import static io.nghlong3004.constant.ButtonConstant.URM_BUTTON_SIZE;
 import static io.nghlong3004.constant.GameConstant.GAME_WIDTH;
 import static io.nghlong3004.constant.GameConstant.SCALE;
-import static io.nghlong3004.constant.ImageConstant.GAME_OVER;
+import static io.nghlong3004.constant.ImageConstant.GAME_WIN;
 
 @Slf4j
-public class GameOverComponent extends PlayComponent {
+public class OfflineWinComponent extends GameComponent {
     private SpriteButton replayButton;
     private SpriteButton homeButton;
 
     private final List<GameButton> buttons;
 
-    private BufferedImage loseImage;
+    private BufferedImage winImage;
     private int animationTick = 0;
     private float imageAlpha = 0f;
     private float imageScale = 0.5f;
-    private boolean scaleGrowing = true;
+    private float starScale = 0f;
+    private int starRotation = 0;
 
-    public GameOverComponent(GameContext context) {
+    public OfflineWinComponent(GameContext context) {
         super(context);
         loadImages();
         createSpritesButton();
@@ -40,14 +42,15 @@ public class GameOverComponent extends PlayComponent {
     }
 
     private void loadImages() {
-        loseImage = ImageLoader.loadImage(GAME_OVER);
+        winImage = ImageLoader.loadImage(GAME_WIN);
     }
 
     public void resetAnimation() {
         animationTick = 0;
         imageAlpha = 0f;
         imageScale = 0.5f;
-        scaleGrowing = true;
+        starScale = 0f;
+        starRotation = 0;
     }
 
     private void createSpritesButton() {
@@ -73,22 +76,13 @@ public class GameOverComponent extends PlayComponent {
     public void mouseReleased(MouseEvent e) {
         if (homeButton.isMouseOver(e)) {
             if (homeButton.isMousePressed()) {
-                PlayingState playingState = (PlayingState) context.getGameState(GameStateType.OFFLINE);
-                if (playingState != null) {
-                    ((GamePlayComponent) playingState.getComponent(PlayType.PLAYING)).exit();
-                }
                 context.changeState(GameStateType.MENU);
             }
         }
         else if (replayButton.isMouseOver(e)) {
             if (replayButton.isMousePressed()) {
-                PlayingState playingState = (PlayingState) context.getGameState(GameStateType.OFFLINE);
-                if (playingState != null) {
-                    ((GamePlayComponent) playingState.getComponent(PlayType.PLAYING)).play();
-                    playingState.setType(PlayType.PLAYING);
-                }
-                resetAnimation();
-                log.info("Game reset from Game Over, restarting...");
+                ((OfflineState) context.getGameState(GameStateType.OFFLINE)).setType(OfflineType.PLAYING);
+
             }
         }
 
@@ -122,11 +116,11 @@ public class GameOverComponent extends PlayComponent {
                 imageAlpha = 1f;
             }
         }
+
         if (animationTick < 40) {
             imageScale += 0.035f;
             if (imageScale > 1.2f) {
                 imageScale = 1.2f;
-                scaleGrowing = false;
             }
         }
         else if (animationTick < 60) {
@@ -140,44 +134,79 @@ public class GameOverComponent extends PlayComponent {
             float pulseAmount = (float) Math.sin(animationTick * 0.05) * 0.03f;
             imageScale = 1.0f + pulseAmount;
         }
+
+        if (starScale < 1f) {
+            starScale += 0.03f;
+            if (starScale > 1f) {
+                starScale = 1f;
+            }
+        }
+
+        starRotation = (starRotation + 2) % 360;
     }
 
     @Override
     public void render(Graphics g) {
+
+
         Graphics2D g2d = (Graphics2D) g;
 
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
-        if (loseImage != null) {
-            int originalWidth = loseImage.getWidth();
-            int originalHeight = loseImage.getHeight();
+        if (winImage != null) {
+            int originalWidth = winImage.getWidth();
+            int originalHeight = winImage.getHeight();
 
             int scaledWidth = (int) (originalWidth * SCALE * imageScale);
             int scaledHeight = (int) (originalHeight * SCALE * imageScale);
 
             int imageX = (GAME_WIDTH - scaledWidth) / 2;
-            int imageY = (int) (150 * SCALE);
+            int imageY = (int) (120 * SCALE);
 
             int alpha = (int) (imageAlpha * 255);
             AlphaComposite alphaComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, imageAlpha);
-            g2d.setComposite(alphaComposite);
 
             if (imageAlpha > 0.5f) {
-                AlphaComposite shadowComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, imageAlpha * 0.4f);
+                AlphaComposite shadowComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, imageAlpha * 0.3f);
                 g2d.setComposite(shadowComposite);
-                g2d.drawImage(loseImage, imageX + 5, imageY + 5, scaledWidth, scaledHeight, null);
-
-                g2d.setComposite(alphaComposite);
+                g2d.drawImage(winImage, imageX + 4, imageY + 4, scaledWidth, scaledHeight, null);
             }
 
-            g2d.drawImage(loseImage, imageX, imageY, scaledWidth, scaledHeight, null);
+            g2d.setComposite(alphaComposite);
+            g2d.drawImage(winImage, imageX, imageY, scaledWidth, scaledHeight, null);
 
             g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+
+            if (starScale > 0.1f && imageAlpha > 0.5f) {
+                drawStar(g2d, imageX - 40, imageY + scaledHeight / 2, 20, starScale, starRotation,
+                         new Color(255, 215, 0, (int) (imageAlpha * 200)));
+                drawStar(g2d, imageX + scaledWidth + 20, imageY + scaledHeight / 2, 20, starScale, -starRotation,
+                         new Color(255, 215, 0, (int) (imageAlpha * 200)));
+            }
         }
 
         for (var gameObject : buttons) {
             gameObject.render(g);
         }
+    }
+
+    private void drawStar(Graphics2D g2d, int x, int y, int size, float scale, int rotation, Color color) {
+        g2d.setColor(color);
+
+        int scaledSize = (int) (size * scale);
+        int[] xPoints = new int[10];
+        int[] yPoints = new int[10];
+
+        double angle = Math.toRadians(rotation);
+
+        for (int i = 0; i < 10; i++) {
+            double r = (i % 2 == 0) ? scaledSize : scaledSize / 2.5;
+            double theta = angle + (i * Math.PI / 5) - Math.PI / 2;
+            xPoints[i] = (int) (x + r * Math.cos(theta));
+            yPoints[i] = (int) (y + r * Math.sin(theta));
+        }
+
+        g2d.fillPolygon(xPoints, yPoints, 10);
     }
 }

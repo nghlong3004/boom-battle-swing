@@ -1,6 +1,6 @@
 package io.nghlong3004.model.type;
 
-public enum PlayType {
+public enum OfflineType {
     OVER,
     PAUSED,
     WIN,

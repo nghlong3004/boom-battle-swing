@@ -65,15 +65,17 @@ public class GameManager {
         }
     }
 
-    public void reset() {
-        agentManager.stop();
+    public void reset(boolean isOnline) {
+        if (!isOnline) {
+            agentManager.stop();
+            agents = null;
+        }
         bomberManager.reset();
         bombManager.reset();
         explosionManager.reset();
         itemManager.reset();
         gameTimer.reset();
         bombers = null;
-        agents = null;
     }
 
     public void update() {
@@ -99,11 +101,28 @@ public class GameManager {
                       .anyMatch(Bomber::isAlive);
     }
 
+    public boolean isBomberLocalAlive(String bomberId) {
+        if (bombers == null) {
+            return true;
+        }
+        return bombers.stream()
+                      .anyMatch(bomber -> bomber.getBomberId()
+                                                .equals(bomberId) && bomber.isAlive());
+    }
+
     public boolean isAnyAgentAlive() {
         if (agents == null || agents.isEmpty()) {
             return false;
         }
         return agents.stream()
                      .anyMatch(Bomber::isAlive);
+    }
+
+    public boolean isBomberNotLocalAlive(String bomberId) {
+        if (bombers == null) {
+            return true;
+        }
+        return bombers.stream()
+                      .allMatch(Bomber::isAlive);
     }
 }

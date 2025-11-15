@@ -2,11 +2,11 @@ package io.nghlong3004.game.component;
 
 import io.nghlong3004.game.component.button.GameButton;
 import io.nghlong3004.game.component.button.SpriteButton;
-import io.nghlong3004.game.component.offline.GamePlayComponent;
+import io.nghlong3004.game.component.offline.OfflinePlayComponent;
 import io.nghlong3004.game.context.GameContext;
-import io.nghlong3004.game.context.state.PlayingState;
+import io.nghlong3004.game.context.state.OfflineState;
 import io.nghlong3004.model.type.GameStateType;
-import io.nghlong3004.model.type.PlayType;
+import io.nghlong3004.model.type.OfflineType;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
@@ -55,26 +55,26 @@ public class SpriteComponent extends GameComponent {
     public void mouseReleased(MouseEvent e) {
         if (homeButton.isMouseOver(e)) {
             if (homeButton.isMousePressed()) {
-                PlayingState playingState = (PlayingState) context.getGameState(GameStateType.OFFLINE);
-                if (playingState.getComponent(PlayType.PLAYING) instanceof GamePlayComponent) {
-                    ((GamePlayComponent) playingState.getComponent(PlayType.PLAYING)).exit();
+                OfflineState playingState = (OfflineState) context.getGameState(GameStateType.OFFLINE);
+                if (playingState.getComponent(OfflineType.PLAYING) instanceof OfflinePlayComponent) {
+                    ((OfflinePlayComponent) playingState.getComponent(OfflineType.PLAYING)).exit();
                 }
-                playingState.setType(PlayType.PLAYING);
+                playingState.setType(OfflineType.PLAYING);
                 context.changeState(GameStateType.MENU);
             }
         }
         else if (unpauseButton.isMouseOver(e)) {
             if (unpauseButton.isMousePressed()) {
-                PlayingState playingState = ((PlayingState) context.getGameState(GameStateType.OFFLINE));
-                playingState.setType(PlayType.PLAYING);
+                OfflineState playingState = ((OfflineState) context.getGameState(GameStateType.OFFLINE));
+                playingState.setType(OfflineType.PLAYING);
                 playingState.unpause();
             }
         }
         else if (replayButton.isMouseOver(e)) {
             if (replayButton.isMousePressed()) {
-                PlayingState playingState = (PlayingState) context.getGameState(GameStateType.OFFLINE);
+                OfflineState playingState = (OfflineState) context.getGameState(GameStateType.OFFLINE);
                 playingState.replay();
-                playingState.setType(PlayType.PLAYING);
+                playingState.setType(OfflineType.PLAYING);
             }
         }
 

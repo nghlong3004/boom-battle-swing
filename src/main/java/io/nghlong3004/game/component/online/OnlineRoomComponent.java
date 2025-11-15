@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 
 import static io.nghlong3004.constant.GameConstant.*;
 
-public class RoomComponent extends GameComponent {
+public class OnlineRoomComponent extends GameComponent {
 
     private final NetworkManager networkManager;
     private final Rectangle startButton;
@@ -52,9 +52,9 @@ public class RoomComponent extends GameComponent {
     private boolean isDraggingChat = false;
     private int lastMessageCount = 0;
 
-    public RoomComponent(GameContext context) {
+    public OnlineRoomComponent(GameContext context) {
         super(context);
-        this.networkManager = NetworkManager.getInstance();
+        this.networkManager = context.getNetworkManager();
         this.arrowLeft = ImageLoader.loadImage(ImageConstant.ARROW_LEFT);
         this.arrowRight = ImageLoader.loadImage(ImageConstant.ARROW_RIGHT);
 
@@ -113,7 +113,11 @@ public class RoomComponent extends GameComponent {
 
     @Override
     public void update() {
-
+        if (networkManager.isPlaying()) {
+            OnlineState onlineState = (OnlineState) context.getGameState(GameStateType.ONLINE);
+            onlineState.setType(OnlineType.PLAYING);
+            ((OnlinePlayComponent) onlineState.getComponent(OnlineType.PLAYING)).play();
+        }
     }
 
     @Override
@@ -769,7 +773,6 @@ public class RoomComponent extends GameComponent {
 
     private BomberInfo getLocalBomber(Room room) {
         String bomberId = networkManager.getBomberId();
-        String bomberName = networkManager.getBomberName();
         BomberInfo me = null;
         if (bomberId != null) {
             for (var bomberInfo : room.getBomberInfos()) {
@@ -808,13 +811,5 @@ public class RoomComponent extends GameComponent {
         if (networkManager.isConnected()) {
             action.accept(values[next]);
         }
-    }
-
-    @Override
-    public void mouseMoved(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
     }
 }

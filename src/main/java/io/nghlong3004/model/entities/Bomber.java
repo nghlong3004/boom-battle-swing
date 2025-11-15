@@ -10,7 +10,8 @@ import static io.nghlong3004.constant.BomberConstant.BOMBER_WIDTH;
 @Getter
 @Setter
 public class Bomber extends Entity {
-
+    
+    private String bomberId = "";
     private int maxBombs = 1;
     private int currentBombs = 0;
     private int explosionRange = 1;

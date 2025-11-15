@@ -7,6 +7,8 @@ import io.nghlong3004.game.input.KeyboardAdapter;
 import io.nghlong3004.game.input.MouseAdapter;
 import io.nghlong3004.game.input.MouseMotionAdapter;
 import io.nghlong3004.game.main.GameLogic;
+import io.nghlong3004.game.manager.GameManager;
+import io.nghlong3004.game.manager.NetworkManager;
 import io.nghlong3004.loader.AudioLoader;
 import io.nghlong3004.model.type.*;
 import io.nghlong3004.util.AudioHelper;
@@ -42,13 +44,19 @@ public class GameContext implements GameLogic, KeyboardAdapter, MouseAdapter, Mo
     @Setter
     private PlayerCountType playerCount = PlayerCountType.ONE_PLAYER;
     @Getter
+    private final GameManager gameManager;
+    @Getter
+    private final NetworkManager networkManager;
+    @Getter
     @Setter
     private int numberBomber = 1;
 
-    public GameContext() {
-        this.stateMap = new EnumMap<>(GameStateType.class);
-        this.audio = new AudioLoader();
-        AudioHelper.setAudioLoader(this.audio);
+    public GameContext(EnumMap<GameStateType, GameState> stateMap, AudioLoader audio, GameManager gameManager,
+                       NetworkManager networkManager) {
+        this.stateMap = stateMap;
+        this.audio = audio;
+        this.gameManager = gameManager;
+        this.networkManager = networkManager;
         loadStates();
         changeState(GameStateType.MENU);
     }
@@ -72,7 +80,7 @@ public class GameContext implements GameLogic, KeyboardAdapter, MouseAdapter, Mo
     private void loadStates() {
         GameComponent audioComponent = new AudioComponent(this);
         stateMap.put(GameStateType.MENU, new MainMenuState(this));
-        stateMap.put(GameStateType.OFFLINE, new PlayingState(this, audioComponent));
+        stateMap.put(GameStateType.OFFLINE, new OfflineState(this, audioComponent));
         stateMap.put(GameStateType.OPTION, new OptionState(this, audioComponent));
         stateMap.put(GameStateType.ONLINE, new OnlineState(this));
         stateMap.put(GameStateType.QUIT, new QuitState(this));

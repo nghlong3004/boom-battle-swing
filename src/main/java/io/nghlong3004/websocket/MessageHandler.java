@@ -5,6 +5,7 @@ import io.nghlong3004.game.manager.NetworkManager;
 import io.nghlong3004.model.ChatMessage;
 import io.nghlong3004.model.NetworkMessage;
 import io.nghlong3004.model.Room;
+import io.nghlong3004.model.request.BomberActionRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,8 +30,16 @@ public class MessageHandler {
             case ROOM_UPDATE -> handleRoomUpdate(message);
             case LEAVE_ROOM -> handleLeaveRoom(message);
             case CHAT_MESSAGE -> handleChatMessage(message);
+            case START_GAME -> handleStartGame(message);
+            case BOMBER_ACTION -> handleBomberAction(message);
             default -> log.warn("Unhandled message type: {}", message.getType());
         }
+    }
+
+    private void handleBomberAction(NetworkMessage message) {
+        var bomberActionRequest = gson.fromJson(message.getData(), BomberActionRequest.class);
+        networkManager.keyAction(bomberActionRequest.keyCode(), bomberActionRequest.bomberId(),
+                                 bomberActionRequest.isReleased());
     }
 
     private void handleLeaveRoom(NetworkMessage message) {
@@ -85,6 +94,7 @@ public class MessageHandler {
     }
 
     private void handleStartGame(NetworkMessage message) {
+        networkManager.setPlaying(true);
         log.info("Game starting!");
     }
 

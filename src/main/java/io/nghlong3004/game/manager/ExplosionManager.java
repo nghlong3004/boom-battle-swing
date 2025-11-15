@@ -87,7 +87,9 @@ public class ExplosionManager {
 
     public void update() {
         checkBomberDamage(bomberManager.getBombers());
-        checkBomberDamage(agentManager.getAgents());
+        if (agentManager.getAgents() != null) {
+            checkBomberDamage(agentManager.getAgents());
+        }
 
         for (Explosion explosion : explosions) {
             explosion.update();

@@ -25,7 +25,7 @@ public class Configuration {
                 throw new IOException(msg);
             }
             properties.load(inputStream);
-            log.debug("Merged properties from {}", RESOURCE_PATH);
+            log.debug("Read properties from {}", RESOURCE_PATH);
         } catch (IOException e) {
             log.error("{} error close file: message {}", RESOURCE_PATH, e.getMessage());
             throw new RuntimeException(e);
@@ -57,13 +57,8 @@ public class Configuration {
     }
 
     public String getServerUrl(int serverNumber) {
-        String key = "server." + serverNumber + ".url";
-        String url = getPropertyValue(key);
-        if (url.isEmpty()) {
-            log.warn("Server URL not configured for server {}", serverNumber);
-            return "ws://localhost:808" + (serverNumber - 1);
-        }
-        return url;
+        String key = "server.%d.url".formatted(serverNumber);
+        return getPropertyValue(key);
     }
 
     public int getServerCount() {
@@ -72,7 +67,8 @@ public class Configuration {
             String url = properties.getProperty("server." + i + ".url");
             if (url != null && !url.isBlank()) {
                 count++;
-            } else {
+            }
+            else {
                 break;
             }
         }

@@ -6,6 +6,7 @@ import io.nghlong3004.model.entities.Item;
 import io.nghlong3004.model.type.ItemType;
 import io.nghlong3004.util.AudioHelper;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
@@ -20,17 +21,23 @@ import static io.nghlong3004.constant.GameConstant.TILE_SIZE;
 public class ItemManager {
     @Getter
     private final List<Item> items;
+    @Setter
+    private ItemType[][] itemTypes;
 
     public ItemManager() {
         this.items = new ArrayList<>();
     }
 
     public void spawnItem(int gridX, int gridY) {
-        if (Math.random() < 0.6) {
-            ItemType randomType = ItemType.random();
-            Item item = new Item(gridX, gridY, randomType);
+        if (itemTypes == null) {
+            return;
+        }
+        int x = gridX / TILE_SIZE;
+        int y = gridY / TILE_SIZE;
+        if (itemTypes[x][y] != ItemType.BLANK) {
+            Item item = new Item(gridX, gridY, itemTypes[x][y]);
             items.add(item);
-            log.debug("Spawned {} at ({}, {})", randomType, gridX, gridY);
+            log.debug("Spawned {} at ({}, {})", itemTypes[x][y], gridX, gridY);
         }
     }
 

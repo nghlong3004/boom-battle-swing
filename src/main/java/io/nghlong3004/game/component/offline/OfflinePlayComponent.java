@@ -34,7 +34,7 @@ public class OfflinePlayComponent extends GameComponent {
 
     public void play() {
         loadBombers();
-        gameManager.play(context.getMapType(), getPlayers(), false);
+        gameManager.playOffline(context.getMapType(), getPlayers());
     }
 
     private List<Bomber> getPlayers() {
@@ -49,7 +49,7 @@ public class OfflinePlayComponent extends GameComponent {
     }
 
     public void exit() {
-        gameManager.reset(false);
+        gameManager.reset();
     }
 
 

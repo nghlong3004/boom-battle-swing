@@ -1,13 +1,11 @@
 package io.nghlong3004;
 
-import io.nghlong3004.game.GameFactory;
-import io.nghlong3004.game.main.GameWindow;
+import io.nghlong3004.game.Game;
 
 import javax.swing.*;
 
 public class BoomBattleSwing {
     public static void main(String[] args) {
-        GameWindow window = GameFactory.createBoomBattle();
-        SwingUtilities.invokeLater(window::open);
+        SwingUtilities.invokeLater(Game::run);
     }
 }

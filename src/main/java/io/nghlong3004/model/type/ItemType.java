@@ -1,18 +1,18 @@
 package io.nghlong3004.model.type;
 
+import lombok.AllArgsConstructor;
+
 import java.util.Random;
 
+@AllArgsConstructor
 public enum ItemType {
-    ITEM_BOMB(0),      // Tăng số lượng bomb có thể đặt
-    ITEM_BOMB_SIZE(1), // Tăng phạm vi nổ của bomb
-    ITEM_SHOE(2);      // Tăng tốc độ di chuyển
+    BLANK(-1),
+    ITEM_BOMB(0),
+    ITEM_BOMB_SIZE(1),
+    ITEM_SHOE(2);
 
     public final int id;
     private static final Random random = new Random();
-
-    ItemType(int id) {
-        this.id = id;
-    }
 
     public static ItemType random() {
         ItemType[] values = values();

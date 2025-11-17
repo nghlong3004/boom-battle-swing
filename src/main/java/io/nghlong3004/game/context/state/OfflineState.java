@@ -144,6 +144,7 @@ public class OfflineState implements GameState {
     }
 
     public void replay() {
+        ((OfflinePlayComponent) gameComponentMap.get(OfflineType.PLAYING)).exit();
         ((OfflinePlayComponent) gameComponentMap.get(OfflineType.PLAYING)).play();
         this.type = OfflineType.PLAYING;
         this.previousType = OfflineType.PLAYING;

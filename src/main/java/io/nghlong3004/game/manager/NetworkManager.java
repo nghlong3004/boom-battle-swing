@@ -9,6 +9,8 @@ import io.nghlong3004.model.request.BomberActionRequest;
 import io.nghlong3004.model.request.ChatMessageRequest;
 import io.nghlong3004.model.request.CreateRoomRequest;
 import io.nghlong3004.model.request.JoinRoomRequest;
+import io.nghlong3004.model.response.PointResponse;
+import io.nghlong3004.model.type.ItemType;
 import io.nghlong3004.model.type.MapType;
 import io.nghlong3004.model.type.MessageType;
 import io.nghlong3004.model.type.SkinType;
@@ -25,23 +27,18 @@ import java.util.List;
 import static io.nghlong3004.game.input.BomberKeyAction.LOOKUP;
 
 @Slf4j
+@Getter
+@Setter
 public class NetworkManager {
-    @Getter
     private BomberWebSocketClient client;
-    @Getter
     private String bomberId;
-    @Getter
     private String bomberName;
-    @Setter
-    @Getter
     private Room currentRoom;
-    @Getter
-    @Setter
     private List<Room> availableRooms;
     private List<Bomber> bombers;
-
-    @Getter
-    @Setter
+    private int[][] mapData;
+    private List<PointResponse> spawns;
+    private ItemType[][] itemSpawns;
     private boolean isPlaying;
 
     private final MessageHandler messageHandler;
@@ -50,6 +47,17 @@ public class NetworkManager {
         this.availableRooms = new ArrayList<>();
         this.messageHandler = new MessageHandler(this);
         this.isPlaying = false;
+    }
+
+    public void update() {
+        if (client == null || !client.isConnected()) {
+            return;
+        }
+
+        while (client.hasMessages()) {
+            NetworkMessage message = client.pollMessage();
+            messageHandler.handle(message);
+        }
     }
 
     public void connect(String serverUrl, String playerName) {
@@ -82,17 +90,6 @@ public class NetworkManager {
         if (client != null && client.isConnected()) {
             client.close();
             log.info("Disconnected from server");
-        }
-    }
-
-    public void update() {
-        if (client == null || !client.isConnected()) {
-            return;
-        }
-
-        while (client.hasMessages()) {
-            NetworkMessage message = client.pollMessage();
-            messageHandler.handle(message);
         }
     }
 
@@ -160,7 +157,8 @@ public class NetworkManager {
     }
 
     public void startGame() {
-        var message = new NetworkMessage(MessageType.START_GAME, null);
+        var message = new NetworkMessage(MessageType.START_GAME, client.getGson()
+                                                                       .toJson(currentRoom.getMap()));
         if (client != null && client.isConnected()) {
             client.sendMessage(message);
         }

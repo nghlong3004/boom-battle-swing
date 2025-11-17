@@ -14,8 +14,8 @@ import io.nghlong3004.util.AudioHelper;
 
 import java.util.EnumMap;
 
-public class GameFactory {
-    public static GameWindow createBoomBattle() {
+public class Game {
+    public static void run() {
         var stateMap = new EnumMap<GameStateType, GameState>(GameStateType.class);
         var audio = new AudioLoader();
         var gameManager = ManagerFactory.createGameManager();
@@ -27,7 +27,7 @@ public class GameFactory {
         var thread = new Thread(gameLoop);
         gamePanel.requestFocus();
         AudioHelper.setAudioLoader(audio);
-        return new GameWindow(gameFrame, thread);
+        (new GameWindow(gameFrame, thread)).open();
     }
 
 }

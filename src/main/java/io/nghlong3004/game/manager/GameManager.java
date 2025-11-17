@@ -1,6 +1,7 @@
 package io.nghlong3004.game.manager;
 
 import io.nghlong3004.model.entities.Bomber;
+import io.nghlong3004.model.type.ItemType;
 import io.nghlong3004.model.type.MapType;
 import io.nghlong3004.model.type.SkinType;
 import lombok.Builder;
@@ -32,41 +33,37 @@ public class GameManager {
     private List<Bomber> bombers;
     private List<Bomber> agents;
 
-    public void play(MapType type, List<Bomber> bombers, boolean isOnline) {
-        mapManager.setType(type);
-        mapManager.loadMap();
-        setSpawnBombers(bombers, isOnline);
+    private void play(List<Bomber> bombers) {
+        setSpawnBombers(bombers);
         this.bombers = bombers;
         bomberManager.addAll(bombers);
         gameTimer.reset();
         gameTimer.start();
     }
 
-    private void setSpawnBombers(List<Bomber> bombers, boolean isOnline) {
-        var points = mapManager.getSpawns(6);
-        for (int i = 0; i < bombers.size(); ++i) {
-            bombers.get(i)
-                   .setX(points.get(i).x);
-            bombers.get(i)
-                   .setY(points.get(i).y);
-            bombers.get(i)
-                   .reset();
-        }
-        if (!isOnline) {
-            agents = new ArrayList<>();
-            for (int i = bombers.size(); i < points.size(); ++i) {
-                Bomber agent = new Bomber(points.get(i).x, points.get(i).y, SkinType.BOZ);
-                agent.reset();
-                agents.add(agent);
-            }
-            agentManager.setAgents(agents);
-            agentManager.setTickMillis(7);
-            agentManager.start();
-        }
+    public void playOffline(MapType type, List<Bomber> bombers) {
+        mapManager.loadMap(type);
+        itemManager.setItemTypes(getItemTypes());
+        setSpawnAgents(bombers.size());
+        play(bombers);
     }
 
-    public void reset(boolean isOnline) {
-        if (!isOnline) {
+    public void playOnline(NetworkManager networkManager) {
+        mapManager.getMap()
+                  .setType(networkManager.getCurrentRoom()
+                                         .getMap());
+        mapManager.getMap()
+                  .setData(networkManager.getMapData());
+        mapManager.setBomberSpawns(networkManager.getSpawns()
+                                                 .stream()
+                                                 .map(pointResponse -> new Point(pointResponse.x(), pointResponse.y()))
+                                                 .toList());
+        itemManager.setItemTypes(networkManager.getItemSpawns());
+        play(networkManager.getBombers());
+    }
+
+    public void reset() {
+        if (agents != null) {
             agentManager.stop();
             agents = null;
         }
@@ -124,5 +121,48 @@ public class GameManager {
         }
         return bombers.stream()
                       .allMatch(Bomber::isAlive);
+    }
+
+    private ItemType[][] getItemTypes() {
+        int n = mapManager.getMap()
+                          .getData().length;
+        int m = mapManager.getMap()
+                          .getData()[0].length;
+        var itemSpawns = new ItemType[n][m];
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < m; ++j) {
+                itemSpawns[i][j] = ItemType.BLANK;
+                if (Math.random() < 0.6) {
+                    ItemType randomType = ItemType.random();
+                    itemSpawns[i][j] = randomType;
+                }
+            }
+        }
+        return itemSpawns;
+    }
+
+    private void setSpawnBombers(List<Bomber> bombers) {
+        var points = mapManager.getSpawns();
+        for (int i = 0; i < bombers.size(); ++i) {
+            bombers.get(i)
+                   .setX(points.get(i).x);
+            bombers.get(i)
+                   .setY(points.get(i).y);
+            bombers.get(i)
+                   .reset();
+        }
+    }
+
+    private void setSpawnAgents(int start) {
+        var points = mapManager.getSpawns();
+        agents = new ArrayList<>();
+        for (int i = start; i < points.size(); ++i) {
+            Bomber agent = new Bomber(points.get(i).x, points.get(i).y, SkinType.BOZ);
+            agent.reset();
+            agents.add(agent);
+        }
+        agentManager.setAgents(agents);
+        agentManager.setTickMillis(7);
+        agentManager.start();
     }
 }

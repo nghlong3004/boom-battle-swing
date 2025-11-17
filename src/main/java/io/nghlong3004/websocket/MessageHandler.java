@@ -6,6 +6,7 @@ import io.nghlong3004.model.ChatMessage;
 import io.nghlong3004.model.NetworkMessage;
 import io.nghlong3004.model.Room;
 import io.nghlong3004.model.request.BomberActionRequest;
+import io.nghlong3004.model.response.StartGameResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -94,6 +95,12 @@ public class MessageHandler {
     }
 
     private void handleStartGame(NetworkMessage message) {
+        var startGameResponse = gson.fromJson(message.getData(), StartGameResponse.class);
+        var mapDataResponse = startGameResponse.mapData();
+        var itemSpawns = startGameResponse.itemSpawns();
+        networkManager.setMapData(mapDataResponse.map());
+        networkManager.setSpawns(mapDataResponse.spawns());
+        networkManager.setItemSpawns(itemSpawns);
         networkManager.setPlaying(true);
         log.info("Game starting!");
     }

@@ -35,13 +35,12 @@ public class OnlinePlayComponent extends GameComponent {
         this.bombers = networkManager.getBombers();
         this.isPlaying = true;
         networkManager.setPlaying(false);
-        this.gameManager.play(this.networkManager.getCurrentRoom()
-                                                 .getMap(), bombers, true);
+        this.gameManager.playOnline(this.networkManager);
     }
 
     public void exit() {
         this.isPlaying = false;
-        gameManager.reset(true);
+        gameManager.reset();
     }
 
     @Override

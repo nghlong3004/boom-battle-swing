@@ -1,1 +1,198 @@
-== boom-battle-swing
+= Boom Battle Document
+Long Nguyen Hoang <nghlong3004@gmail.com>
+Version 1.0, 11.2025
+:sectnums:
+:doctype: book
+:toc:
+:toclevels: 4
+
+== Introduction
+
+=== About the Game
+
+Game Boom Battle được mình mô phỏng lại dựa trên tựa game Boom Online 2D. +
+Khi tham gia trò chơi, người chơi sẽ điều khiển nhân vật bằng các nút di chuyển trên bàn phím Nhiệm vụ của người chơi là nhặt item, né bomb và đặt bomb để tiêu diệt đối thủ (gồm người chơi khác hoặc máy). +
+
+[NOTE]
+====
+Mục tiêu của project là để cá nhân mình vận dụng những lý thuyết như Design Pattern, OOP, SOLID và giao thức WebSocket vào trong thực tế.
+====
+
+=== Installation
+
+Để trải nghiệm bạn cần clone 2 repositories của mình.
+
+[source,bash]
+----
+git clone https://github.com/nghlong3004/boom-battle-backend.git
+----
+
+[source,bash]
+----
+git clone https://github.com/nghlong3004/boom-battle-swing.git
+----
+
+Hoặc bạn chỉ cần clone https://github.com/nghlong3004/boom-battle-backend[*Boom Battle Backend*^].
+Và tải file `.jar` cho client ở https://github.com/nghlong3004/boom-battle-swing/blob/main/out/artifacts/boom_battle_swing_jar/boom-battle-swing.jar[*đây*]. +
+Khi clone về ở phía `server`: +
+Bạn tìm file `BoomBattleBackendApplication.java` để chạy. +
+Phía `Client`: +
+Bạn tìm tới file `BoomBattleSwing.java` để chạy hoặc vào terminal gõ:
+
+[source,bash]
+----
+cd out\artifacts\boom_battle_swing_jar
+java -jar boom-battle-swing
+----
+
+[IMPORTANT]
+====
+Để chạy dự án, bạn cần có Java 21 trở lên
+====
+
+== Design for Boom Battle
+
+=== High Level Design
+
+==== System Overview
+
+Game theo dạng mô hình client-server. +
+- `Client`: Java Swing (Java 21). +
+- `Server`: Spring Boot (3.5.8). +
+- `Protocol`: WebSocket (JSON). +
+- `Game Type`: Offline, Online (real-time).
+
+==== Requirements
+
+.Functional
+[cols="1, 3"]
+|===
+|Function| Short Description
+|Connection
+|Kết nối người chơi với server qua WebSocket.
+|Disconnection
+|Người chơi ngắt kết nối với Server
+|Create Room
+|Người chơi tạo phòng
+|Room List
+|Lấy danh sách phòng
+|Join Room
+|Người chơi tham gia phòng
+|Leave Room
+|Người chơi rời khỏi phòng
+|Chat Message
+|Người chơi gửi tin nhắn trong phòng
+|Update Map, Skin, Ready
+|Người chơi thay đổi skin, map và trạng thái ready
+|Start Game
+|Chủ phòng bắt đầu ván đấu
+|Bomber Action
+|Hành động của người chơi khi di chuyển
+
+|===
+
+.Non-Fuctional
+[cols="1,3"]
+|===
+|Category | Requirement
+|Hiệu năng
+|Trong 1s sẽ update số UPS lần (khuyến nghị 200)
+|===
+
+==== Architecture Overview
+
+image::docs/images/architecture_overview.png[Architecture Overview]
+
+==== Game Flow
+
+* User Flow: +
+1. Open game.
+2. Chọn ONLINE/OFFLINE. +
+2.1. Chọn OFFLINE. +
+2.1.1. Chọn Số người chơi (1 VS NPC) (2 VS NPC). +
+2.2. Chọn ONLINE. +
+2.2.1. Chọn Server + nhập nickname. +
+2.2.2. Tạo Phòng hoặc Join vào 1 phòng bất kì. +
+2.2.3. Đợi số người trong 1 phòng >= 2 và mọi người trong phòng đã Ready hết thì chủ phòng mới được phép Start để bắt đầu ván đấu.
+Trong lúc đó có thể chat với nhau, chọn skin, chọn map. +
+2.2.4. Game Start. +
+2.2.5. Playing game, người dùng điều khiển nhân vật bằng bàn phím với các nút `mũi tên` và `A`, `W`, `S`, `D`, `SPACE`, `0`. +
+2.2.6. Game over | Game win -> Có 2 option là quay lại hoặc trở ra sảnh. +
+2.2.6.1 Quay lại -> quay lại 2.2.3 +
+2.2.6.2 Trở ra sảnh -> Quay lại 2.2.2
+3. Chọn Settings -> Điều chỉnh âm thanh.
+4. Quit -> Đóng game.
+
+* Game Session Flow: +
+1. Client kết nối tới Server.
+2. Server lưu lại session vào 1 và trả về danh sách các phòng  +
+3. Người chơi Create Room hoặc Join Room -> Cho Session Người chơi vào một class `ConcurrentHashMap<String, Room>`
+4. Nếu người chơi Leave Room Tìm tới phòng đang chứa session người chơi và xoá khỏi phòng đó.
+5. Nếu người chơi ấn `BACK` hoặc là `tắt ứng dụng` -> Client gửi ping tới Server và Server xoá Session khỏi Set trên Server.
+6. Nếu người chơi Create Room hoặc Join Room -> quay lại 3
+
+==== Module Overview
+
+.Client
+[cols="1,2"]
+|===
+| Module | Responsibilities
+
+| WebSocket
+| Quản lý kết nối WebSocket, nhận/gửi message JSON
+
+| AI
+| Đưa ra quyết định cho Agent
+
+| Game.Main
+| Game loop, Game Panel, Game Frame, Game Window
+
+| Game.Context
+| Chứa các state là trạng thái của game như MENU, ONLINE, OFFLINE, OPTION
+
+| Game.Component
+| Thành phần nhỏ của các Bối cảnh game như Over, Win,etc...
+
+| Game.Input
+| Nơi lắng nghe các Input như keyboard, mouse
+
+| Game.Manager
+| Quản lý game như update gì, render cái gì, có những dữ liệu gì
+
+| Assets
+| Nơi chứa tài nguyên đảm bảo tài nguyên chỉ được loading lên 1 lần
+
+| Model
+| Chứa Entities, POJO và Data Transfer Object.
+
+| Loader
+| dùng để Load tài nguyên như ảnh, file audio
+
+| Util
+| Hỗ trợ check vị trí, map, ...
+
+|===
+
+.Server
+[cols="1,2"]
+|===
+| Module | Responsibilities
+
+| WebSocket
+| Quản lý kết nối WebSocket, nhận/gửi message JSON
+
+| Controller
+| Điều hướng để xử lý data và trả về cho client
+
+| Service
+| Xử lý data
+
+| Model
+| Chứa Entities, POJO và Data Transfer Object.
+
+| Configuration
+| Chứa các class configuration
+
+|===
+
+== Low Level Design

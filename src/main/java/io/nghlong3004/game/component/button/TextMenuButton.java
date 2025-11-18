@@ -1,5 +1,6 @@
 package io.nghlong3004.game.component.button;
 
+import io.nghlong3004.loader.AudioLoader;
 import io.nghlong3004.loader.ImageLoader;
 import io.nghlong3004.model.type.GameStateType;
 import lombok.Getter;
@@ -20,8 +21,8 @@ public class TextMenuButton extends GameButton {
     private BufferedImage buttonTouchImage;
     private final String text;
 
-    public TextMenuButton(int x, int y, String text, GameStateType state) {
-        super(x, y, MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT, 0);
+    public TextMenuButton(int x, int y, String text, GameStateType state, AudioLoader audioLoader) {
+        super(x, y, MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT, 0, audioLoader);
         this.text = text;
         this.state = state;
         loadImage();

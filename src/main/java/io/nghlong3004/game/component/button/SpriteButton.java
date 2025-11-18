@@ -1,6 +1,7 @@
 package io.nghlong3004.game.component.button;
 
 import io.nghlong3004.constant.ImageConstant;
+import io.nghlong3004.loader.AudioLoader;
 import io.nghlong3004.loader.ImageLoader;
 
 import java.awt.*;
@@ -12,8 +13,8 @@ import static io.nghlong3004.constant.ButtonConstant.URM_BUTTON_SIZE_DEFAULT;
 public class SpriteButton extends GameButton {
     private BufferedImage[] images;
 
-    public SpriteButton(int x, int y, int width, int height, int rowIndex) {
-        super(x, y, width, height, rowIndex);
+    public SpriteButton(int x, int y, int width, int height, int rowIndex, AudioLoader audioLoader) {
+        super(x, y, width, height, rowIndex, audioLoader);
         loadImage();
     }
 

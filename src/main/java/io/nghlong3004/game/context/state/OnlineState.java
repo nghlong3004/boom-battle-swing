@@ -1,5 +1,6 @@
 package io.nghlong3004.game.context.state;
 
+import io.nghlong3004.constant.AudioConstant;
 import io.nghlong3004.game.component.GameComponent;
 import io.nghlong3004.game.component.online.*;
 import io.nghlong3004.game.context.GameContext;
@@ -121,6 +122,8 @@ public class OnlineState implements GameState {
     @Override
     public void on() {
         this.type = OnlineType.SERVER_CONNECT;
+        context.getAudio()
+               .playSong(AudioConstant.ONLINE);
     }
 
     @Override

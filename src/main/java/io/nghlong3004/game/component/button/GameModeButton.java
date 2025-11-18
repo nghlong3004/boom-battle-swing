@@ -1,5 +1,6 @@
 package io.nghlong3004.game.component.button;
 
+import io.nghlong3004.loader.AudioLoader;
 import io.nghlong3004.loader.ImageLoader;
 import io.nghlong3004.model.type.GameType;
 import lombok.Getter;
@@ -25,8 +26,8 @@ public class GameModeButton extends GameButton {
     private static final long BLINK_DURATION = 300;
     private static final int BLINK_INTERVAL = 100;
 
-    public GameModeButton(int x, int y, GameType gameMode, String label) {
-        super(x - MENU_BUTTON_WIDTH / 2, y, MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT, 0);
+    public GameModeButton(int x, int y, GameType gameMode, String label, AudioLoader audioLoader) {
+        super(x - MENU_BUTTON_WIDTH / 2, y, MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT, 0, audioLoader);
         this.gameMode = gameMode;
         this.label = label;
         this.isBlinking = false;

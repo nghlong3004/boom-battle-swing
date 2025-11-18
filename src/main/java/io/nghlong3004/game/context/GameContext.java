@@ -1,5 +1,6 @@
 package io.nghlong3004.game.context;
 
+import io.nghlong3004.constant.AudioConstant;
 import io.nghlong3004.game.component.GameComponent;
 import io.nghlong3004.game.component.option.AudioComponent;
 import io.nghlong3004.game.context.state.*;
@@ -11,7 +12,6 @@ import io.nghlong3004.game.manager.GameManager;
 import io.nghlong3004.game.manager.NetworkManager;
 import io.nghlong3004.loader.AudioLoader;
 import io.nghlong3004.model.type.*;
-import io.nghlong3004.util.AudioHelper;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -108,7 +108,7 @@ public class GameContext implements GameLogic, KeyboardAdapter, MouseAdapter, Mo
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        AudioHelper.playClickSound();
+        audio.playEffect(AudioConstant.CLICK);
         currentState.mouseClicked(e);
     }
 

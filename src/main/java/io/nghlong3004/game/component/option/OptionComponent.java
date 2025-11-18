@@ -35,7 +35,7 @@ public class OptionComponent extends GameComponent {
     private void createSpritesButton() {
         int homeX = GAME_WIDTH - URM_BUTTON_SIZE >>> 1;
         int spriteY = GAME_HEIGHT - URM_BUTTON_SIZE * 2;
-        homeButton = new SpriteButton(homeX, spriteY, URM_BUTTON_SIZE, URM_BUTTON_SIZE, 2);
+        homeButton = new SpriteButton(homeX, spriteY, URM_BUTTON_SIZE, URM_BUTTON_SIZE, 2, context.getAudio());
     }
 
     @Override

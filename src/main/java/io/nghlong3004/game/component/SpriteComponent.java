@@ -37,9 +37,9 @@ public class SpriteComponent extends GameComponent {
         int unPauseX = homeX + URM_BUTTON_SIZE * 6 / 5;
         int relayX = unPauseX + URM_BUTTON_SIZE * 6 / 5;
         int y = GAME_HEIGHT / 2 + URM_BUTTON_SIZE * 2;
-        unpauseButton = new SpriteButton(unPauseX, y, URM_BUTTON_SIZE, URM_BUTTON_SIZE, 0);
-        replayButton = new SpriteButton(relayX, y, URM_BUTTON_SIZE, URM_BUTTON_SIZE, 1);
-        homeButton = new SpriteButton(homeX, y, URM_BUTTON_SIZE, URM_BUTTON_SIZE, 2);
+        unpauseButton = new SpriteButton(unPauseX, y, URM_BUTTON_SIZE, URM_BUTTON_SIZE, 0, context.getAudio());
+        replayButton = new SpriteButton(relayX, y, URM_BUTTON_SIZE, URM_BUTTON_SIZE, 1, context.getAudio());
+        homeButton = new SpriteButton(homeX, y, URM_BUTTON_SIZE, URM_BUTTON_SIZE, 2, context.getAudio());
     }
 
     @Override

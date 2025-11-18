@@ -39,10 +39,12 @@ public class PlayerCountComponent extends GameComponent {
         int factor = (int) ((MENU_BUTTON_WIDTH_DEFAULT) * SCALE);
 
         int y1P = factor * 3 >>> 1;
-        playerCountButtons[0] = new PlayerCountButton(x, y1P, PlayerCountType.ONE_PLAYER, BUTTON_1P, BUTTON_1P_TOUCH);
+        playerCountButtons[0] = new PlayerCountButton(x, y1P, PlayerCountType.ONE_PLAYER, BUTTON_1P, BUTTON_1P_TOUCH,
+                                                      context.getAudio());
 
         int y2P = factor * 4 >>> 1;
-        playerCountButtons[1] = new PlayerCountButton(x, y2P, PlayerCountType.TWO_PLAYER, BUTTON_2P, BUTTON_2P_TOUCH);
+        playerCountButtons[1] = new PlayerCountButton(x, y2P, PlayerCountType.TWO_PLAYER, BUTTON_2P, BUTTON_2P_TOUCH,
+                                                      context.getAudio());
     }
 
     @Override

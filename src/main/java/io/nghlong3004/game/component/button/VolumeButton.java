@@ -1,6 +1,7 @@
 package io.nghlong3004.game.component.button;
 
 import io.nghlong3004.constant.ImageConstant;
+import io.nghlong3004.loader.AudioLoader;
 import io.nghlong3004.loader.ImageLoader;
 import lombok.Getter;
 
@@ -22,8 +23,8 @@ public class VolumeButton extends GameButton {
     private int buttonX;
 
 
-    public VolumeButton(int x, int y, int width, int height) {
-        super((int) (x + width * VOLUME_START), y, VOLUME_BUTTON_WIDTH, height, 0);
+    public VolumeButton(int x, int y, int width, int height, AudioLoader audioLoader) {
+        super((int) (x + width * VOLUME_START), y, VOLUME_BUTTON_WIDTH, height, 0, audioLoader);
         this.box.x -= (int) (VOLUME_BUTTON_WIDTH * 0.5);
         buttonX = (int) (x + width * VOLUME_START);
         this.x = x;

@@ -1,7 +1,8 @@
 package io.nghlong3004.game.component.button;
 
+import io.nghlong3004.constant.AudioConstant;
 import io.nghlong3004.game.main.GameLogic;
-import io.nghlong3004.util.AudioHelper;
+import io.nghlong3004.loader.AudioLoader;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,17 +20,20 @@ public abstract class GameButton implements GameLogic {
 
     private boolean wasMouseOver = false;
 
-    protected GameButton(int x, int y, int width, int height, int rowIndex) {
+    private final AudioLoader audioLoader;
+
+    protected GameButton(int x, int y, int width, int height, int rowIndex, AudioLoader audioLoader) {
         this.x = x;
         this.y = y;
         this.height = height;
         this.width = width;
         this.box = new Rectangle(x, y, width, height);
         this.rowIndex = rowIndex;
+        this.audioLoader = audioLoader;
     }
 
-    protected GameButton(int x, int y, int width, int height) {
-        this(x, y, width, height, 0);
+    protected GameButton(int x, int y, int width, int height, AudioLoader audioLoader) {
+        this(x, y, width, height, 0, audioLoader);
     }
 
 
@@ -50,7 +54,7 @@ public abstract class GameButton implements GameLogic {
     }
 
     protected void playHoverSound() {
-        AudioHelper.playTouchSound();
+        audioLoader.playEffect(AudioConstant.TOUCH);
     }
 
     public boolean isMouseOver(MouseEvent e) {

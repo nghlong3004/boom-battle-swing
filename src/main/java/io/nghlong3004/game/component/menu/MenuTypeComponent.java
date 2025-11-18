@@ -36,7 +36,7 @@ public class MenuTypeComponent extends GameComponent {
 
         for (int i = 0; i < 3; i++) {
             int y = factor + i * spacing;
-            menuButtons[i] = new TextMenuButton(x, y, texts[i], states[i]);
+            menuButtons[i] = new TextMenuButton(x, y, texts[i], states[i], context.getAudio());
         }
     }
 

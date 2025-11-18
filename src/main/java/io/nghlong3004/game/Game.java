@@ -10,7 +10,6 @@ import io.nghlong3004.game.manager.ManagerFactory;
 import io.nghlong3004.game.manager.NetworkManager;
 import io.nghlong3004.loader.AudioLoader;
 import io.nghlong3004.model.type.GameStateType;
-import io.nghlong3004.util.AudioHelper;
 
 import java.util.EnumMap;
 
@@ -18,7 +17,7 @@ public class Game {
     public static void run() {
         var stateMap = new EnumMap<GameStateType, GameState>(GameStateType.class);
         var audio = new AudioLoader();
-        var gameManager = ManagerFactory.createGameManager();
+        var gameManager = ManagerFactory.createGameManager(audio);
         var networkManager = new NetworkManager();
         var gameContext = new GameContext(stateMap, audio, gameManager, networkManager);
         var gamePanel = new GamePanel(gameContext);
@@ -26,7 +25,6 @@ public class Game {
         var gameLoop = new GameLoop(gamePanel);
         var thread = new Thread(gameLoop);
         gamePanel.requestFocus();
-        AudioHelper.setAudioLoader(audio);
         (new GameWindow(gameFrame, thread)).open();
     }
 

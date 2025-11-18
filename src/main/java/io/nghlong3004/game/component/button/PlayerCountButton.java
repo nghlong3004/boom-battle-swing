@@ -1,5 +1,6 @@
 package io.nghlong3004.game.component.button;
 
+import io.nghlong3004.loader.AudioLoader;
 import io.nghlong3004.loader.ImageLoader;
 import io.nghlong3004.model.type.PlayerCountType;
 import lombok.Getter;
@@ -24,8 +25,9 @@ public class PlayerCountButton extends GameButton {
     private static final long BLINK_DURATION = 300;
     private static final int BLINK_INTERVAL = 100;
 
-    public PlayerCountButton(int x, int y, PlayerCountType playerCount, String normalImagePath, String touchImagePath) {
-        super(x - MENU_BUTTON_WIDTH / 2, y, MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT, 0);
+    public PlayerCountButton(int x, int y, PlayerCountType playerCount, String normalImagePath, String touchImagePath,
+                             AudioLoader audioLoader) {
+        super(x - MENU_BUTTON_WIDTH / 2, y, MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT, 0, audioLoader);
         this.playerCount = playerCount;
         this.isBlinking = false;
         loadImages(normalImagePath, touchImagePath);

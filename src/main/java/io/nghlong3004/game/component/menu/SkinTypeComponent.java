@@ -47,7 +47,7 @@ public class SkinTypeComponent extends GameComponent {
 
         for (int i = 0; i < skins.length; i++) {
             int x = startX + i * (buttonWidth + spacing);
-            skinButtons[i] = new SkinButton(x, y, buttonWidth, buttonHeight, skins[i]);
+            skinButtons[i] = new SkinButton(x, y, buttonWidth, buttonHeight, skins[i], context.getAudio());
         }
     }
 

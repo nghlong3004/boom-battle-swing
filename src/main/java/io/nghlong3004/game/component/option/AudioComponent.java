@@ -36,7 +36,7 @@ public class AudioComponent extends GameComponent {
     private void createVolumeButton() {
         int vX = GAME_WIDTH - SLIDER_BUTTON >>> 1;
         int vY = (int) (262 * SCALE);
-        volumeButton = new VolumeButton(vX, vY, SLIDER_BUTTON, VOLUME_BUTTON_HEIGHT);
+        volumeButton = new VolumeButton(vX, vY, SLIDER_BUTTON, VOLUME_BUTTON_HEIGHT, context.getAudio());
     }
 
     @Override

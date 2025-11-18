@@ -1,32 +1,31 @@
 package io.nghlong3004.game.manager;
 
 import io.nghlong3004.assets.ObjectAssets;
+import io.nghlong3004.constant.AudioConstant;
+import io.nghlong3004.loader.AudioLoader;
 import io.nghlong3004.model.entities.Bomber;
 import io.nghlong3004.model.entities.Item;
 import io.nghlong3004.model.type.ItemType;
-import io.nghlong3004.util.AudioHelper;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import static io.nghlong3004.constant.GameConstant.TILE_SIZE;
 
 @Slf4j
+@RequiredArgsConstructor
 public class ItemManager {
     @Getter
     private final List<Item> items;
     @Setter
     private ItemType[][] itemTypes;
-
-    public ItemManager() {
-        this.items = new ArrayList<>();
-    }
+    private final AudioLoader audioLoader;
 
     public void spawnItem(int gridX, int gridY) {
         if (itemTypes == null) {
@@ -70,7 +69,7 @@ public class ItemManager {
                 if (item.getGridX() == bomberGridX && item.getGridY() == bomberGridY) {
                     item.applyEffect(bomber);
                     iterator.remove();
-                    AudioHelper.playEatItemSound();
+                    audioLoader.playEffect(AudioConstant.EAT_ITEM);
                     log.info("Bomber collected {}", item.getType());
                 }
             }

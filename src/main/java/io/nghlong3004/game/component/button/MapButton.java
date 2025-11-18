@@ -1,6 +1,7 @@
 package io.nghlong3004.game.component.button;
 
 import io.nghlong3004.constant.MapConstant;
+import io.nghlong3004.loader.AudioLoader;
 import io.nghlong3004.loader.ImageLoader;
 import io.nghlong3004.model.type.MapType;
 import lombok.Getter;
@@ -15,8 +16,8 @@ public class MapButton extends GameButton {
     private final MapType tileMode;
     protected BufferedImage image;
 
-    public MapButton(int x, int y, int width, int height, MapType tileMode) {
-        super((int) (x - width / 2f), (int) (y - height / 2f), width, height);
+    public MapButton(int x, int y, int width, int height, MapType tileMode, AudioLoader audioLoader) {
+        super((int) (x - width / 2f), (int) (y - height / 2f), width, height, audioLoader);
         this.tileMode = tileMode;
         loadImage();
     }

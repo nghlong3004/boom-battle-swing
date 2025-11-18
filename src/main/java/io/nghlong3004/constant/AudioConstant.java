@@ -3,6 +3,7 @@ package io.nghlong3004.constant;
 public class AudioConstant {
     public static int MENU = 5;
     public static int GAME = 6;
+    public static int ONLINE = 7;
     public static int BYE_BYE = 2;
 
     public static int MOVE = 0;

@@ -1,10 +1,11 @@
 package io.nghlong3004.game.manager;
 
 import io.nghlong3004.assets.ObjectAssets;
+import io.nghlong3004.constant.AudioConstant;
+import io.nghlong3004.loader.AudioLoader;
 import io.nghlong3004.model.entities.Bomber;
 import io.nghlong3004.model.entities.Explosion;
 import io.nghlong3004.model.type.TileType;
-import io.nghlong3004.util.AudioHelper;
 import io.nghlong3004.util.CollisionUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -26,12 +27,13 @@ public class ExplosionManager {
     private final BomberManager bomberManager;
     private final AgentManager agentManager;
     private final ItemManager itemManager;
+    private final AudioLoader audioLoader;
 
     public void createExplosion(int gridX, int gridY, int range) {
         log.debug("Creating explosion at grid ({}, {}) with range {}", gridX, gridY, range);
 
         explosions.add(new Explosion(gridX, gridY));
-        AudioHelper.playBombExplosionSound();
+        audioLoader.playEffect(AudioConstant.BOOM_BANG);
 
         createExplosionLine(gridX, gridY, 0, -1, range);
         createExplosionLine(gridX, gridY, 0, 1, range);

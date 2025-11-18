@@ -1,5 +1,6 @@
 package io.nghlong3004.game.component.button;
 
+import io.nghlong3004.loader.AudioLoader;
 import io.nghlong3004.loader.ImageLoader;
 import io.nghlong3004.model.type.SkinType;
 import lombok.Getter;
@@ -12,8 +13,8 @@ public class SkinButton extends MapButton {
     @Getter
     private final SkinType skin;
 
-    public SkinButton(int x, int y, int width, int height, SkinType skin) {
-        super(x, y, width, height, null);
+    public SkinButton(int x, int y, int width, int height, SkinType skin, AudioLoader audioLoader) {
+        super(x, y, width, height, null, audioLoader);
         this.skin = skin;
         loadImage();
     }

@@ -50,7 +50,7 @@ public class MapTypeComponent extends GameComponent {
         int index = 0;
         for (MapType mode : allModes) {
             int x = startX + index * (buttonWidth + spacing);
-            mapButtons[index] = new MapButton(x, y, buttonWidth, buttonHeight, mode);
+            mapButtons[index] = new MapButton(x, y, buttonWidth, buttonHeight, mode, context.getAudio());
             index++;
         }
     }

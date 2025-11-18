@@ -42,7 +42,7 @@ public class AudioLoader {
     }
 
     private void loadSongs() {
-        String[] names = {"desert", "land", "town", "underwater", "xmas", "soundMenu", "soundGame"};
+        String[] names = {"desert", "land", "town", "underwater", "xmas", "soundMenu", "soundGame", "online"};
         songs = new Clip[names.length];
         for (int i = 0; i < songs.length; i++) {
             songs[i] = getClip(names[i]);

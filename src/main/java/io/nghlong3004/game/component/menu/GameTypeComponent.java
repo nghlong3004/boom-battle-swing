@@ -40,11 +40,11 @@ public class GameTypeComponent extends GameComponent {
 
 
         int yOffline = factor * 3 >>> 1;
-        modeButtons[0] = new GameModeButton(x, yOffline, GameType.OFFLINE, "OFFLINE");
+        modeButtons[0] = new GameModeButton(x, yOffline, GameType.OFFLINE, "OFFLINE", context.getAudio());
 
 
         int yOnline = factor * 4 >>> 1;
-        modeButtons[1] = new GameModeButton(x, yOnline, GameType.ONLINE, "ONLINE");
+        modeButtons[1] = new GameModeButton(x, yOnline, GameType.ONLINE, "ONLINE", context.getAudio());
     }
 
     @Override

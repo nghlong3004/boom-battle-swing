@@ -209,7 +209,7 @@ public class BomberManager {
         int index = bomber.getIndex();
         return BomberAssets.getInstance()
                            .getBomberAssets()
-                           .get(bomber.getSkin().id)[direction][index];
+                           .get(bomber.getSkinId())[direction][index];
     }
 
     protected void drawHitbox(Graphics g, Rectangle2D.Float hitbox) {

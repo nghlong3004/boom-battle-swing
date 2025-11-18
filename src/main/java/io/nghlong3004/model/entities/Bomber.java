@@ -10,7 +10,7 @@ import static io.nghlong3004.constant.BomberConstant.BOMBER_WIDTH;
 @Getter
 @Setter
 public class Bomber extends Entity {
-    
+
     private String bomberId = "";
     private int maxBombs = 1;
     private int currentBombs = 0;
@@ -30,7 +30,7 @@ public class Bomber extends Entity {
 
     @Override
     protected float getDefaultSpeed() {
-        return 1;
+        return 0.6f;
     }
 
     public void setHasSpeedBoost(boolean b) {
@@ -61,5 +61,9 @@ public class Bomber extends Entity {
             deathAnimationTick = 0;
             deathAnimationFrame = 0;
         }
+    }
+
+    public int getSkinId() {
+        return getSkin().id;
     }
 }

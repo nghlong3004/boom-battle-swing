@@ -1,9 +1,10 @@
 package io.nghlong3004.game.manager;
 
 import io.nghlong3004.model.entities.Bomber;
+import io.nghlong3004.model.entities.Monster;
 import io.nghlong3004.model.type.ItemType;
 import io.nghlong3004.model.type.MapType;
-import io.nghlong3004.model.type.SkinType;
+import io.nghlong3004.model.type.MonsterType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -157,7 +158,7 @@ public class GameManager {
         var points = mapManager.getSpawns();
         agents = new ArrayList<>();
         for (int i = start; i < points.size(); ++i) {
-            Bomber agent = new Bomber(points.get(i).x, points.get(i).y, SkinType.BOZ);
+            var agent = new Monster(points.get(i).x, points.get(i).y, MonsterType.MONSTER);
             agent.reset();
             agents.add(agent);
         }

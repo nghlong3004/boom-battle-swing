@@ -42,6 +42,7 @@ public class ImageConstant {
 
     public static final String BOMBER_SKIN_TEMPLATE = "/images/player/%s.png";
     public static final String BOMBER_AVATAR_TEMPLATE = "/images/player/%s_avatar.png";
+    public static final String MONSTER_TEMPLATE = "/images/monster/%d/%s.jpg";
 
     public static final String BOMBER_DEAD = "/images/player/bomber_deads.png";
     public static final int BOMBER_DEAD_SPRITE_SIZE = 100;
@@ -58,7 +59,7 @@ public class ImageConstant {
     public static final int SOLDIER_DIE_FRAMES = 3;
 
     public static final String BOMB_TEMPLATE = "/images/boom/boom%d.png";
-    public static final String CUSTOM_BOMB = "/images/boom/custom_bubble_100.png";
+    public static final String CUSTOM_BOMB = "/images/boom/custom_bubble_102.png";
     public static final int CUSTOM_BOMB_SPRITE_SIZE = 73;
     public static final int CUSTOM_BOMB_FRAMES = 3;
 

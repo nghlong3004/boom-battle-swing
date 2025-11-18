@@ -5,7 +5,7 @@ v1.0, 2025-11
 :toc:
 :toclevels: 4
 :source-highlighter: highlight.js
-:imagesdir: docs/images
+:imagesdir: docs/
 
 '''
 
@@ -28,6 +28,40 @@ Khi tham gia trò chơi, người chơi sẽ điều khiển nhân vật bằng 
 Nhiệm vụ của người chơi là nhặt item, né bomb và đặt bomb để tiêu diệt đối thủ (gồm người chơi khác hoặc máy).
 
 NOTE: Mục tiêu của project là để cá nhân mình vận dụng những lý thuyết như **Design Pattern, OOP, SOLID** và giao thức **WebSocket** vào trong thực tế.
+
+=== Demo Game
+
+* ** Menu **
+
+image::/demo/menu.jpg[Menu]
+
+* **Online**
+
+image::/demo/online.jpg[Online]
+
+* **Room List**
+
+image::/demo/room_list.jpg[Room List]
+
+* **Room**
+
+image::/demo/room.jpg[Room]
+
+* **Chat**
+
+image::/demo/chat.jpg[chat]
+
+* **Playing**
+
+image::/demo/playing.jpg[Playing]
+
+* **Game Lose**
+
+image::/demo/lose.jpg[Game Lose]
+
+* **Setting**
+
+image::/demo/setting.jpg[Setting]
 
 === Installation
 
@@ -127,21 +161,21 @@ Game hoạt động theo mô hình Client-Server:
 
 ==== Architecture Overview
 
-image::architecture_overview.png[Architecture Overview]
+image::/images/architecture_overview.png[Architecture Overview]
 
 ==== Data Flow Diagram
 
 * **Game Flow**:
 
-image::game_flow.png[Game Flow]
+image::/images/game_flow.png[Game Flow]
 
 * **User Flow**:
 
-image::user_flow.png[User Flow]
+image::/images/user_flow.png[User Flow]
 
 * **Client - Server Flow**:
 
-image::client_server_flow.png[Client-Server Flow]
+image::/images/client_server_flow.png[Client-Server Flow]
 
 ==== Package Overview
 

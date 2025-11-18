@@ -4,6 +4,12 @@ v1.0, 11-2025
 :sectnums:
 :toc:
 :toclevels: 4
+:source-highlighter: highlight.js
+
+Author: {author} {email} +
+Version: {revnumber} ({revdate})
+
+'''
 
 == Introduction
 
@@ -12,10 +18,7 @@ v1.0, 11-2025
 Game Boom Battle được mình mô phỏng lại dựa trên tựa game Boom Online 2D. +
 Khi tham gia trò chơi, người chơi sẽ điều khiển nhân vật bằng các nút di chuyển trên bàn phím Nhiệm vụ của người chơi là nhặt item, né bomb và đặt bomb để tiêu diệt đối thủ (gồm người chơi khác hoặc máy). +
 
-[NOTE]
-====
-Mục tiêu của project là để cá nhân mình vận dụng những lý thuyết như Design Pattern, OOP, SOLID và giao thức WebSocket vào trong thực tế.
-====
+NOTE: Mục tiêu của project là để cá nhân mình vận dụng những lý thuyết như Design Pattern, OOP, SOLID và giao thức WebSocket vào trong thực tế.
 
 === Installation
 
@@ -32,11 +35,12 @@ git clone https://github.com/nghlong3004/boom-battle-swing.git
 ----
 
 Hoặc bạn chỉ cần clone https://github.com/nghlong3004/boom-battle-backend[*Boom Battle Backend*^].
-Và tải file `.jar` cho client ở https://github.com/nghlong3004/boom-battle-swing/blob/main/out/artifacts/boom_battle_swing_jar/boom-battle-swing.jar[*đây*]. +
-Khi clone về ở phía `server`: +
-Bạn tìm file `BoomBattleBackendApplication.java` để chạy. +
-Phía `Client`: +
-Bạn tìm tới file `BoomBattleSwing.java` để chạy hoặc vào terminal gõ:
+Và tải file `.jar` cho client ở https://github.com/nghlong3004/boom-battle-swing/blob/main/out/artifacts/boom_battle_swing_jar/boom-battle-swing.jar[*đây*].
+
+* Server: +
+Bạn tìm file `BoomBattleBackendApplication.java` để chạy.
+* Client: +
+Bạn tìm file `BoomBattleSwing.java` để chạy hoặc vào terminal gõ:
 
 [source,bash]
 ----
@@ -102,33 +106,19 @@ Game theo dạng mô hình client-server. +
 
 image::docs/images/architecture_overview.png[Architecture Overview]
 
-==== Game Flow
+==== Data Flow Diagram
 
-* User Flow: +
-1. Open game.
-2. Chọn ONLINE/OFFLINE. +
-2.1. Chọn OFFLINE. +
-2.1.1. Chọn Số người chơi (1 VS NPC) (2 VS NPC). +
-2.2. Chọn ONLINE. +
-2.2.1. Chọn Server + nhập nickname. +
-2.2.2. Tạo Phòng hoặc Join vào 1 phòng bất kì. +
-2.2.3. Đợi số người trong 1 phòng >= 2 và mọi người trong phòng đã Ready hết thì chủ phòng mới được phép Start để bắt đầu ván đấu.
-Trong lúc đó có thể chat với nhau, chọn skin, chọn map. +
-2.2.4. Game Start. +
-2.2.5. Playing game, người dùng điều khiển nhân vật bằng bàn phím với các nút `mũi tên` và `A`, `W`, `S`, `D`, `SPACE`, `0`. +
-2.2.6. Game over | Game win -> Có 2 option là quay lại hoặc trở ra sảnh. +
-2.2.6.1 Quay lại -> quay lại 2.2.3 +
-2.2.6.2 Trở ra sảnh -> Quay lại 2.2.2
-3. Chọn Settings -> Điều chỉnh âm thanh.
-4. Quit -> Đóng game.
+* **Game Flow**:
 
-* Game Session Flow: +
-1. Client kết nối tới Server.
-2. Server lưu lại session vào 1 và trả về danh sách các phòng  +
-3. Người chơi Create Room hoặc Join Room -> Cho Session Người chơi vào một class `ConcurrentHashMap<String, Room>`
-4. Nếu người chơi Leave Room Tìm tới phòng đang chứa session người chơi và xoá khỏi phòng đó.
-5. Nếu người chơi ấn `BACK` hoặc là `tắt ứng dụng` -> Client gửi ping tới Server và Server xoá Session khỏi Set trên Server.
-6. Nếu người chơi Create Room hoặc Join Room -> quay lại 3
+image::docs/images/game_flow.png[Game Flow]
+
+* **User Flow**:
+
+image::docs/images/user_flow.png[User Flow]
+
+* **Client - Server Flow**:
+
+image::docs/images/client_server_flow.png[Client-Server Flow]
 
 ==== Package Overview
 

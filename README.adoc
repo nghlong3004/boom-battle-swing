@@ -1,8 +1,7 @@
 = Boom Battle Document
 Long Nguyen Hoang <nghlong3004@gmail.com>
-Version 1.0, 11.2025
+v1.0, 11-2025
 :sectnums:
-:doctype: book
 :toc:
 :toclevels: 4
 
@@ -131,12 +130,12 @@ Trong lúc đó có thể chat với nhau, chọn skin, chọn map. +
 5. Nếu người chơi ấn `BACK` hoặc là `tắt ứng dụng` -> Client gửi ping tới Server và Server xoá Session khỏi Set trên Server.
 6. Nếu người chơi Create Room hoặc Join Room -> quay lại 3
 
-==== Module Overview
+==== Package Overview
 
 .Client
 [cols="1,2"]
 |===
-| Module | Responsibilities
+| Package | Responsibilities
 
 | WebSocket
 | Quản lý kết nối WebSocket, nhận/gửi message JSON

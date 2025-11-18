@@ -185,3 +185,109 @@ image::docs/images/client_server_flow.png[Client-Server Flow]
 |===
 
 == Low Level Design
+
+=== Package Structure
+
+[cols="3,5"]
+|===
+|Package | Short Description
+
+|`io.nghlong3004.game.main`
+| Thành phần khởi tạo (`GamePanel`, `GameFrame`, `GameWindow`), vòng lặp (`GameLoop`).
+
+|`io.nghlong3004.game.context`
+| context: `GameContext` +
+các lớp state trong `state/`.
+
+|`io.nghlong3004.game.manager`
+| Game manager: `GameManager` +
+Manager-sub (Map, Bomber, Bomb, Explosion, Item, Agent, Timer, Render, Network).
+
+|`io.nghlong3004.model.entities`
+| Thực thể gameplay (`Bomber`, `Bomb`, `Explosion`, `Item`).
+
+|`io.nghlong3004.loader`
+| Loader tài nguyên: ảnh, âm thanh, map, object.
+
+|`io.nghlong3004.constant`
+| Các hằng số tile, fps, asset path, kích thước.
+
+|`io.nghlong3004.configuration`
+| Các configuration.
+
+|`io.nghlong3004.websocket`
+| Client WebSocket (`BomberWebSocketClient`, `MessageHandler`).
+
+|io.nghlong3004.model.request / response
+| DTO send/receive qua WebSocket.
+
+|`io.nghlong3004.util`
+| Util check va chạm, âm thanh.
+
+|`io.nghlong3004.ai`
+| Điều hướng Agent.
+|===
+
+=== Class Design
+
+* UI: `BoomBattleSwing.main()` -> `Game.run()`.
+* `Game` Factory Init: `AudioLoader` -> `GameManager` -> `NetworkManager` -> `GameContext` -> `GamePanel` -> `GameLoop`.
+* State Pattern: `GameContext` holder `EnumMap<GameStateType, GameState>`; forward method `update`, `render`, `input` -> `currentState`.
+* Manager Facade: `GameManager` Manager lifecycle ván game:
+** `MapManager`: load map, check spawn.
+** `BomberManager`, `BombManager`, `ExplosionManager`, `ItemManager`: update & render.
+** `AgentManager`: update Agent without tickMillis.
+** `GameTimer`: Manager Timer (reset, start, update).
+** `GameRender`: logic render.
+* Entity Hierarchy: `Entity` (x, y, width, height, alive, skin, speed). +
+`Bomber` added bomb slots, range, speed, flag bomb, animation dead (8 frames / speed 10 ticks).
+* Configuration: `Configuration` (Singleton Holder) ->  `GameConstant` (TILE_SIZE, GAME_WIDTH/HEIGHT...).
+* Thread: `GameLoop` .
+
+=== WebSocket Protocol Detail
+
+* Message Types (`MessageType` enum):
+** Kết nối vòng đời: `CONNECT`, `DISCONNECT`.
+** Phòng: `CREATE_ROOM`, `JOIN_ROOM`, `LEAVE_ROOM`, `ROOM_LIST`, `ROOM_UPDATE`, `START_GAME`.
+** Gameplay: `BOMBER_ACTION`, `GAME_STATE_UPDATE`.
+** Cập nhật thuộc tính: `UPDATE_READY`, `UPDATE_SKIN`, `UPDATE_MAP`.
+** Chat: `CHAT_MESSAGE`.
+** Lỗi: `ERROR`.
+* Request DTO (client -> server):
+** `CreateRoomRequest(owner, ownerName, name, maxBombers, mapType, skinType)`.
+** `JoinRoomRequest(id, bomberInfo)` với `BomberInfo(id,name,skin,isReady)`.
+** `ChatMessageRequest(roomId, owner, content)`.
+** `BomberActionRequest(bomberId, keyCode, isReleased)`.
+* Response / Data DTO (server -> client):
+** `Room` : id, owner, name, danh sách `BomberInfo`, `maxBomber`, `map`, `chatMessages`.
+** `MapDataResponse(map[][], spawns[])` +
+Start added `StartGameResponse(mapData, itemSpawns[][])`.
+** `PointResponse(x,y)` spawn.
+* Chu trình điển hình:
+** Client send `CREATE_ROOM` -> receive `ROOM_UPDATE`  -> các client cập nhật danh sách qua `ROOM_LIST`.
+** Chủ phòng send `START_GAME` -> server phát `START_GAME` với `MapDataResponse` + `itemSpawns` -> client call `playOnline()`.
+** Mỗi phím nhấn/thả: gửi `BOMBER_ACTION` -> server broadcast lại -> `NetworkManager.keyAction()` .
+
+=== Game Loop Detail
+
+* Hằng số: `FPS`, `UPS` lấy từ `GameConstant`.
+SECOND = 1E9 ns.
+* Công thức: `FRAMES_PER_NANO_TIME = SECOND / FPS`, tương tự cho UPDATE.
+* Delta and Count: `frameDelta`, `updateDelta`, `secondDelta` (double) + đếm `frameCount`, `updateCount`.
+* Trình tự:
+** `updateTimer()`: tính elapsed ns, thêm vô delta.
+** `processUpdate()`: while `updateDelta >= 1` -> `gamePanel.update()` -> `GameContext.update()` -> `currentState.update()` ->  `GameManager.update()`.
+** `processRender()`: if `frameDelta >= 1` -> `gamePanel.repaint()` -> `paintComponent()` -> `GameContext.render()` -> `currentState.render()`.
+** `displayFPSandUPS()`: reset count.
+
+=== Map & Collision Handling
+
+* Map Loading: `MapManager.loadMap(mapType)` -> gọi `MapLoader.loadMapFromFilePath(assetKey)` -> parse từng dòng thành int[].
+* Spawn Extraction: tile == 6 được thêm vào `bomberSpawns` (tọa độ lưới).
+Sau đó chuyển thành vị trí pixel căn giữa theo số cột/hàng của màn hình (dịch bởi `spaceX`, `spaceY`).
+* Asset Tile: `MapLoader.loadMapAssets()` tạo ma trận sprite `[MapType][TileType]` với path template `MapConstant.IMAGE_PATH_TEMPLATE`.
+* Centering: dịch spawn bằng nửa phần dư màn hình: `(MAX_SCREEN_COLUMN - mapWidth) >>> 1`, `(MAX_SCREEN_ROW - mapHeight) >>> 1`.
+* Collision Conversion: `CollisionUtil.pixelToGridRow/Column(pixel, offset)` dựa trên `TILE_SIZE` để chuyển đổi.
+* Item Spawns: nếu Offline random 60% tạo item (qua `GameManager.getItemTypes()`), online nhận từ server `StartGameResponse.itemSpawns`.
+* Explosions & Bomb logic dựa trên grid align -> check (`SOFT_WALL`, `SOLID_WALL`).
+

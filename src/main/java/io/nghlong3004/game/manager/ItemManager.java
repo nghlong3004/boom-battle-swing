@@ -31,8 +31,8 @@ public class ItemManager {
         if (itemTypes == null) {
             return;
         }
-        int x = gridX / TILE_SIZE;
-        int y = gridY / TILE_SIZE;
+        int x = gridX - 1;
+        int y = gridY - 5;
         if (itemTypes[x][y] != ItemType.BLANK) {
             Item item = new Item(gridX, gridY, itemTypes[x][y]);
             items.add(item);

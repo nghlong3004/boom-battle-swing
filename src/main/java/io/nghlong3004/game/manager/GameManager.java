@@ -132,7 +132,7 @@ public class GameManager {
         for (int i = 0; i < n; ++i) {
             for (int j = 0; j < m; ++j) {
                 itemSpawns[i][j] = ItemType.BLANK;
-                if (Math.random() < 0.6) {
+                if (Math.random() < 0.9) {
                     ItemType randomType = ItemType.random();
                     itemSpawns[i][j] = randomType;
                 }
